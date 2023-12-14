@@ -1,7 +1,7 @@
-import {PostboyService} from "./postboy.service";
-import {BehaviorSubject, ReplaySubject, Subject} from "rxjs";
-import {Injectable, OnDestroy} from "@angular/core";
-import {IPostboyDependingService} from "./i-postboy-depending.service";
+import { PostboyService } from './postboy.service';
+import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
+import { Injectable, OnDestroy } from '@angular/core';
+import { IPostboyDependingService } from './i-postboy-depending.service';
 
 @Injectable()
 export abstract class PostboyAbstractRegistrator implements OnDestroy {
@@ -16,7 +16,7 @@ export abstract class PostboyAbstractRegistrator implements OnDestroy {
 
   public up(): void {
     this._up();
-    this.services.forEach(s => s.up());
+    this.services.forEach((s) => s.up());
   }
 
   protected abstract _up(): void;
@@ -26,17 +26,14 @@ export abstract class PostboyAbstractRegistrator implements OnDestroy {
     this.postboy.register(id, sub);
   }
 
-  protected registerReplay = <T>(id: string, bufferSize = 1) =>
-    this.register(id, new ReplaySubject<T>(bufferSize));
+  protected registerReplay = <T>(id: string, bufferSize = 1) => this.register(id, new ReplaySubject<T>(bufferSize));
 
-  protected registerBehavior = <T>(id: string, initial: T) =>
-    this.register(id, new BehaviorSubject<T>(initial));
+  protected registerBehavior = <T>(id: string, initial: T) => this.register(id, new BehaviorSubject<T>(initial));
 
-  protected registerSubject = <T>(id: string) =>
-    this.register(id, new Subject<T>());
+  protected registerSubject = <T>(id: string) => this.register(id, new Subject<T>());
 
   ngOnDestroy(): void {
     this.services = [];
-    this.ids.forEach(id => this.postboy.unregister(id));
+    this.ids.forEach((id) => this.postboy.unregister(id));
   }
 }

@@ -1,8 +1,9 @@
 import {PostboyService} from "./postboy.service";
 import {BehaviorSubject, ReplaySubject, Subject} from "rxjs";
-import {OnDestroy} from "@angular/core";
+import {Injectable, OnDestroy} from "@angular/core";
 import {IPostboyDependingService} from "./i-postboy-depending.service";
 
+@Injectable()
 export abstract class PostboyAbstractRegistrator implements OnDestroy {
   private ids: string[] = [];
   private services: IPostboyDependingService[] = [];

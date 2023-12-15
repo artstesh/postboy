@@ -31,8 +31,8 @@
     "url": "git+https://github.com/artstesh/maps.git"
   },
   "dependencies": {
-    "@angular/common": "^12.2.0",
-    "@angular/core": "^12.2.0",
+    "@angular/common": "^12.0.0",
+    "@angular/core": "^12.0.0",
     "rxjs": "^6.0.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.11.4"

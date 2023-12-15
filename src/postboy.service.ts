@@ -1,9 +1,7 @@
-import { Injectable, OnDestroy } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { PostboyGenericMessage } from './models/postboy-generic-message';
 
-@Injectable()
-export class PostboyService implements OnDestroy {
+export class PostboyService {
   private applications: { [id: string]: Subject<any> } = {};
 
   public register<T>(id: string, sub: Subject<T>): void {
@@ -26,5 +24,7 @@ export class PostboyService implements OnDestroy {
     this.applications[message.id].next(message);
   }
 
-  ngOnDestroy = () => Object.keys(this.applications).forEach((key) => this.unregister(key));
+  public ngOnDestroy(): void {
+    Object.keys(this.applications).forEach((key) => this.unregister(key));
+  }
 }

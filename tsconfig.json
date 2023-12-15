@@ -1,42 +1,26 @@
-/* To learn more about this file see: https://angular.io/config/tsconfig. */
 {
-  "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": "./",
-    "outDir": "./dist/out-tsc",
+    "outDir": "./lib",
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "declaration": true,
     "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "noImplicitReturns": true,
+    "lib": ["ES2021"],
+    "module": "commonjs",
+    "noEmitOnError": true,
     "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "pretty": true,
+    "declarationMap": true,
     "sourceMap": true,
-    "declaration": false,
-    "downlevelIteration": true,
-    "experimentalDecorators": true,
-    "moduleResolution": "node",
-    "importHelpers": true,
-    "target": "es2020",
-    "module": "es2020",
+    "strict": true,
+    "target": "ES2018",
     "skipLibCheck": true,
-    "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true,
-    "paths": {
-      "maps-components/*": [
-        "dist/maps-components/*"
-      ],
-      "maps-components": [
-        "dist/maps-components"
-      ]
-    },
-    "lib": [
-      "es2018",
-      "dom"
-    ]
+    "skipDefaultLibCheck": true
   },
-  "angularCompilerOptions": {
-    "enableI18nLegacyMessageIdFormat": false,
-    "strictInjectionParameters": true,
-    "strictInputAccessModifiers": true,
-    "strictTemplates": true,
-    "preserveSymlinks": true
-  }
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts"
+  ],
+  "include": ["src/**/*.ts"]
 }

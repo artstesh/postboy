@@ -1,10 +1,8 @@
 import { PostboyService } from './postboy.service';
 import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
-import { Injectable, OnDestroy } from '@angular/core';
 import { IPostboyDependingService } from './i-postboy-depending.service';
 
-@Injectable()
-export abstract class PostboyAbstractRegistrator implements OnDestroy {
+export abstract class PostboyAbstractRegistrator {
   private ids: string[] = [];
   private services: IPostboyDependingService[] = [];
 
@@ -32,7 +30,7 @@ export abstract class PostboyAbstractRegistrator implements OnDestroy {
 
   protected registerSubject = <T>(id: string) => this.register(id, new Subject<T>());
 
-  ngOnDestroy(): void {
+  public ngOnDestroy(): void {
     this.services = [];
     this.ids.forEach((id) => this.postboy.unregister(id));
   }

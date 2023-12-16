@@ -30,7 +30,7 @@ export abstract class PostboyAbstractRegistrator {
 
   protected registerSubject = <T>(id: string) => this.register(id, new Subject<T>());
 
-  public ngOnDestroy(): void {
+  public down(): void {
     this.services = [];
     this.ids.forEach((id) => this.postboy.unregister(id));
   }

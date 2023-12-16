@@ -1,9 +1,8 @@
-
 import { Forger } from '@artstesh/forger';
 import { Subject } from 'rxjs';
 import { should } from '@artstesh/it-should';
-import {PostboyService} from "./postboy.service";
-import {PostboyGenericMessage} from "./models/postboy-generic-message";
+import { PostboyService } from './postboy.service';
+import { PostboyGenericMessage } from './models/postboy-generic-message';
 
 class TestEvent extends PostboyGenericMessage {
   public static readonly ID = Forger.create<string>()!;
@@ -22,9 +21,7 @@ describe('PostboyService', () => {
     service.register(TestEvent.ID, new Subject<TestEvent>());
   });
 
-  afterEach(() => {
-
-  });
+  afterEach(() => {});
 
   it('success', () => {
     let testEvent = new TestEvent(Forger.create<number>()!);

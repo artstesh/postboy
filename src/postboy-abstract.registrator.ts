@@ -1,5 +1,5 @@
 import { PostboyService } from './postboy.service';
-import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
+import {BehaviorSubject, Observable, ReplaySubject, Subject} from 'rxjs';
 import { IPostboyDependingService } from './i-postboy-depending.service';
 
 export abstract class PostboyAbstractRegistrator {
@@ -22,6 +22,11 @@ export abstract class PostboyAbstractRegistrator {
   protected register<T>(id: string, sub: Subject<T>): void {
     this.ids.push(id);
     this.postboy.register(id, sub);
+  }
+
+  protected registerWithPipe<T>(id: string, sub: Subject<T>, pipe: (s: Subject<T>) => Observable<T>): void {
+    this.ids.push(id);
+    this.postboy.registerWithPipe(id, sub, pipe);
   }
 
   protected registerReplay = <T>(id: string, bufferSize = 1) => this.register(id, new ReplaySubject<T>(bufferSize));

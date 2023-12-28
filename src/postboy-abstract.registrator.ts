@@ -1,5 +1,5 @@
 import { PostboyService } from './postboy.service';
-import {BehaviorSubject, Observable, ReplaySubject, Subject} from 'rxjs';
+import { BehaviorSubject, Observable, ReplaySubject, Subject } from 'rxjs';
 import { IPostboyDependingService } from './i-postboy-depending.service';
 
 export abstract class PostboyAbstractRegistrator {

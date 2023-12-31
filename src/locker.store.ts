@@ -6,8 +6,8 @@ export class LockerStore {
   private locked = new Set<string>();
 
   addLocker(locker: PostboyLocker): void {
-    this.lockers[locker.locker] = locker.locking;
-    this.unlockers[locker.unlocker] = locker.locking;
+    if (locker.locker) this.lockers[locker.locker] = locker.locking;
+    if (locker.unlocker) this.unlockers[locker.unlocker] = locker.locking;
   }
 
   check(eventId: string): boolean {

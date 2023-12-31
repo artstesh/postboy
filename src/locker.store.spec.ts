@@ -36,7 +36,7 @@ describe('LockerStore', () => {
     const locker = Forger.create<PostboyLocker>()!;
     //
     store.addLocker(locker);
-    store.check(locker.locker);
+    store.check(locker.locker!);
     //
     should().false(store.check(locker.locking[0]));
   });
@@ -45,8 +45,8 @@ describe('LockerStore', () => {
     const locker = Forger.create<PostboyLocker>()!;
     //
     store.addLocker(locker);
-    store.check(locker.locker);
-    store.check(locker.unlocker);
+    store.check(locker.locker!);
+    store.check(locker.unlocker!);
     //
     should().true(store.check(locker.locking[0]));
   });

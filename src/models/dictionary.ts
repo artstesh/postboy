@@ -1,5 +1,5 @@
 export class Dictionary<T> {
-  public collection: DictionaryType<T> = {}
+  public collection: DictionaryType<T> = {};
   private _keys = new Set<string>();
 
   public get keys(): string[] {
@@ -26,8 +26,8 @@ export class Dictionary<T> {
 
   public find(predicate: (value: T) => boolean): T | null {
     let result: T | null = null;
-    this.forEach(e => {
-      if (result === null && predicate(e)) result = e
+    this.forEach((e) => {
+      if (result === null && predicate(e)) result = e;
     });
     return result;
   }

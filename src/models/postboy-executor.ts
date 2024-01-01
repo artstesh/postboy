@@ -1,3 +1,3 @@
-export abstract class PostboyExecutor<T>{
+export abstract class PostboyExecutor<T> {
   public abstract id: string;
 }

@@ -3,8 +3,8 @@ import { PostboyGenericMessage } from './models/postboy-generic-message';
 import { LockerStore } from './locker.store';
 import { PostboyLocker } from './models/postboy.locker';
 import { PostboySubscription } from './models/postboy-subscription';
-import {Dictionary} from "./models/dictionary";
-import {PostboyExecutor} from "./models/postboy-executor";
+import { Dictionary } from './models/dictionary';
+import { PostboyExecutor } from './models/postboy-executor';
 
 export class PostboyService {
   private applications = new Dictionary<PostboySubscription<any>>();
@@ -19,17 +19,17 @@ export class PostboyService {
     this.executors.put(id, exec);
   }
 
-  public execute<T>(executor: PostboyExecutor<T>) : T {
+  public execute<T>(executor: PostboyExecutor<T>): T {
     if (!this.executors.has(executor.id)) throw new Error(`There is no executor with id ${executor.id}`);
     return this.executors.take(executor.id)!(executor);
   }
 
   public register<T>(id: string, sub: Subject<T>): void {
-    this.applications.put(id,new PostboySubscription<T>(sub, (s) => s.asObservable()));
+    this.applications.put(id, new PostboySubscription<T>(sub, (s) => s.asObservable()));
   }
 
   public registerWithPipe<T>(id: string, sub: Subject<T>, pipe: (s: Subject<T>) => Observable<T>): void {
-    this.applications.put(id,new PostboySubscription<T>(sub, pipe));
+    this.applications.put(id, new PostboySubscription<T>(sub, pipe));
   }
 
   public unregister<T>(id: string): void {

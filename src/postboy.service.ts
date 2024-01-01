@@ -3,37 +3,48 @@ import { PostboyGenericMessage } from './models/postboy-generic-message';
 import { LockerStore } from './locker.store';
 import { PostboyLocker } from './models/postboy.locker';
 import { PostboySubscription } from './models/postboy-subscription';
+import {Dictionary} from "./models/dictionary";
+import {PostboyExecutor} from "./models/postboy-executor";
 
 export class PostboyService {
-  private applications: { [id: string]: PostboySubscription<any> } = {};
+  private applications = new Dictionary<PostboySubscription<any>>();
   private locker = new LockerStore();
+  private executors = new Dictionary<(e: PostboyExecutor<any>) => any>();
 
   public addLocker(locker: PostboyLocker): void {
     this.locker.addLocker(locker);
   }
 
+  public registerExecutor<T>(id: string, exec: (e: PostboyExecutor<T>) => T): void {
+    this.executors.put(id, exec);
+  }
+
+  public execute<T>(executor: PostboyExecutor<T>) : T {
+    if (!this.executors.has(executor.id)) throw new Error(`There is no executor with id ${executor.id}`);
+    return this.executors.take(executor.id)!(executor);
+  }
+
   public register<T>(id: string, sub: Subject<T>): void {
-    this.applications[id] = new PostboySubscription<T>(sub, (s) => s.asObservable());
+    this.applications.put(id,new PostboySubscription<T>(sub, (s) => s.asObservable()));
   }
 
   public registerWithPipe<T>(id: string, sub: Subject<T>, pipe: (s: Subject<T>) => Observable<T>): void {
-    this.applications[id] = new PostboySubscription<T>(sub, pipe);
+    this.applications.put(id,new PostboySubscription<T>(sub, pipe));
   }
 
   public unregister<T>(id: string): void {
-    if (!this.applications[id]?.sub) return;
-    this.applications[id].sub.complete();
-    delete this.applications[id];
+    this.applications.take(id)?.sub?.complete();
+    this.applications.rmv(id);
   }
 
   public subscribe<T>(id: string): Observable<T> {
-    const application = this.applications[id];
+    const application = this.applications.take(id);
     if (!application) throw new Error(`There is no event with id ${id}`);
     return application.pipe(application.sub);
   }
 
   public fire<T extends PostboyGenericMessage>(message: T): void {
-    if (!this.applications[message.id]?.sub) throw new Error(`There is no event with id ${message.id}`);
-    if (this.locker.check(message.id)) this.applications[message.id]?.sub.next(message);
+    if (!this.applications.take(message.id)?.sub) throw new Error(`There is no event with id ${message.id}`);
+    if (this.locker.check(message.id)) this.applications.take(message.id)?.sub.next(message);
   }
 }

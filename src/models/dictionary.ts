@@ -15,10 +15,9 @@ export class Dictionary<T> {
   }
 
   public static create<T>(dic: DictionaryType<T>, action?: (e: T, k: string) => T): Dictionary<T> {
-    let keyList = Object.keys(dic);
+    const keyList = Object.keys(dic);
     const result = new Dictionary<T>();
-    for (let i = 0; i < keyList.length; i++) {
-      let key = keyList[i];
+    for (const key of keyList) {
       result._keys.add(key);
       result.collection[key] = action ? action(dic[key], key) : dic[key];
     }
@@ -52,7 +51,7 @@ export class Dictionary<T> {
   }
 
   public forEach(callback: (value: T, index: number) => void): void {
-    let keys = Object.keys(this.collection);
+    const keys = Object.keys(this.collection);
     for (let i = 0; i < keys.length; i++) {
       callback(this.collection[keys[i]], i);
     }

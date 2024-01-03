@@ -1,6 +1,7 @@
 import { PostboyService } from './postboy.service';
 import { BehaviorSubject, Observable, ReplaySubject, Subject } from 'rxjs';
 import { IPostboyDependingService } from './i-postboy-depending.service';
+import {PostboyExecutor} from "./models/postboy-executor";
 
 export abstract class PostboyAbstractRegistrator {
   private ids: string[] = [];
@@ -18,6 +19,10 @@ export abstract class PostboyAbstractRegistrator {
   }
 
   protected abstract _up(): void;
+
+  protected registerExecutor<E extends PostboyExecutor<T>,T>(id: string, exec: (e: E) => T): void {
+    this.postboy.registerExecutor(id, exec);
+  }
 
   protected register<T>(id: string, sub: Subject<T>): void {
     this.ids.push(id);

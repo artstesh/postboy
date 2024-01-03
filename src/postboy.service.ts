@@ -15,11 +15,11 @@ export class PostboyService {
     this.locker.addLocker(locker);
   }
 
-  public registerExecutor<T>(id: string, exec: (e: PostboyExecutor<T>) => T): void {
-    this.executors.put(id, exec);
+  public registerExecutor<E extends PostboyExecutor<T>,T>(id: string, exec: (e: E) => T): void {
+    this.executors.put(id, exec as any);
   }
 
-  public execute<T>(executor: PostboyExecutor<T>): T {
+  public execute<E extends PostboyExecutor<T>,T>(executor: E): T {
     if (!this.executors.has(executor.id)) throw new Error(`There is no executor with id ${executor.id}`);
     return this.executors.take(executor.id)!(executor);
   }

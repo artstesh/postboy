@@ -1,7 +1,7 @@
-import { LockerStore } from './locker.store';
-import { should } from '@artstesh/it-should';
-import { Forger } from '@artstesh/forger';
-import { PostboyLocker } from './models/postboy.locker';
+import {LockerStore} from './locker.store';
+import {PostboyLocker} from './models/postboy.locker';
+import {should} from "@artstesh/it-should";
+import {Forger} from "@artstesh/forger";
 
 describe('LockerStore', () => {
   let store: LockerStore;
@@ -25,7 +25,7 @@ describe('LockerStore', () => {
   });
 
   it('do not lock without check', () => {
-    const locker = Forger.create<PostboyLocker>()!;
+    const locker: PostboyLocker = {locking: Forger.create<string[]>()!};
     //
     store.addLocker(locker);
     //
@@ -33,7 +33,7 @@ describe('LockerStore', () => {
   });
 
   it('lock success', () => {
-    const locker = Forger.create<PostboyLocker>()!;
+    const locker: PostboyLocker = {locking: Forger.create<string[]>()!, locker: Forger.create<string>()};
     //
     store.addLocker(locker);
     store.check(locker.locker!);
@@ -42,7 +42,10 @@ describe('LockerStore', () => {
   });
 
   it('unlock success', () => {
-    const locker = Forger.create<PostboyLocker>()!;
+    const locker: PostboyLocker = {locking: Forger.create<string[]>()!,
+      locker: Forger.create<string>(),
+      unlocker: Forger.create<string>(),
+    };
     //
     store.addLocker(locker);
     store.check(locker.locker!);

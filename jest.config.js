@@ -1,11 +1,11 @@
 /** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
 module.exports = {
-  preset: 'ts-jest',
-  globals: {
-    'ts-jest': {
+  preset: 'ts-jest', extensionsToTreatAsEsm: ['.ts'],
+  transform: {
+    ".*.spec.ts": ["ts-jest", {
       astTransformers: {
-        before: ['@artstesh/forger']
+        before: ['@artstesh/forger/lib/utils/transformer']
       }
-    }
+    }]
   }
 };

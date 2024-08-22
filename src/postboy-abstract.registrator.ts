@@ -7,7 +7,7 @@ export abstract class PostboyAbstractRegistrator {
   private ids: string[] = [];
   private services: IPostboyDependingService[] = [];
 
-  constructor(private postboy: PostboyService) {}
+  constructor(protected postboy: PostboyService) {}
 
   protected registerServices(services: IPostboyDependingService[]): void {
     this.services = services;

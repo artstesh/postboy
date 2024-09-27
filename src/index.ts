@@ -3,6 +3,7 @@
  */
 
 export * from './postboy.service';
+export * from './mocks/postboy-service-mock';
 export * from './i-postboy-depending.service';
 export * from './postboy-abstract.registrator';
 export * from './models/postboy-generic-message';

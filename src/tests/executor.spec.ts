@@ -1,7 +1,7 @@
-import {Forger} from '@artstesh/forger';
-import {should} from '@artstesh/it-should';
-import {PostboyExecutor} from "../models/postboy-executor";
-import {PostboyService} from "../postboy.service";
+import { Forger } from '@artstesh/forger';
+import { should } from '@artstesh/it-should';
+import { PostboyExecutor } from '../models/postboy-executor';
+import { PostboyService } from '../postboy.service';
 
 class TestExecutor extends PostboyExecutor<string> {
   public get id() {
@@ -22,9 +22,7 @@ describe('Executor', () => {
     service = new PostboyService();
   });
 
-  afterEach(() => {
-
-  });
+  afterEach(() => {});
 
   describe('executors', () => {
     it('success', () => {

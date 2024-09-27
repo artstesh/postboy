@@ -1,9 +1,9 @@
 import { Forger } from '@artstesh/forger';
 import { Subject } from 'rxjs';
 import { should } from '@artstesh/it-should';
-import {PostboyGenericMessage} from "../models/postboy-generic-message";
-import {PostboyService} from "../postboy.service";
-import {PostboyCallbackMessage} from "../models/postboy-callback.message";
+import { PostboyGenericMessage } from '../models/postboy-generic-message';
+import { PostboyService } from '../postboy.service';
+import { PostboyCallbackMessage } from '../models/postboy-callback.message';
 
 class TestEvent extends PostboyCallbackMessage<string> {
   public static readonly ID = Forger.create<string>()!;
@@ -31,7 +31,7 @@ describe('CallbackMessage', () => {
     testEvent.result.subscribe((e) => (gotValue = e));
     service.fire(testEvent);
     //
-    testEvent.finish(expected)
+    testEvent.finish(expected);
     //
     should().string(gotValue!).equals(expected);
   });

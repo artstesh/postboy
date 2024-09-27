@@ -1,9 +1,9 @@
-import {PostboyService} from "../postboy.service";
-import {Observable, pipe, Subject} from "rxjs";
-import {PostboyExecutor} from "../models/postboy-executor";
-import {PostboyGenericMessage} from "../models/postboy-generic-message";
+import { PostboyService } from '../postboy.service';
+import { Observable, pipe, Subject } from 'rxjs';
+import { PostboyExecutor } from '../models/postboy-executor';
+import { PostboyGenericMessage } from '../models/postboy-generic-message';
 
-export class PostboyServiceMock extends PostboyService{
+export class PostboyServiceMock extends PostboyService {
   private executions: string[] = [];
   private subscriptions: string[] = [];
   private fires: string[] = [];
@@ -15,21 +15,21 @@ export class PostboyServiceMock extends PostboyService{
   }
 
   fired(id: string, times: number = 0): boolean {
-    const count = this.count(this.fires, id)
+    const count = this.count(this.fires, id);
     return !!count && (!times || count === times);
   }
 
   executed(id: string, times: number = 0): boolean {
-    const count = this.count(this.executions, id)
+    const count = this.count(this.executions, id);
     return !!count && (!times || count === times);
   }
 
   subscribed(id: string, times: number = 0): boolean {
-    const count = this.count(this.subscriptions, id)
+    const count = this.count(this.subscriptions, id);
     return !!count && (!times || count === times);
   }
 
-  private count = (collection: string[], el: string) => collection.filter(e => e === el).length;
+  private count = (collection: string[], el: string) => collection.filter((e) => e === el).length;
 
   execute<E extends PostboyExecutor<T>, T>(executor: E): T {
     this.executions.push(executor.id);

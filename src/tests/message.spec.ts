@@ -1,9 +1,8 @@
 import { Forger } from '@artstesh/forger';
 import { Subject } from 'rxjs';
 import { should } from '@artstesh/it-should';
-import { PostboyService } from './postboy.service';
-import { PostboyGenericMessage } from './models/postboy-generic-message';
-import { PostboyExecutor } from './models/postboy-executor';
+import {PostboyGenericMessage} from "../models/postboy-generic-message";
+import {PostboyService} from "../postboy.service";
 
 class TestEvent extends PostboyGenericMessage {
   public static readonly ID = Forger.create<string>()!;
@@ -13,19 +12,8 @@ class TestEvent extends PostboyGenericMessage {
     super();
   }
 }
-class TestExecutor extends PostboyExecutor<string> {
-  public get id() {
-    return TestExecutor.ID;
-  }
 
-  public static ID = 'TestExecutor';
-
-  constructor() {
-    super();
-  }
-}
-
-describe('PostboyService', () => {
+describe('GenericMessage', () => {
   let service: PostboyService;
 
   beforeEach(() => {
@@ -43,14 +31,5 @@ describe('PostboyService', () => {
     service.fire(testEvent);
     //
     should().number(gotValue!).equals(testEvent.value);
-  });
-
-  describe('executors', () => {
-    it('success', () => {
-      const result = Forger.create<string>()!;
-      service.registerExecutor(TestExecutor.ID, (e: TestExecutor) => result);
-      //
-      should().string(service.execute(new TestExecutor())).equals(result);
-    });
   });
 });

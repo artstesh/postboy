@@ -9,7 +9,7 @@ export abstract class PostboyAbstractRegistrator {
 
   constructor(protected postboy: PostboyService) {}
 
-  protected registerServices(services: IPostboyDependingService[]): void {
+  public registerServices(services: IPostboyDependingService[]): void {
     this.services = services;
   }
 
@@ -20,25 +20,25 @@ export abstract class PostboyAbstractRegistrator {
 
   protected abstract _up(): void;
 
-  protected registerExecutor<E extends PostboyExecutor<T>, T>(id: string, exec: (e: E) => T): void {
+  public registerExecutor<E extends PostboyExecutor<T>, T>(id: string, exec: (e: E) => T): void {
     this.postboy.registerExecutor(id, exec);
   }
 
-  protected register<T>(id: string, sub: Subject<T>): void {
+  public register<T>(id: string, sub: Subject<T>): void {
     this.ids.push(id);
     this.postboy.register(id, sub);
   }
 
-  protected registerWithPipe<T>(id: string, sub: Subject<T>, pipe: (s: Subject<T>) => Observable<T>): void {
+  public registerWithPipe<T>(id: string, sub: Subject<T>, pipe: (s: Subject<T>) => Observable<T>): void {
     this.ids.push(id);
     this.postboy.registerWithPipe(id, sub, pipe);
   }
 
-  protected registerReplay = <T>(id: string, bufferSize = 1) => this.register(id, new ReplaySubject<T>(bufferSize));
+  public registerReplay = <T>(id: string, bufferSize = 1) => this.register(id, new ReplaySubject<T>(bufferSize));
 
-  protected registerBehavior = <T>(id: string, initial: T) => this.register(id, new BehaviorSubject<T>(initial));
+  public registerBehavior = <T>(id: string, initial: T) => this.register(id, new BehaviorSubject<T>(initial));
 
-  protected registerSubject = <T>(id: string) => this.register(id, new Subject<T>());
+  public registerSubject = <T>(id: string) => this.register(id, new Subject<T>());
 
   public down(): void {
     this.services = [];

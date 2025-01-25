@@ -41,6 +41,11 @@ export class PostboyServiceMock extends PostboyService {
     return super.subscribe(id);
   }
 
+  public sub<T extends PostboyGenericMessage>(type: { new (...args: any[]): T ;}): Observable<T> {
+    this.subscriptions.push(type.name);
+    return super.subscribe(type.name);
+  }
+
   fire<T extends PostboyGenericMessage>(message: T) {
     this.fires.push(message.id);
     super.fire(message);

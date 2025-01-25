@@ -1,3 +1,3 @@
-export abstract class PostboyGenericMessage {
-  public abstract id: string;
+export abstract class PostboyGenericMessage{
+  public abstract id?: string;
 }

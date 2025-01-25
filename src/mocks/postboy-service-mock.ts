@@ -1,7 +1,7 @@
-import { PostboyService } from '../postboy.service';
-import { Observable, pipe, Subject } from 'rxjs';
-import { PostboyExecutor } from '../models/postboy-executor';
-import { PostboyGenericMessage } from '../models/postboy-generic-message';
+import {PostboyService} from '../postboy.service';
+import {Observable} from 'rxjs';
+import {PostboyExecutor} from '../models/postboy-executor';
+import {PostboyGenericMessage} from '../models/postboy-generic-message';
 
 export class PostboyServiceMock extends PostboyService {
   private executions: string[] = [];
@@ -32,7 +32,7 @@ export class PostboyServiceMock extends PostboyService {
   private count = (collection: string[], el: string) => collection.filter((e) => e === el).length;
 
   execute<E extends PostboyExecutor<T>, T>(executor: E): T {
-    this.executions.push(executor.id);
+    this.executions.push(executor.id??executor.constructor.name);
     return super.execute(executor);
   }
 
@@ -47,7 +47,7 @@ export class PostboyServiceMock extends PostboyService {
   }
 
   fire<T extends PostboyGenericMessage>(message: T) {
-    this.fires.push(message.id);
+    this.fires.push(message.id??message.constructor.name);
     super.fire(message);
   }
 }

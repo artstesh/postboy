@@ -1,8 +1,7 @@
-import { PostboyService } from './postboy.service';
-import { BehaviorSubject, Observable, ReplaySubject, Subject } from 'rxjs';
-import { IPostboyDependingService } from './i-postboy-depending.service';
-import { PostboyExecutor } from './models/postboy-executor';
-import {Dictionary} from "./models/dictionary";
+import {PostboyService} from './postboy.service';
+import {BehaviorSubject, Observable, ReplaySubject, Subject} from 'rxjs';
+import {IPostboyDependingService} from './i-postboy-depending.service';
+import {PostboyExecutor} from './models/postboy-executor';
 
 export abstract class PostboyAbstractRegistrator {
   private ids: string[] = [];

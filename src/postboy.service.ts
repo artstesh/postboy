@@ -23,7 +23,7 @@ export class PostboyService {
   }
 
   public execute<T>(executor: PostboyExecutor<T>): T {
-    const id = executor.id??executor.constructor.name;
+    const id = executor.id ?? executor.constructor.name;
     if (!this.executors.has(id)) throw new Error(`There is no executor with id ${id}`);
     return this.executors.take(id)!(executor);
   }
@@ -57,7 +57,7 @@ export class PostboyService {
   }
 
   public fire<T extends PostboyGenericMessage>(message: T): void {
-    const id = message.id??message.constructor.name;
+    const id = message.id ?? message.constructor.name;
     if (!this.applications.take(id)?.sub) throw new Error(`There is no event with id ${id}`);
     if (this.locker.check(id)) this.applications.take(id)?.sub.next(message);
   }
@@ -74,7 +74,11 @@ export class PostboyService {
     this.applications.put(type.name, new PostboySubscription<T>(sub, (s) => s.asObservable()));
   }
 
-  public recordWithPipe<T>(type: new (...args: any[]) => T, sub: Subject<T>, pipe: (s: Subject<T>) => Observable<T>): void {
+  public recordWithPipe<T>(
+    type: new (...args: any[]) => T,
+    sub: Subject<T>,
+    pipe: (s: Subject<T>) => Observable<T>,
+  ): void {
     this.applications.put(type.name, new PostboySubscription<T>(sub, pipe));
   }
 

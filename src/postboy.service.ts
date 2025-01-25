@@ -64,7 +64,7 @@ export class PostboyService {
 
   // future
 
-  public sub<T extends PostboyGenericMessage>(type: { new (...args: any[]): T ;}): Observable<T> {
+  public sub<T extends PostboyGenericMessage>(type: new (...args: any[]) => T): Observable<T> {
     const application = this.applications.take(type.name);
     if (!application) throw new Error(`There is no event with id ${type.name}`);
     return application.pipe(application.sub);

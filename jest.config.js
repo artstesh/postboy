@@ -7,5 +7,7 @@ module.exports = {
         before: ['@artstesh/forger/lib/utils/transformer']
       }
     }]
-  }
+  },
+  coverageDirectory: 'coverage',
+  rootDir: 'src'
 };

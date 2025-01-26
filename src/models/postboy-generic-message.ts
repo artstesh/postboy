@@ -1,3 +1,3 @@
 export abstract class PostboyGenericMessage {
-  public abstract id?: string;
+  public get id(): string | undefined {return undefined;}
 }

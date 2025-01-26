@@ -1,13 +1,14 @@
 import { Forger } from '@artstesh/forger';
 import { Subject } from 'rxjs';
 import { should } from '@artstesh/it-should';
-import { PostboyGenericMessage } from '../models/postboy-generic-message';
 import { PostboyService } from '../postboy.service';
 import { PostboyCallbackMessage } from '../models/postboy-callback.message';
 
 class TestEvent extends PostboyCallbackMessage<string> {
   public static readonly ID = Forger.create<string>()!;
-  id: string = TestEvent.ID;
+  public get id(): string {
+    return TestEvent.ID;
+  }
 
   constructor() {
     super();

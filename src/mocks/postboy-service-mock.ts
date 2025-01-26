@@ -31,9 +31,9 @@ export class PostboyServiceMock extends PostboyService {
 
   private count = (collection: string[], el: string) => collection.filter((e) => e === el).length;
 
-  execute<E extends PostboyExecutor<T>, T>(executor: E): T {
+  exec<E extends PostboyExecutor<T>, T>(executor: E): T {
     this.executions.push(executor.id ?? executor.constructor.name);
-    return super.execute(executor);
+    return super.exec(executor);
   }
 
   subscribe<T>(id: string): Observable<T> {

@@ -22,7 +22,10 @@ export class PostboyService {
     this.executors.put(id, exec as any);
   }
 
-  public execute<T>(executor: PostboyExecutor<T>): T {
+  /**
+   * @deprecated The method should be replaced with exec<T>
+   */
+  public execute<E extends PostboyExecutor<T>, T>(executor: E): T {
     const id = executor.id ?? executor.constructor.name;
     if (!this.executors.has(id)) throw new Error(`There is no executor with id ${id}`);
     return this.executors.take(id)!(executor);
@@ -63,7 +66,6 @@ export class PostboyService {
   }
 
   // future
-
   public sub<T extends PostboyGenericMessage>(type: new (...args: any[]) => T): Observable<T> {
     const application = this.applications.take(type.name);
     if (!application) throw new Error(`There is no event with id ${type.name}`);
@@ -81,8 +83,14 @@ export class PostboyService {
   ): void {
     this.applications.put(type.name, new PostboySubscription<T>(sub, pipe));
   }
+  
+  public recordExecutor<E extends PostboyExecutor<T>,T>(type: new (...args: any[]) => E, exec: (e: E) => T): void {
+    this.executors.put(type.name, exec as any);
+  }
 
-  public recordExecutor<T>(type: new (...args: any[]) => PostboyExecutor<T>, exec: (e: PostboyExecutor<T>) => T): void {
-    this.executors.put(type.name, exec);
+  public exec<T>(executor: PostboyExecutor<T>): T {
+    const id = executor.id ?? executor.constructor.name;
+    if (!this.executors.has(id)) throw new Error(`There is no executor with id ${id}`);
+    return this.executors.take(id)!(executor);
   }
 }

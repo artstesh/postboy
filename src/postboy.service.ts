@@ -83,8 +83,8 @@ export class PostboyService {
   ): void {
     this.applications.put(type.name, new PostboySubscription<T>(sub, pipe));
   }
-  
-  public recordExecutor<E extends PostboyExecutor<T>,T>(type: new (...args: any[]) => E, exec: (e: E) => T): void {
+
+  public recordExecutor<E extends PostboyExecutor<T>, T>(type: new (...args: any[]) => E, exec: (e: E) => T): void {
     this.executors.put(type.name, exec as any);
   }
 

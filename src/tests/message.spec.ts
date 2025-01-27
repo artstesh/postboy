@@ -6,7 +6,9 @@ import { PostboyService } from '../postboy.service';
 
 class TestEvent extends PostboyGenericMessage {
   public static readonly ID = Forger.create<string>()!;
-  id: string = TestEvent.ID;
+  public get id(): string {
+    return TestEvent.ID;
+  }
 
   constructor(public value: number) {
     super();

@@ -4,11 +4,9 @@ import { PostboyExecutor } from '../models/postboy-executor';
 import { PostboyService } from '../postboy.service';
 
 class TestExecutor extends PostboyExecutor<string> {
-  public get id() {
-    return TestExecutor.ID;
+  public get id(): string {
+    return TestExecutor.name;
   }
-
-  public static ID = 'TestExecutor';
 
   constructor() {
     super();
@@ -25,11 +23,20 @@ describe('Executor', () => {
   afterEach(() => {});
 
   describe('executors', () => {
-    it('success', () => {
+    it('register,execute success', () => {
       const result = Forger.create<string>()!;
-      service.registerExecutor(TestExecutor.ID, (e: TestExecutor) => result);
+      service.registerExecutor(TestExecutor.name, (e: TestExecutor) => result);
       //
-      should().string(service.execute(new TestExecutor())).equals(result);
+      let entry = service.execute<TestExecutor, string>(new TestExecutor());
+      should().string(entry).equals(result);
     });
+  });
+
+  it('record,execute success', () => {
+    const result = Forger.create<string>()!;
+    service.recordExecutor(TestExecutor, (e) => result);
+    //
+    let entry = service.exec<string>(new TestExecutor());
+    should().string(entry).equals(result);
   });
 });

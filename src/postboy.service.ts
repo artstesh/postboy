@@ -5,6 +5,7 @@ import { PostboyLocker } from './models/postboy.locker';
 import { PostboySubscription } from './models/postboy-subscription';
 import { Dictionary } from './models/dictionary';
 import { PostboyExecutor } from './models/postboy-executor';
+import { PostboyCallbackMessage } from './models/postboy-callback.message';
 
 export class PostboyService {
   private applications = new Dictionary<PostboySubscription<any>>();
@@ -15,36 +16,89 @@ export class PostboyService {
     this.locker.addLocker(locker);
   }
 
+  /**
+   * @deprecated The method should be replaced with recordExecutor<T>
+   */
   public registerExecutor<E extends PostboyExecutor<T>, T>(id: string, exec: (e: E) => T): void {
     this.executors.put(id, exec as any);
   }
 
+  /**
+   * @deprecated The method should be replaced with exec<T>
+   */
   public execute<E extends PostboyExecutor<T>, T>(executor: E): T {
-    if (!this.executors.has(executor.id)) throw new Error(`There is no executor with id ${executor.id}`);
-    return this.executors.take(executor.id)!(executor);
+    const id = executor.id ?? executor.constructor.name;
+    if (!this.executors.has(id)) throw new Error(`There is no executor with id ${id}`);
+    return this.executors.take(id)!(executor);
   }
 
+  /**
+   * @deprecated The method should be replaced with record<T>
+   */
   public register<T>(id: string, sub: Subject<T>): void {
     this.applications.put(id, new PostboySubscription<T>(sub, (s) => s.asObservable()));
   }
 
+  /**
+   * @deprecated The method should be replaced with recordWithPipe<T>
+   */
   public registerWithPipe<T>(id: string, sub: Subject<T>, pipe: (s: Subject<T>) => Observable<T>): void {
     this.applications.put(id, new PostboySubscription<T>(sub, pipe));
   }
 
-  public unregister<T>(id: string): void {
+  public unregister(id: string): void {
     this.applications.take(id)?.sub?.complete();
     this.applications.rmv(id);
   }
 
+  /**
+   * @deprecated The method should be replaced with sub<T>
+   */
   public subscribe<T>(id: string): Observable<T> {
     const application = this.applications.take(id);
     if (!application) throw new Error(`There is no event with id ${id}`);
     return application.pipe(application.sub);
   }
 
-  public fire<T extends PostboyGenericMessage>(message: T): void {
-    if (!this.applications.take(message.id)?.sub) throw new Error(`There is no event with id ${message.id}`);
-    if (this.locker.check(message.id)) this.applications.take(message.id)?.sub.next(message);
+  public fire(message: PostboyGenericMessage): void {
+    const id = message.id ?? message.constructor.name;
+    if (!this.applications.take(id)?.sub) throw new Error(`There is no event with id ${id}`);
+    if (this.locker.check(id)) this.applications.take(id)?.sub.next(message);
+  }
+
+  public fireCallback<T>(message: PostboyCallbackMessage<T>, action: (e: T) => void): void {
+    const id = message.id ?? message.constructor.name;
+    if (!this.applications.take(id)?.sub) throw new Error(`There is no event with id ${id}`);
+    message.result.subscribe(action);
+    if (this.locker.check(id)) this.applications.take(id)?.sub.next(message);
+  }
+
+  // future
+  public sub<T extends PostboyGenericMessage>(type: new (...args: any[]) => T): Observable<T> {
+    const application = this.applications.take(type.name);
+    if (!application) throw new Error(`There is no event with id ${type.name}`);
+    return application.pipe(application.sub);
+  }
+
+  public record<T>(type: new (...args: any[]) => T, sub: Subject<T>): void {
+    this.applications.put(type.name, new PostboySubscription<T>(sub, (s) => s.asObservable()));
+  }
+
+  public recordWithPipe<T>(
+    type: new (...args: any[]) => T,
+    sub: Subject<T>,
+    pipe: (s: Subject<T>) => Observable<T>,
+  ): void {
+    this.applications.put(type.name, new PostboySubscription<T>(sub, pipe));
+  }
+
+  public recordExecutor<E extends PostboyExecutor<T>, T>(type: new (...args: any[]) => E, exec: (e: E) => T): void {
+    this.executors.put(type.name, exec as any);
+  }
+
+  public exec<T>(executor: PostboyExecutor<T>): T {
+    const id = executor.id ?? executor.constructor.name;
+    if (!this.executors.has(id)) throw new Error(`There is no executor with id ${id}`);
+    return this.executors.take(id)!(executor);
   }
 }

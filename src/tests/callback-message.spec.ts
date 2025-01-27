@@ -4,8 +4,7 @@ import { should } from '@artstesh/it-should';
 import { PostboyService } from '../postboy.service';
 import { PostboyCallbackMessage } from '../models/postboy-callback.message';
 
-class TestEvent extends PostboyCallbackMessage<string> {
-}
+class TestEvent extends PostboyCallbackMessage<string> {}
 
 describe('CallbackMessage', () => {
   let service: PostboyService;
@@ -21,7 +20,7 @@ describe('CallbackMessage', () => {
     let testEvent = new TestEvent();
     const expected = Forger.create<string>()!;
     let gotValue: string;
-    service.fireCallback(testEvent,e => (gotValue = e));
+    service.fireCallback(testEvent, (e) => (gotValue = e));
     //
     testEvent.finish(expected);
     //

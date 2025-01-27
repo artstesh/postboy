@@ -5,7 +5,7 @@ import { PostboyLocker } from './models/postboy.locker';
 import { PostboySubscription } from './models/postboy-subscription';
 import { Dictionary } from './models/dictionary';
 import { PostboyExecutor } from './models/postboy-executor';
-import {PostboyCallbackMessage} from "./models/postboy-callback.message";
+import { PostboyCallbackMessage } from './models/postboy-callback.message';
 
 export class PostboyService {
   private applications = new Dictionary<PostboySubscription<any>>();
@@ -66,7 +66,7 @@ export class PostboyService {
     if (this.locker.check(id)) this.applications.take(id)?.sub.next(message);
   }
 
-  public fireCallback<T>(message: PostboyCallbackMessage<T>, action: (e:T) => void): void {
+  public fireCallback<T>(message: PostboyCallbackMessage<T>, action: (e: T) => void): void {
     const id = message.id ?? message.constructor.name;
     if (!this.applications.take(id)?.sub) throw new Error(`There is no event with id ${id}`);
     message.result.subscribe(action);

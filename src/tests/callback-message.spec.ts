@@ -5,14 +5,6 @@ import { PostboyService } from '../postboy.service';
 import { PostboyCallbackMessage } from '../models/postboy-callback.message';
 
 class TestEvent extends PostboyCallbackMessage<string> {
-  public static readonly ID = Forger.create<string>()!;
-  public get id(): string {
-    return TestEvent.ID;
-  }
-
-  constructor() {
-    super();
-  }
 }
 
 describe('CallbackMessage', () => {
@@ -20,7 +12,7 @@ describe('CallbackMessage', () => {
 
   beforeEach(() => {
     service = new PostboyService();
-    service.register(TestEvent.ID, new Subject<TestEvent>());
+    service.record(TestEvent, new Subject<TestEvent>());
   });
 
   afterEach(() => {});
@@ -29,8 +21,7 @@ describe('CallbackMessage', () => {
     let testEvent = new TestEvent();
     const expected = Forger.create<string>()!;
     let gotValue: string;
-    testEvent.result.subscribe((e) => (gotValue = e));
-    service.fire(testEvent);
+    service.fireCallback(testEvent,e => (gotValue = e));
     //
     testEvent.finish(expected);
     //

@@ -27,10 +27,7 @@ export abstract class PostboyAbstractRegistrator {
     this.postboy.registerExecutor(id, exec);
   }
 
-  public recordExecutor<E extends PostboyExecutor<T>, T>(
-    type: new (...args: any[]) => E,
-    exec: (e: E) => T,
-  ): void {
+  public recordExecutor<E extends PostboyExecutor<T>, T>(type: new (...args: any[]) => E, exec: (e: E) => T): void {
     this.postboy.recordExecutor(type, exec);
   }
 

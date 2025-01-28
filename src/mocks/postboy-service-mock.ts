@@ -2,7 +2,7 @@ import { PostboyService } from '../postboy.service';
 import { Observable } from 'rxjs';
 import { PostboyExecutor } from '../models/postboy-executor';
 import { PostboyGenericMessage } from '../models/postboy-generic-message';
-import {PostboyCallbackMessage} from "../models/postboy-callback.message";
+import { PostboyCallbackMessage } from '../models/postboy-callback.message';
 
 export class PostboyServiceMock extends PostboyService {
   private executions: string[] = [];

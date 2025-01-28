@@ -2,6 +2,7 @@ import { PostboyService } from '../postboy.service';
 import { Observable } from 'rxjs';
 import { PostboyExecutor } from '../models/postboy-executor';
 import { PostboyGenericMessage } from '../models/postboy-generic-message';
+import { PostboyCallbackMessage } from '../models/postboy-callback.message';
 
 export class PostboyServiceMock extends PostboyService {
   private executions: string[] = [];
@@ -49,5 +50,10 @@ export class PostboyServiceMock extends PostboyService {
   fire<T extends PostboyGenericMessage>(message: T) {
     this.fires.push(message.id ?? message.constructor.name);
     super.fire(message);
+  }
+
+  fireCallback<T>(message: PostboyCallbackMessage<T>, action: (e: T) => void): void {
+    this.fires.push(message.id ?? message.constructor.name);
+    super.fireCallback(message, action);
   }
 }

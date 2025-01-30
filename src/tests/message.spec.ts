@@ -3,7 +3,7 @@ import { Subject } from 'rxjs';
 import { should } from '@artstesh/it-should';
 import { PostboyGenericMessage } from '../models/postboy-generic-message';
 import { PostboyService } from '../postboy.service';
-import {PostboyCallbackMessage} from "../models/postboy-callback.message";
+import { PostboyCallbackMessage } from '../models/postboy-callback.message';
 
 class TestEvent extends PostboyGenericMessage {
   static ID = 'b1c82888';
@@ -34,8 +34,8 @@ describe('GenericMessage', () => {
   });
 
   it('throws without id', () => {
-    class ErrorEvent extends PostboyGenericMessage {    }
+    class ErrorEvent extends PostboyGenericMessage {}
     //
-    expect(() =>service.record(ErrorEvent, new Subject<ErrorEvent>())).toThrow();
-  })
+    expect(() => service.record(ErrorEvent, new Subject<ErrorEvent>())).toThrow();
+  });
 });

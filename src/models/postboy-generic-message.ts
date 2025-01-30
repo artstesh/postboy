@@ -6,7 +6,7 @@ export abstract class PostboyGenericMessage {
     return (this.constructor as any).ID;
   }
 }
- export function checkId(message: new (...args: any[]) => any): string {
+export function checkId(message: new (...args: any[]) => any): string {
   if (!(message as any).ID) throw new Error(`${message.name} should have a static ID field`);
   return (message as any).ID;
- }
+}

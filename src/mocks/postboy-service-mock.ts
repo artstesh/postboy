@@ -1,7 +1,7 @@
 import { PostboyService } from '../postboy.service';
 import { Observable } from 'rxjs';
 import { PostboyExecutor } from '../models/postboy-executor';
-import {checkId, PostboyGenericMessage} from '../models/postboy-generic-message';
+import { checkId, PostboyGenericMessage } from '../models/postboy-generic-message';
 import { PostboyCallbackMessage } from '../models/postboy-callback.message';
 
 export class PostboyServiceMock extends PostboyService {

@@ -1,5 +1,5 @@
 import { Observable, Subject } from 'rxjs';
-import {checkId, PostboyGenericMessage} from './models/postboy-generic-message';
+import { checkId, PostboyGenericMessage } from './models/postboy-generic-message';
 import { LockerStore } from './locker.store';
 import { PostboyLocker } from './models/postboy.locker';
 import { PostboySubscription } from './models/postboy-subscription';
@@ -27,7 +27,8 @@ export class PostboyService {
    * @deprecated The method should be replaced with exec<T>
    */
   public execute<E extends PostboyExecutor<T>, T>(executor: E): T {
-    if (!this.executors.has(executor.id)) throw new Error(`There is no registered executor ${executor.constructor.name}`);
+    if (!this.executors.has(executor.id))
+      throw new Error(`There is no registered executor ${executor.constructor.name}`);
     return this.executors.take(executor.id)!(executor);
   }
 
@@ -60,12 +61,14 @@ export class PostboyService {
   }
 
   public fire(message: PostboyGenericMessage): void {
-    if (!this.applications.take(message.id)?.sub) throw new Error(`There is no registered event ${message.constructor.name}`);
+    if (!this.applications.take(message.id)?.sub)
+      throw new Error(`There is no registered event ${message.constructor.name}`);
     if (this.locker.check(message.id)) this.applications.take(message.id)?.sub.next(message);
   }
 
   public fireCallback<T>(message: PostboyCallbackMessage<T>, action: (e: T) => void): void {
-    if (!this.applications.take(message.id)?.sub) throw new Error(`There is no registered event ${message.constructor.name}`);
+    if (!this.applications.take(message.id)?.sub)
+      throw new Error(`There is no registered event ${message.constructor.name}`);
     message.result.subscribe(action);
     if (this.locker.check(message.id)) this.applications.take(message.id)?.sub.next(message);
   }

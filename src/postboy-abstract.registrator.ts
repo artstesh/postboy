@@ -2,7 +2,7 @@ import { PostboyService } from './postboy.service';
 import { BehaviorSubject, Observable, ReplaySubject, Subject } from 'rxjs';
 import { IPostboyDependingService } from './i-postboy-depending.service';
 import { PostboyExecutor } from './models/postboy-executor';
-import {checkId, PostboyGenericMessage} from "./models/postboy-generic-message";
+import { checkId, PostboyGenericMessage } from './models/postboy-generic-message';
 
 export abstract class PostboyAbstractRegistrator {
   private ids: string[] = [];
@@ -90,5 +90,6 @@ export abstract class PostboyAbstractRegistrator {
   public recordBehavior = <T extends PostboyGenericMessage>(type: new (...args: any[]) => T, initial: T) =>
     this.record(type, new BehaviorSubject<T>(initial));
 
-  public recordSubject = <T extends PostboyGenericMessage>(type: new (...args: any[]) => T) => this.record(type, new Subject<T>());
+  public recordSubject = <T extends PostboyGenericMessage>(type: new (...args: any[]) => T) =>
+    this.record(type, new Subject<T>());
 }

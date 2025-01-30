@@ -72,9 +72,8 @@ export class PostboyService {
 
   // future
   public sub<T extends PostboyGenericMessage>(type: new (...args: any[]) => T): Observable<T> {
-    let id = checkId(type);
-    const application = this.applications.take(id);
-    if (!application) throw new Error(`There is no event with id ${id}`);
+    const application = this.applications.take(checkId(type));
+    if (!application) throw new Error(`There is no registered event ${type.constructor.name}`);
     return application.pipe(application.sub);
   }
 

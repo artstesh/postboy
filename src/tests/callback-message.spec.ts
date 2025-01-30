@@ -4,7 +4,9 @@ import { should } from '@artstesh/it-should';
 import { PostboyService } from '../postboy.service';
 import { PostboyCallbackMessage } from '../models/postboy-callback.message';
 
-class TestEvent extends PostboyCallbackMessage<string> {}
+class TestEvent extends PostboyCallbackMessage<string> {
+  static ID = 'test-event';
+}
 
 describe('CallbackMessage', () => {
   let service: PostboyService;

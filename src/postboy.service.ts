@@ -1,5 +1,5 @@
 import { Observable, Subject } from 'rxjs';
-import { PostboyGenericMessage } from './models/postboy-generic-message';
+import {checkId, PostboyGenericMessage} from './models/postboy-generic-message';
 import { LockerStore } from './locker.store';
 import { PostboyLocker } from './models/postboy.locker';
 import { PostboySubscription } from './models/postboy-subscription';
@@ -27,9 +27,8 @@ export class PostboyService {
    * @deprecated The method should be replaced with exec<T>
    */
   public execute<E extends PostboyExecutor<T>, T>(executor: E): T {
-    const id = executor.id ?? executor.constructor.name;
-    if (!this.executors.has(id)) throw new Error(`There is no executor with id ${id}`);
-    return this.executors.take(id)!(executor);
+    if (!this.executors.has(executor.id)) throw new Error(`There is no registered executor ${executor.constructor.name}`);
+    return this.executors.take(executor.id)!(executor);
   }
 
   /**
@@ -61,44 +60,42 @@ export class PostboyService {
   }
 
   public fire(message: PostboyGenericMessage): void {
-    const id = message.id ?? message.constructor.name;
-    if (!this.applications.take(id)?.sub) throw new Error(`There is no event with id ${id}`);
-    if (this.locker.check(id)) this.applications.take(id)?.sub.next(message);
+    if (!this.applications.take(message.id)?.sub) throw new Error(`There is no registered event ${message.constructor.name}`);
+    if (this.locker.check(message.id)) this.applications.take(message.id)?.sub.next(message);
   }
 
   public fireCallback<T>(message: PostboyCallbackMessage<T>, action: (e: T) => void): void {
-    const id = message.id ?? message.constructor.name;
-    if (!this.applications.take(id)?.sub) throw new Error(`There is no event with id ${id}`);
+    if (!this.applications.take(message.id)?.sub) throw new Error(`There is no registered event ${message.constructor.name}`);
     message.result.subscribe(action);
-    if (this.locker.check(id)) this.applications.take(id)?.sub.next(message);
+    if (this.locker.check(message.id)) this.applications.take(message.id)?.sub.next(message);
   }
 
   // future
   public sub<T extends PostboyGenericMessage>(type: new (...args: any[]) => T): Observable<T> {
-    const application = this.applications.take(type.name);
-    if (!application) throw new Error(`There is no event with id ${type.name}`);
+    let id = checkId(type);
+    const application = this.applications.take(id);
+    if (!application) throw new Error(`There is no event with id ${id}`);
     return application.pipe(application.sub);
   }
 
-  public record<T>(type: new (...args: any[]) => T, sub: Subject<T>): void {
-    this.applications.put(type.name, new PostboySubscription<T>(sub, (s) => s.asObservable()));
+  public record<T extends PostboyGenericMessage>(type: new (...args: any[]) => T, sub: Subject<T>): void {
+    this.applications.put(checkId(type), new PostboySubscription<T>(sub, (s) => s.asObservable()));
   }
 
-  public recordWithPipe<T>(
+  public recordWithPipe<T extends PostboyGenericMessage>(
     type: new (...args: any[]) => T,
     sub: Subject<T>,
     pipe: (s: Subject<T>) => Observable<T>,
   ): void {
-    this.applications.put(type.name, new PostboySubscription<T>(sub, pipe));
+    this.applications.put(checkId(type), new PostboySubscription<T>(sub, pipe));
   }
 
   public recordExecutor<E extends PostboyExecutor<T>, T>(type: new (...args: any[]) => E, exec: (e: E) => T): void {
-    this.executors.put(type.name, exec as any);
+    this.executors.put(checkId(type), exec as any);
   }
 
   public exec<T>(executor: PostboyExecutor<T>): T {
-    const id = executor.id ?? executor.constructor.name;
-    if (!this.executors.has(id)) throw new Error(`There is no executor with id ${id}`);
-    return this.executors.take(id)!(executor);
+    if (!this.executors.has(executor.id)) throw new Error(`There is no registered executor ${executor.id}`);
+    return this.executors.take(executor.id)!(executor);
   }
 }

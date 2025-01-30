@@ -2,6 +2,7 @@ import { PostboyService } from './postboy.service';
 import { BehaviorSubject, Observable, ReplaySubject, Subject } from 'rxjs';
 import { IPostboyDependingService } from './i-postboy-depending.service';
 import { PostboyExecutor } from './models/postboy-executor';
+import {checkId, PostboyGenericMessage} from "./models/postboy-generic-message";
 
 export abstract class PostboyAbstractRegistrator {
   private ids: string[] = [];
@@ -69,25 +70,25 @@ export abstract class PostboyAbstractRegistrator {
 
   // future
 
-  public record<T>(type: new (...args: any[]) => T, sub: Subject<T>): void {
-    this.ids.push(type.name);
+  public record<T extends PostboyGenericMessage>(type: new (...args: any[]) => T, sub: Subject<T>): void {
+    this.ids.push(checkId(type));
     this.postboy.record(type, sub);
   }
 
-  public recordWithPipe<T>(
+  public recordWithPipe<T extends PostboyGenericMessage>(
     type: new (...args: any[]) => T,
     sub: Subject<T>,
     pipe: (s: Subject<T>) => Observable<T>,
   ): void {
-    this.ids.push(type.name);
+    this.ids.push(checkId(type));
     this.postboy.recordWithPipe(type, sub, pipe);
   }
 
-  public recordReplay = <T>(type: new (...args: any[]) => T, bufferSize = 1) =>
+  public recordReplay = <T extends PostboyGenericMessage>(type: new (...args: any[]) => T, bufferSize = 1) =>
     this.record(type, new ReplaySubject<T>(bufferSize));
 
-  public recordBehavior = <T>(type: new (...args: any[]) => T, initial: T) =>
+  public recordBehavior = <T extends PostboyGenericMessage>(type: new (...args: any[]) => T, initial: T) =>
     this.record(type, new BehaviorSubject<T>(initial));
 
-  public recordSubject = <T>(type: new (...args: any[]) => T) => this.record(type, new Subject<T>());
+  public recordSubject = <T extends PostboyGenericMessage>(type: new (...args: any[]) => T) => this.record(type, new Subject<T>());
 }

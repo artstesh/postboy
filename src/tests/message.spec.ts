@@ -3,12 +3,10 @@ import { Subject } from 'rxjs';
 import { should } from '@artstesh/it-should';
 import { PostboyGenericMessage } from '../models/postboy-generic-message';
 import { PostboyService } from '../postboy.service';
+import {PostboyCallbackMessage} from "../models/postboy-callback.message";
 
 class TestEvent extends PostboyGenericMessage {
-  public static readonly ID = Forger.create<string>()!;
-  public get id(): string {
-    return TestEvent.ID;
-  }
+  static ID = 'b1c82888';
 
   constructor(public value: number) {
     super();
@@ -34,4 +32,10 @@ describe('GenericMessage', () => {
     //
     should().number(gotValue!).equals(testEvent.value);
   });
+
+  it('throws without id', () => {
+    class ErrorEvent extends PostboyGenericMessage {    }
+    //
+    expect(() =>service.record(ErrorEvent, new Subject<ErrorEvent>())).toThrow();
+  })
 });

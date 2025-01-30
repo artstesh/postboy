@@ -1,5 +1,3 @@
-export abstract class PostboyExecutor<T> {
-  public get id(): string | undefined {
-    return undefined;
-  }
-}
+import { PostboyGenericMessage } from './postboy-generic-message';
+
+export abstract class PostboyExecutor<T> extends PostboyGenericMessage {}

@@ -1,7 +1,7 @@
 import { PostboyService } from '../postboy.service';
 import { Observable } from 'rxjs';
 import { PostboyExecutor } from '../models/postboy-executor';
-import { PostboyGenericMessage } from '../models/postboy-generic-message';
+import { checkId, PostboyGenericMessage } from '../models/postboy-generic-message';
 import { PostboyCallbackMessage } from '../models/postboy-callback.message';
 
 export class PostboyServiceMock extends PostboyService {
@@ -33,7 +33,7 @@ export class PostboyServiceMock extends PostboyService {
   private count = (collection: string[], el: string) => collection.filter((e) => e === el).length;
 
   exec<E extends PostboyExecutor<T>, T>(executor: E): T {
-    this.executions.push(executor.id ?? executor.constructor.name);
+    this.executions.push(executor.id);
     return super.exec(executor);
   }
 
@@ -43,17 +43,17 @@ export class PostboyServiceMock extends PostboyService {
   }
 
   public sub<T extends PostboyGenericMessage>(type: new (...args: any[]) => T): Observable<T> {
-    this.subscriptions.push(type.name);
-    return super.subscribe(type.name);
+    this.subscriptions.push(checkId(type));
+    return super.subscribe(checkId(type));
   }
 
   fire<T extends PostboyGenericMessage>(message: T) {
-    this.fires.push(message.id ?? message.constructor.name);
+    this.fires.push(message.id);
     super.fire(message);
   }
 
   fireCallback<T>(message: PostboyCallbackMessage<T>, action: (e: T) => void): void {
-    this.fires.push(message.id ?? message.constructor.name);
+    this.fires.push(message.id);
     super.fireCallback(message, action);
   }
 }

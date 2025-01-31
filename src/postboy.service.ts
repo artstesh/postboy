@@ -66,11 +66,12 @@ export class PostboyService {
     if (this.locker.check(message.id)) this.applications.take(message.id)?.sub.next(message);
   }
 
-  public fireCallback<T>(message: PostboyCallbackMessage<T>, action: (e: T) => void): void {
+  public fireCallback<T>(message: PostboyCallbackMessage<T>, action?: (e: T) => void): Observable<T> {
     if (!this.applications.take(message.id)?.sub)
       throw new Error(`There is no registered event ${message.constructor.name}`);
     message.result.subscribe(action);
     if (this.locker.check(message.id)) this.applications.take(message.id)?.sub.next(message);
+    return message.result;
   }
 
   // future

@@ -52,8 +52,8 @@ export class PostboyServiceMock extends PostboyService {
     super.fire(message);
   }
 
-  fireCallback<T>(message: PostboyCallbackMessage<T>, action: (e: T) => void): void {
+  fireCallback<T>(message: PostboyCallbackMessage<T>, action?: (e: T) => void): Observable<T> {
     this.fires.push(message.id);
-    super.fireCallback(message, action);
+    return super.fireCallback(message, action);
   }
 }

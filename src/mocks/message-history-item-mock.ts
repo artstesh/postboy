@@ -1,14 +1,14 @@
-import {PostboyGenericMessage} from "../models/postboy-generic-message";
+import { PostboyGenericMessage } from '../models/postboy-generic-message';
 
 export class MessageHistoryItemMock<T extends PostboyGenericMessage> {
   private list: T[] = [];
 
-  add(message: T){
+  add(message: T) {
     this.list.push(message);
     return this;
   }
 
-  clear(){
+  clear() {
     this.list = [];
   }
 

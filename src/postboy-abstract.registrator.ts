@@ -152,6 +152,5 @@ export abstract class PostboyAbstractRegistrator {
    * @param {MessageType<T>} type - The constructor for the message type being recorded.
    * @returns {Subject<T>} A new instance of `Subject<T>` bound to the specified message type.
    */
-  public recordSubject = <T extends PostboyGenericMessage>(type: MessageType<T>) =>
-    this.record(type, new Subject<T>());
+  public recordSubject = <T extends PostboyGenericMessage>(type: MessageType<T>) => this.record(type, new Subject<T>());
 }

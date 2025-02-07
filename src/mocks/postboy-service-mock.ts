@@ -3,9 +3,9 @@ import { Observable } from 'rxjs';
 import { PostboyExecutor } from '../models/postboy-executor';
 import { checkId, PostboyGenericMessage } from '../models/postboy-generic-message';
 import { PostboyCallbackMessage } from '../models/postboy-callback.message';
-import {MessageHistoryMock} from "./message-history-mock";
-import {MessageHistoryItemMock} from "./message-history-item-mock";
-import {MessageType} from "../postboy-abstract.registrator";
+import { MessageHistoryMock } from './message-history-mock';
+import { MessageHistoryItemMock } from './message-history-item-mock';
+import { MessageType } from '../postboy-abstract.registrator';
 
 export class PostboyServiceMock extends PostboyService {
   private subscriptions: string[] = [];

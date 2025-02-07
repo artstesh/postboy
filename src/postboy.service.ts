@@ -5,8 +5,8 @@ import { PostboyLocker } from './models/postboy.locker';
 import { PostboySubscription } from './models/postboy-subscription';
 import { PostboyExecutor } from './models/postboy-executor';
 import { PostboyCallbackMessage } from './models/postboy-callback.message';
-import {Dictionary} from "@artstesh/collections";
-import {MessageType} from "./postboy-abstract.registrator";
+import { Dictionary } from '@artstesh/collections';
+import { MessageType } from './postboy-abstract.registrator';
 
 export class PostboyService {
   private applications = new Dictionary<PostboySubscription<any>>();

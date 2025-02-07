@@ -1,6 +1,6 @@
-import {PostboyGenericMessage} from "../models/postboy-generic-message";
-import {MessageHistoryItemMock} from "./message-history-item-mock";
-import {Dictionary} from "@artstesh/collections";
+import { PostboyGenericMessage } from '../models/postboy-generic-message';
+import { MessageHistoryItemMock } from './message-history-item-mock';
+import { Dictionary } from '@artstesh/collections';
 
 export class MessageHistoryMock {
   private _items = new Dictionary<MessageHistoryItemMock<any>>();
@@ -15,6 +15,6 @@ export class MessageHistoryMock {
   }
 
   reset(): void {
-    this._items.forEach(i => i.clear());
+    this._items.forEach((i) => i.clear());
   }
 }

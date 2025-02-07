@@ -5,6 +5,8 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "license": "MIT",
+  "description": "Let's send a message ;)",
+  "homepage": "https://postboy.artstesh.ru",
   "scripts": {
     "prepare": "npm run build",
     "prepublishOnly": "npm test && npm run lint",
@@ -27,7 +29,8 @@
   },
   "peerDependencies": {
     "rxjs": ">6.0.0",
-    "typescript": "^4.0.0"
+    "typescript": "^4.0.0",
+    "@artstesh/collections": "^1.0.4"
   },
   "dependencies": {
     "rxjs": "^6.0.0",

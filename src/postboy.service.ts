@@ -81,18 +81,18 @@ export class PostboyService {
   }
 
   /**
-   * Fires a callback for a given message, optionally taking an action to apply to the message's result.
+   * Triggers a callback function associated with a given message.
    *
-   * @param {PostboyCallbackMessage<T>} message The message object that contains the callback information.
-   * @param {(e: T) => void} [action] An optional action function to execute with the emitted result of the message.
-   * @return {Observable<T>} An observable representing the result of the message's callback.
+   * @param {PostboyCallbackMessage<T>} message - The message object used to trigger the callback.
+   * It contains details about the event and result subscription.
+   * @param {(e: T) => void} [action] - Optional callback function to execute when the result of the message is emitted.
+   * @return {void} This method does not return any value.
    */
-  public fireCallback<T>(message: PostboyCallbackMessage<T>, action?: (e: T) => void): Observable<T> {
+  public fireCallback<T>(message: PostboyCallbackMessage<T>, action?: (e: T) => void): void {
     if (!this.applications.take(message.id)?.sub)
       throw new Error(`There is no registered event ${message.constructor.name}`);
     message.result.subscribe(action);
     if (this.locker.check(message.id)) this.applications.take(message.id)?.sub.next(message);
-    return message.result;
   }
 
   // future

@@ -1,6 +1,6 @@
 {
   "name": "@artstesh/postboy",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "author": "artstesh",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",

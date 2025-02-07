@@ -3,26 +3,21 @@ import { Observable } from 'rxjs';
 import { PostboyExecutor } from '../models/postboy-executor';
 import { checkId, PostboyGenericMessage } from '../models/postboy-generic-message';
 import { PostboyCallbackMessage } from '../models/postboy-callback.message';
+import { MessageHistoryMock } from './message-history-mock';
+import { MessageHistoryItemMock } from './message-history-item-mock';
+import { MessageType } from '../postboy-abstract.registrator';
 
 export class PostboyServiceMock extends PostboyService {
-  private executions: string[] = [];
   private subscriptions: string[] = [];
-  private fires: string[] = [];
+  private _history = new MessageHistoryMock();
 
   reset(): void {
-    this.executions = [];
     this.subscriptions = [];
-    this.fires = [];
+    this._history.reset();
   }
 
   fired(id: string, times: number = 0): boolean {
-    const count = this.count(this.fires, id);
-    return !!count && (!times || count === times);
-  }
-
-  executed(id: string, times: number = 0): boolean {
-    const count = this.count(this.executions, id);
-    return !!count && (!times || count === times);
+    return this._history.get(id)?.length === times;
   }
 
   subscribed(id: string, times: number = 0): boolean {
@@ -33,7 +28,7 @@ export class PostboyServiceMock extends PostboyService {
   private count = (collection: string[], el: string) => collection.filter((e) => e === el).length;
 
   exec<E extends PostboyExecutor<T>, T>(executor: E): T {
-    this.executions.push(executor.id);
+    this._history.add(executor);
     return super.exec(executor);
   }
 
@@ -42,18 +37,22 @@ export class PostboyServiceMock extends PostboyService {
     return super.subscribe(id);
   }
 
-  public sub<T extends PostboyGenericMessage>(type: new (...args: any[]) => T): Observable<T> {
+  public sub<T extends PostboyGenericMessage>(type: MessageType<T>): Observable<T> {
     this.subscriptions.push(checkId(type));
     return super.subscribe(checkId(type));
   }
 
   fire<T extends PostboyGenericMessage>(message: T) {
-    this.fires.push(message.id);
+    this._history.add(message);
     super.fire(message);
   }
 
   fireCallback<T>(message: PostboyCallbackMessage<T>, action?: (e: T) => void): Observable<T> {
-    this.fires.push(message.id);
+    this._history.add(message);
     return super.fireCallback(message, action);
+  }
+
+  history<T extends PostboyGenericMessage>(type: MessageType<T>): MessageHistoryItemMock<T> {
+    return this._history.get(checkId(type));
   }
 }

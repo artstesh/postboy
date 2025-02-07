@@ -10,8 +10,8 @@ export class MessageHistoryMock {
   }
 
   add(message: PostboyGenericMessage): void {
-    this._items.take(message.id)?.add(message) ||
-    this._items.put(message.id, new MessageHistoryItemMock().add(message));
+    if (!this._items.take(message.id)?.add(message))
+      this._items.put(message.id, new MessageHistoryItemMock().add(message));
   }
 
   reset(): void {

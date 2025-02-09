@@ -28,7 +28,8 @@
   },
   "peerDependencies": {
     "rxjs": ">7.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "@artstesh/collections": "^1.0.4"
   },
   "dependencies": {
     "rxjs": "^7.0.0",

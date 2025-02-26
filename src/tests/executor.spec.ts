@@ -2,9 +2,18 @@ import { Forger } from '@artstesh/forger';
 import { should } from '@artstesh/it-should';
 import { PostboyExecutor } from '../models/postboy-executor';
 import { PostboyService } from '../postboy.service';
+import { PostboyExecutionHandler } from '../models/postboy-execution.handler';
 
 class TestExecutor extends PostboyExecutor<string> {
-  static ID = 'b1c82888';
+  static ID = Forger.create<string>()!;
+}
+
+class TestHandler extends PostboyExecutionHandler<string, TestExecutor> {
+  public value = '';
+
+  handle(executor: TestExecutor): string {
+    return this.value;
+  }
 }
 
 describe('Executor', () => {
@@ -32,5 +41,23 @@ describe('Executor', () => {
     //
     let entry = service.exec<string>(new TestExecutor());
     should().string(entry).equals(result);
+  });
+});
+
+describe('ExecutorHandler', () => {
+  let service: PostboyService;
+  let handler: TestHandler;
+
+  beforeEach(() => {
+    handler = new TestHandler();
+    handler.value = Forger.create<string>()!;
+    service = new PostboyService();
+  });
+
+  it('record,execute success', () => {
+    service.recordHandler(TestExecutor, handler);
+    //
+    let entry = service.exec<string>(new TestExecutor());
+    should().string(entry).equals(handler.value);
   });
 });

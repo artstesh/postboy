@@ -7,6 +7,7 @@ import { PostboyExecutor } from './models/postboy-executor';
 import { PostboyCallbackMessage } from './models/postboy-callback.message';
 import { Dictionary } from '@artstesh/collections';
 import { MessageType } from './postboy-abstract.registrator';
+import { PostboyExecutionHandler } from './models/postboy-execution.handler';
 
 export class PostboyService {
   private applications = new Dictionary<PostboySubscription<any>>();
@@ -157,5 +158,19 @@ export class PostboyService {
   public exec<T>(executor: PostboyExecutor<T>): T {
     if (!this.executors.has(executor.id)) throw new Error(`There is no registered executor ${executor.id}`);
     return this.executors.take(executor.id)!(executor);
+  }
+
+  /**
+   * Manages the recording of an executor and its corresponding handler into internal storage.
+   *
+   * @param {new (...args: any[]) => E} executor - The constructor for a class extending PostboyExecutor, used to register the executor type.
+   * @param {PostboyExecutionHandler<R, E>} handler - The handler responsible for processing the specific executor.
+   * @return {void} No return value.
+   */
+  public recordHandler<E extends PostboyExecutor<R>, R>(
+    executor: new (...args: any[]) => E,
+    handler: PostboyExecutionHandler<R, E>,
+  ): void {
+    this.executors.put(checkId(executor), (e) => handler.handle(e as E));
   }
 }

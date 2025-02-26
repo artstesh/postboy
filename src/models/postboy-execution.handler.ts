@@ -1,4 +1,4 @@
-import {PostboyExecutor} from "./postboy-executor";
+import { PostboyExecutor } from './postboy-executor';
 
 /**
  * Abstract class representing a handler for executing a Postboy task.
@@ -10,6 +10,6 @@ import {PostboyExecutor} from "./postboy-executor";
  * @template R The type of the result returned by the `handle` method.
  * @template E The type of the executor extending the PostboyExecutor.
  */
-export abstract class PostboyExecutionHandler<R,E extends PostboyExecutor<R>> {
+export abstract class PostboyExecutionHandler<R, E extends PostboyExecutor<R>> {
   abstract handle(executor: E): R;
 }

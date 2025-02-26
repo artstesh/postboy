@@ -7,7 +7,7 @@ import { PostboyExecutor } from './models/postboy-executor';
 import { PostboyCallbackMessage } from './models/postboy-callback.message';
 import { Dictionary } from '@artstesh/collections';
 import { MessageType } from './postboy-abstract.registrator';
-import {PostboyExecutionHandler} from "./models/postboy-execution.handler";
+import { PostboyExecutionHandler } from './models/postboy-execution.handler';
 
 export class PostboyService {
   private applications = new Dictionary<PostboySubscription<any>>();
@@ -167,7 +167,10 @@ export class PostboyService {
    * @param {PostboyExecutionHandler<R, E>} handler - The handler responsible for processing the specific executor.
    * @return {void} No return value.
    */
-  public recordHandler<E extends PostboyExecutor<R>, R>(executor: new (...args: any[]) => E, handler: PostboyExecutionHandler<R,E>): void {
-    this.executors.put(checkId(executor), e => handler.handle(e as E));
+  public recordHandler<E extends PostboyExecutor<R>, R>(
+    executor: new (...args: any[]) => E,
+    handler: PostboyExecutionHandler<R, E>,
+  ): void {
+    this.executors.put(checkId(executor), (e) => handler.handle(e as E));
   }
 }

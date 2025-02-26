@@ -1,8 +1,8 @@
-import {Forger} from '@artstesh/forger';
-import {should} from '@artstesh/it-should';
-import {PostboyExecutor} from '../models/postboy-executor';
-import {PostboyService} from '../postboy.service';
-import {PostboyExecutionHandler} from "../models/postboy-execution.handler";
+import { Forger } from '@artstesh/forger';
+import { should } from '@artstesh/it-should';
+import { PostboyExecutor } from '../models/postboy-executor';
+import { PostboyService } from '../postboy.service';
+import { PostboyExecutionHandler } from '../models/postboy-execution.handler';
 
 class TestExecutor extends PostboyExecutor<string> {
   static ID = Forger.create<string>()!;
@@ -23,8 +23,7 @@ describe('Executor', () => {
     service = new PostboyService();
   });
 
-  afterEach(() => {
-  });
+  afterEach(() => {});
 
   describe('executors', () => {
     it('register,execute success', () => {
@@ -45,10 +44,9 @@ describe('Executor', () => {
   });
 });
 
-
 describe('ExecutorHandler', () => {
   let service: PostboyService;
-  let handler:TestHandler;
+  let handler: TestHandler;
 
   beforeEach(() => {
     handler = new TestHandler();

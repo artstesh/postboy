@@ -3,7 +3,7 @@ import { BehaviorSubject, Observable, ReplaySubject, Subject } from 'rxjs';
 import { IPostboyDependingService } from './i-postboy-depending.service';
 import { PostboyExecutor } from './models/postboy-executor';
 import { checkId, PostboyGenericMessage } from './models/postboy-generic-message';
-import {PostboyExecutionHandler} from "./models/postboy-execution.handler";
+import { PostboyExecutionHandler } from './models/postboy-execution.handler';
 
 export type MessageType<T extends PostboyGenericMessage> = new (...args: any[]) => T;
 
@@ -124,7 +124,10 @@ export abstract class PostboyAbstractRegistrator {
    * @param handler The execution handler associated with the given executor type.
    * @return void
    */
-  public recordHandler<E extends PostboyExecutor<R>, R>(executor: new (...args: any[]) => E, handler: PostboyExecutionHandler<R,E>): void {
+  public recordHandler<E extends PostboyExecutor<R>, R>(
+    executor: new (...args: any[]) => E,
+    handler: PostboyExecutionHandler<R, E>,
+  ): void {
     this.postboy.recordHandler(executor, handler);
   }
 

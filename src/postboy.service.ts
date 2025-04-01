@@ -106,7 +106,7 @@ export class PostboyService {
    */
   public sub<T extends PostboyGenericMessage>(type: MessageType<T>): Observable<T> {
     const application = this.applications.take(checkId(type));
-    if (!application) throw new Error(`There is no registered event ${type.constructor.name}`);
+    if (!application) throw new Error(`There is no registered event ${type.name}`);
     return application.pipe(application.sub);
   }
 
@@ -156,7 +156,7 @@ export class PostboyService {
    * @throws {Error} If the specified executor is not registered.
    */
   public exec<T>(executor: PostboyExecutor<T>): T {
-    if (!this.executors.has(executor.id)) throw new Error(`There is no registered executor ${executor.id}`);
+    if (!this.executors.has(executor.id)) throw new Error(`There is no registered executor with id ${executor.id}`);
     return this.executors.take(executor.id)!(executor);
   }
 

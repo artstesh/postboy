@@ -1,10 +1,10 @@
-import {Observable, Subject} from 'rxjs';
-import {PostboyService} from "../postboy.service";
-import {PostboyExecutor} from "../models/postboy-executor";
-import {PostboyGenericMessage} from "../models/postboy-generic-message";
-import {PostboyCallbackMessage} from "../models/postboy-callback.message";
-import {Forger} from "@artstesh/forger";
-import {PostboyLocker} from "../models/postboy.locker";
+import { Observable, Subject } from 'rxjs';
+import { PostboyService } from '../postboy.service';
+import { PostboyExecutor } from '../models/postboy-executor';
+import { PostboyGenericMessage } from '../models/postboy-generic-message';
+import { PostboyCallbackMessage } from '../models/postboy-callback.message';
+import { Forger } from '@artstesh/forger';
+import { PostboyLocker } from '../models/postboy.locker';
 
 describe('PostboyService', () => {
   let service: PostboyService;
@@ -51,12 +51,12 @@ describe('PostboyService', () => {
 
     it('should throw an error if executor is not registered', () => {
       class TestExec extends PostboyExecutor<string> {
-        static ID = Forger.create<string>({stringSpecial: false})!;
+        static ID = Forger.create<string>({ stringSpecial: false })!;
       }
 
       const executor = new TestExec();
       //
-      expect(() => service.exec(executor)).toThrow(new RegExp('.?' + TestExec.ID + '.?', "g"));
+      expect(() => service.exec(executor)).toThrow(new RegExp('.?' + TestExec.ID + '.?', 'g'));
     });
   });
 
@@ -98,7 +98,7 @@ describe('PostboyService', () => {
   describe('fire', () => {
     it('should fire a registered event and notify subscribers', () => {
       const subject = new Subject<PostboyGenericMessage>();
-      const message = {id: 'testEvent'} as PostboyGenericMessage;
+      const message = { id: 'testEvent' } as PostboyGenericMessage;
 
       service.register('testEvent', subject);
 

@@ -1,10 +1,10 @@
-import {Observable, Subject} from 'rxjs';
-import {PostboyService} from '../postboy.service';
-import {PostboyExecutor} from '../models/postboy-executor';
-import {PostboyGenericMessage} from '../models/postboy-generic-message';
-import {PostboyCallbackMessage} from '../models/postboy-callback.message';
-import {Forger} from '@artstesh/forger';
-import {PostboyLocker} from '../models/postboy.locker';
+import { Observable, Subject } from 'rxjs';
+import { PostboyService } from '../postboy.service';
+import { PostboyExecutor } from '../models/postboy-executor';
+import { PostboyGenericMessage } from '../models/postboy-generic-message';
+import { PostboyCallbackMessage } from '../models/postboy-callback.message';
+import { Forger } from '@artstesh/forger';
+import { PostboyLocker } from '../models/postboy.locker';
 
 describe('PostboyService', () => {
   let service: PostboyService;
@@ -129,7 +129,7 @@ describe('PostboyService', () => {
       const text = Forger.create<string>()!;
       const message = new TestMessage();
       service.record(TestMessage, new Subject<PostboyCallbackMessage<string>>());
-      service.fireCallback(message, t => expect(t).toBe(text));
+      service.fireCallback(message, (t) => expect(t).toBe(text));
       message.finish(text);
     });
 
@@ -141,7 +141,7 @@ describe('PostboyService', () => {
       const text = Forger.create<string>()!;
       const message = new TestMessage();
       service.record(TestMessage, new Subject<PostboyCallbackMessage<string>>());
-      service.fireCallback(message).subscribe(t => expect(t).toBe(text));
+      service.fireCallback(message).subscribe((t) => expect(t).toBe(text));
       message.finish(text);
     });
 

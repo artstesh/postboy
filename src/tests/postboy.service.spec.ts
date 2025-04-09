@@ -1,11 +1,10 @@
-import { Observable, Subject } from 'rxjs';
-import { PostboyService } from '../postboy.service';
-import { PostboyExecutor } from '../models/postboy-executor';
-import { PostboyGenericMessage } from '../models/postboy-generic-message';
-import { PostboyCallbackMessage } from '../models/postboy-callback.message';
-import { Forger } from '@artstesh/forger';
-import { PostboyLocker } from '../models/postboy.locker';
-import {should} from "@artstesh/it-should";
+import {Observable, Subject} from 'rxjs';
+import {PostboyService} from '../postboy.service';
+import {PostboyExecutor} from '../models/postboy-executor';
+import {PostboyGenericMessage} from '../models/postboy-generic-message';
+import {PostboyCallbackMessage} from '../models/postboy-callback.message';
+import {Forger} from '@artstesh/forger';
+import {PostboyLocker} from '../models/postboy.locker';
 
 describe('PostboyService', () => {
   let service: PostboyService;

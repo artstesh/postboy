@@ -1,10 +1,10 @@
-import { Observable, Subject } from 'rxjs';
-import { PostboyService } from '../postboy.service';
-import { PostboyExecutor } from '../models/postboy-executor';
-import { PostboyGenericMessage } from '../models/postboy-generic-message';
-import { PostboyCallbackMessage } from '../models/postboy-callback.message';
-import { Forger } from '@artstesh/forger';
-import { PostboyLocker } from '../models/postboy.locker';
+import {Observable, Subject} from 'rxjs';
+import {PostboyService} from '../postboy.service';
+import {PostboyExecutor} from '../models/postboy-executor';
+import {PostboyGenericMessage} from '../models/postboy-generic-message';
+import {PostboyCallbackMessage} from '../models/postboy-callback.message';
+import {Forger} from '@artstesh/forger';
+import {PostboyLocker} from '../models/postboy.locker';
 
 describe('PostboyService', () => {
   let service: PostboyService;
@@ -122,23 +122,34 @@ describe('PostboyService', () => {
 
   describe('fireCallback', () => {
     it('should fire a callback event and execute the action', () => {
-      const subject = new Subject<PostboyCallbackMessage<string>>();
-      const message = new (class extends PostboyCallbackMessage<string> {
-        static ID = 'testCallback';
-      })();
-      const action = jest.fn();
+      expect.assertions(1);
+      class TestMessage extends PostboyCallbackMessage<string> {
+        static ID = Forger.create<string>()!;
+      }
+      const text = Forger.create<string>()!;
+      const message = new TestMessage();
+      service.record(TestMessage, new Subject<PostboyCallbackMessage<string>>());
+      service.fireCallback(message, t => expect(t).toBe(text));
+      message.finish(text);
+    });
 
-      service.register('testCallback', subject);
-      service.fireCallback(message, action);
-      message.next('callback result');
-
-      expect(action).toHaveBeenCalledWith('callback result');
+    it('should fire a callback event and execute the action - 2', () => {
+      expect.assertions(1);
+      class TestMessage extends PostboyCallbackMessage<string> {
+        static ID = Forger.create<string>()!;
+      }
+      const text = Forger.create<string>()!;
+      const message = new TestMessage();
+      service.record(TestMessage, new Subject<PostboyCallbackMessage<string>>());
+      service.fireCallback(message).subscribe(t => expect(t).toBe(text));
+      message.finish(text);
     });
 
     it('should throw an error if no callback event is registered for the message ID', () => {
       class TestMessage extends PostboyCallbackMessage<string> {
         static ID = Forger.create<string>()!;
       }
+
       //
       const message = new TestMessage();
       //

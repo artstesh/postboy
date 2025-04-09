@@ -1,13 +1,13 @@
-import { Observable, Subject } from 'rxjs';
-import { checkId, PostboyGenericMessage } from './models/postboy-generic-message';
-import { LockerStore } from './locker.store';
-import { PostboyLocker } from './models/postboy.locker';
-import { PostboySubscription } from './models/postboy-subscription';
-import { PostboyExecutor } from './models/postboy-executor';
-import { PostboyCallbackMessage } from './models/postboy-callback.message';
-import { Dictionary } from '@artstesh/collections';
-import { MessageType } from './postboy-abstract.registrator';
-import { PostboyExecutionHandler } from './models/postboy-execution.handler';
+import {Observable, Subject} from 'rxjs';
+import {checkId, PostboyGenericMessage} from './models/postboy-generic-message';
+import {LockerStore} from './locker.store';
+import {PostboyLocker} from './models/postboy.locker';
+import {PostboySubscription} from './models/postboy-subscription';
+import {PostboyExecutor} from './models/postboy-executor';
+import {PostboyCallbackMessage} from './models/postboy-callback.message';
+import {Dictionary} from '@artstesh/collections';
+import {MessageType} from './postboy-abstract.registrator';
+import {PostboyExecutionHandler} from './models/postboy-execution.handler';
 
 export class PostboyService {
   private applications = new Dictionary<PostboySubscription<any>>();
@@ -89,11 +89,13 @@ export class PostboyService {
    * @param {(e: T) => void} [action] - Optional callback function to execute when the result of the message is emitted.
    * @return {void} This method does not return any value.
    */
-  public fireCallback<T>(message: PostboyCallbackMessage<T>, action?: (e: T) => void): void {
+  public fireCallback<T>(message: PostboyCallbackMessage<T>, action?: (e: T) => void): Observable<T> {
     if (!this.applications.take(message.id)?.sub)
       throw new Error(`There is no registered event ${message.constructor.name}`);
     message.result.subscribe(action);
-    if (this.locker.check(message.id)) this.applications.take(message.id)?.sub.next(message);
+    if (this.locker.check(message.id))
+      setTimeout(() => this.applications.take(message.id)?.sub.next(message), 0);
+    return message.result;
   }
 
   // future

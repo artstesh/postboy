@@ -10,9 +10,9 @@ import { MessageType } from './postboy-abstract.registrator';
 import { PostboyExecutionHandler } from './models/postboy-execution.handler';
 
 export class PostboyService {
-  private applications = new Dictionary<PostboySubscription<any>>();
-  private locker = new LockerStore();
-  private executors = new Dictionary<(e: PostboyExecutor<any>) => any>();
+  protected applications = new Dictionary<PostboySubscription<any>>();
+  protected locker = new LockerStore();
+  protected executors = new Dictionary<(e: PostboyExecutor<any>) => any>();
 
   /**
    * Adds a locker to the current list of lockers.

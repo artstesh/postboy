@@ -9,6 +9,5 @@ export * from './models/postboy-generic-message';
 export * from './models/postboy-callback.message';
 export * from './models/postboy-execution.handler';
 export * from './models/postboy-executor';
-export * from './models/message-queue.model';
 export * from './models/postboy-middleware';
 export * from './models/postboy.message';

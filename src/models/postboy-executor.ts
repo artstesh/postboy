@@ -1,3 +1,3 @@
-import { PostboyGenericMessage } from './postboy-generic-message';
+import {PostboyMessage} from "./postboy.message";
 
-export abstract class PostboyExecutor<T> extends PostboyGenericMessage {}
+export abstract class PostboyExecutor<T>  extends PostboyMessage{}

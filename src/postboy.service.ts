@@ -1,26 +1,33 @@
 import {Observable, Subject} from 'rxjs';
 import {checkId, PostboyGenericMessage} from './models/postboy-generic-message';
-import {LockerStore} from './locker.store';
-import {PostboyLocker} from './models/postboy.locker';
 import {PostboySubscription} from './models/postboy-subscription';
 import {PostboyExecutor} from './models/postboy-executor';
 import {PostboyCallbackMessage} from './models/postboy-callback.message';
 import {MessageType} from './postboy-abstract.registrator';
 import {PostboyExecutionHandler} from './models/postboy-execution.handler';
+import {PostboyMiddleware} from "./models/postboy-middleware";
+import {PostboyMessage} from "./models/postboy.message";
 
 export class PostboyService {
-  protected locker = new LockerStore();
+  protected locked = new Set<string>();
   protected applications = new Map<string, PostboySubscription<any>>();
   protected executors = new Map<string, (e: PostboyExecutor<any>) => any>();
+  protected middlewares: PostboyMiddleware[] = [];
 
-  /**
-   * Adds a locker to the current list of lockers.
-   *
-   * @param {PostboyLocker} locker - The locker object to be added.
-   * @return {void} This method does not return a value.
-   */
-  public addLocker(locker: PostboyLocker): void {
-    this.locker.addLocker(locker);
+  public lock<T extends PostboyGenericMessage>(type: MessageType<T>): void {
+    this.locked.add(checkId(type));
+  }
+
+  public unlock<T extends PostboyGenericMessage>(type: MessageType<T>): void {
+    this.locked.delete(checkId(type));
+  }
+
+  public addMiddleware(middleware: PostboyMiddleware): void {
+    this.middlewares.push(middleware);
+  }
+
+  public removeMiddleware(middleware: PostboyMiddleware): void {
+    this.middlewares = this.middlewares.filter((m) => m !== middleware);
   }
 
   public unregister(id: string): void {
@@ -36,9 +43,10 @@ export class PostboyService {
    * @throws {Error} Throws an error if no registered event is found for the provided message ID.
    */
   public fire(message: PostboyGenericMessage): void {
+    this.executeMiddleware(message);
     if (!this.applications.get(message.id)?.sub)
       throw new Error(`There is no registered event ${message.constructor.name}`);
-    if (this.locker.check(message.id)) this.applications.get(message.id)?.sub.next(message);
+    if (!this.locked.has(message.id)) this.applications.get(message.id)?.sub.next(message);
   }
 
   /**
@@ -50,11 +58,25 @@ export class PostboyService {
    * @return {void} This method does not return any value.
    */
   public fireCallback<T>(message: PostboyCallbackMessage<T>, action?: (e: T) => void): Observable<T> {
+    this.executeMiddleware(message);
     if (!this.applications.get(message.id)?.sub)
       throw new Error(`There is no registered event ${message.constructor.name}`);
     message.result.subscribe(action);
-    if (this.locker.check(message.id)) setTimeout(() => this.applications.get(message.id)?.sub.next(message), 0);
+    if (!this.locked.has(message.id)) setTimeout(() => this.applications.get(message.id)?.sub.next(message), 0);
     return message.result;
+  }
+
+  /**
+   * Executes the provided executor function and returns its result.
+   *
+   * @param {PostboyExecutor<T>} executor The executor to be executed, which includes its identifier and logic.
+   * @return {T} The resulting output from the executed executor function.
+   * @throws {Error} If the specified executor is not registered.
+   */
+  public exec<T>(executor: PostboyExecutor<T>): T {
+    this.executeMiddleware(executor);
+    if (!this.executors.has(executor.id)) throw new Error(`There is no registered executor with id ${executor.id}`);
+    return this.executors.get(executor.id)!(executor);
   }
 
   /**
@@ -108,18 +130,6 @@ export class PostboyService {
   }
 
   /**
-   * Executes the provided executor function and returns its result.
-   *
-   * @param {PostboyExecutor<T>} executor The executor to be executed, which includes its identifier and logic.
-   * @return {T} The resulting output from the executed executor function.
-   * @throws {Error} If the specified executor is not registered.
-   */
-  public exec<T>(executor: PostboyExecutor<T>): T {
-    if (!this.executors.has(executor.id)) throw new Error(`There is no registered executor with id ${executor.id}`);
-    return this.executors.get(executor.id)!(executor);
-  }
-
-  /**
    * Manages the recording of an executor and its corresponding handler into internal storage.
    *
    * @param {new (...args: any[]) => E} executor - The constructor for a class extending PostboyExecutor, used to register the executor type.
@@ -131,5 +141,15 @@ export class PostboyService {
     handler: PostboyExecutionHandler<R, E>,
   ): void {
     this.executors.set(checkId(executor), (e) => handler.handle(e as E));
+  }
+
+  /**
+   * Executes each middleware in the order they are registered, passing the provided message to each middleware's handle method.
+   *
+   * @param {PostboyGenericMessage} msg - The message object to be processed by the middlewares.
+   * @return {void} This method does not return a value.
+   */
+  private executeMiddleware(msg: PostboyMessage): void {
+    for (let i = 0; i < this.middlewares.length; i++) this.middlewares[i].handle(msg);
   }
 }

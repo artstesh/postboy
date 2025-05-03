@@ -4,7 +4,6 @@ import {PostboyExecutor} from '../models/postboy-executor';
 import {PostboyGenericMessage} from '../models/postboy-generic-message';
 import {PostboyCallbackMessage} from '../models/postboy-callback.message';
 import {Forger} from '@artstesh/forger';
-import {PostboyLocker} from '../models/postboy.locker';
 
 describe('PostboyService', () => {
   let service: PostboyService;
@@ -13,19 +12,12 @@ describe('PostboyService', () => {
     service = new PostboyService();
   });
 
-  describe('addLocker', () => {
-    it('should add a locker without errors', () => {
-      const locker = Forger.create<PostboyLocker>()!;
-      //
-      expect(() => service.addLocker(locker)).not.toThrow();
-    });
-  });
-
   describe('recordExecutor', () => {
     it('should register an executor without errors', () => {
       class TestExec extends PostboyExecutor<string> {
         static ID = Forger.create<string>()!;
       }
+
       //
       expect(() => service.recordExecutor(TestExec, jest.fn())).not.toThrow();
     });
@@ -88,6 +80,7 @@ describe('PostboyService', () => {
       class TestMessage extends PostboyGenericMessage {
         static ID = Forger.create<string>()!;
       }
+
       //
       expect(() => service.sub(TestMessage)).toThrow(/.?TestMessage.?/g);
     });
@@ -154,8 +147,80 @@ describe('PostboyService', () => {
       class TestMessage extends PostboyCallbackMessage<string> {
         static ID = Forger.create<string>()!;
       }
+
       //
       expect(() => service.record(TestMessage, new Subject())).not.toThrow();
+    });
+  });
+
+  describe('lock', () => {
+    it('should prevent firing a locked message type', () => {
+      class TestMessage extends PostboyGenericMessage {
+        static ID = 'test-message';
+      }
+
+      const subject = new Subject<TestMessage>();
+      const spy = jest.fn();
+      service.record(TestMessage, subject);
+      service.lock(TestMessage);
+      service.sub(TestMessage).subscribe(spy);
+      //
+      service.fire(new TestMessage());
+      //
+      expect(spy).not.toHaveBeenCalled();
+    });
+
+    it('should not affect other message types when a message type is locked', () => {
+      class TestMessage1 extends PostboyGenericMessage {
+        static ID = 'test-message-1';
+      }
+
+      class TestMessage2 extends PostboyGenericMessage {
+        static ID = 'test-message-2';
+      }
+
+      service.record(TestMessage1, new Subject<TestMessage1>());
+      service.record(TestMessage2, new Subject<TestMessage2>());
+      const spy1 = jest.fn();
+      service.sub(TestMessage1).subscribe(spy1);
+      const spy2 = jest.fn();
+      service.sub(TestMessage2).subscribe(spy2);
+      //
+      service.lock(TestMessage1);
+      service.fire(new TestMessage1());
+      service.fire(new TestMessage2());
+      //
+      expect(spy1).not.toHaveBeenCalled();
+      expect(spy2).toHaveBeenCalled();
+    });
+  });
+
+  describe('unlock', () => {
+    it('should allow firing a previously locked message type after unlocking', () => {
+      class TestMessage extends PostboyGenericMessage {
+        static ID = 'test-message';
+      }
+
+      const subject = new Subject<TestMessage>();
+      const spy = jest.fn();
+      service.record(TestMessage, subject);
+      service.lock(TestMessage);
+      service.sub(TestMessage).subscribe(spy);
+      service.unlock(TestMessage);
+      //
+      service.fire(new TestMessage());
+      //
+      expect(spy).toHaveBeenCalled();
+    });
+
+    it('should not throw an error when unlocking a message type that is not locked', () => {
+      class TestMessage extends PostboyGenericMessage {
+        static ID = 'test-message';
+      }
+
+      service.record(TestMessage, new Subject<TestMessage>());
+      //
+      expect(() => service.unlock(TestMessage)).not.toThrow();
     });
   });
 });

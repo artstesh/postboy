@@ -1,5 +1,5 @@
 import { PostboyCallbackMessage } from './postboy-callback.message';
-import { Queue } from '@artstesh/collections';
+import {Queue} from "./queue";
 
 export class MessageQueue<D> {
   /**

@@ -8,6 +8,6 @@ module.exports = {
       }
     }]
   },
-  coverageDirectory: 'coverage',
-  rootDir: 'src'
+  coverageDirectory: '../coverage',
+  rootDir: 'src', collectCoverage: true
 };

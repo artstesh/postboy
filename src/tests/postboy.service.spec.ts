@@ -1,10 +1,10 @@
-import { Observable, Subject } from 'rxjs';
-import { PostboyService } from '../postboy.service';
-import { PostboyExecutor } from '../models/postboy-executor';
-import { PostboyGenericMessage } from '../models/postboy-generic-message';
-import { PostboyCallbackMessage } from '../models/postboy-callback.message';
-import { Forger } from '@artstesh/forger';
-import { PostboyLocker } from '../models/postboy.locker';
+import {Observable, Subject} from 'rxjs';
+import {PostboyService} from '../postboy.service';
+import {PostboyExecutor} from '../models/postboy-executor';
+import {PostboyGenericMessage} from '../models/postboy-generic-message';
+import {PostboyCallbackMessage} from '../models/postboy-callback.message';
+import {Forger} from '@artstesh/forger';
+import {PostboyLocker} from '../models/postboy.locker';
 
 describe('PostboyService', () => {
   let service: PostboyService;
@@ -26,10 +26,8 @@ describe('PostboyService', () => {
       class TestExec extends PostboyExecutor<string> {
         static ID = Forger.create<string>()!;
       }
-
-      const mockExecutor = jest.fn();
       //
-      expect(() => service.recordExecutor(TestExec, mockExecutor)).not.toThrow();
+      expect(() => service.recordExecutor(TestExec, jest.fn())).not.toThrow();
     });
   });
 
@@ -51,7 +49,7 @@ describe('PostboyService', () => {
 
     it('should throw an error if executor is not registered', () => {
       class TestExec extends PostboyExecutor<string> {
-        static ID = Forger.create<string>({ stringSpecial: false })!;
+        static ID = Forger.create<string>({stringSpecial: false})!;
       }
 
       const executor = new TestExec();
@@ -61,13 +59,12 @@ describe('PostboyService', () => {
   });
 
   describe('unregister', () => {
-    it('should unregister an application without errors', () => {
+    it('unregisters an application without throwing errors', () => {
       class TestMessage extends PostboyGenericMessage {
-        static ID = Forger.create<string>()!;
+        static ID = 'test-message';
       }
 
-      const subject = new Subject<TestMessage>();
-      service.record(TestMessage, subject);
+      service.record(TestMessage, new Subject<TestMessage>());
       //
       expect(() => service.unregister(TestMessage.ID)).not.toThrow();
     });
@@ -91,29 +88,28 @@ describe('PostboyService', () => {
       class TestMessage extends PostboyGenericMessage {
         static ID = Forger.create<string>()!;
       }
+      //
       expect(() => service.sub(TestMessage)).toThrow(/.?TestMessage.?/g);
     });
   });
 
   describe('fire', () => {
+    class TestMessage extends PostboyGenericMessage {
+      static ID = Forger.create<string>()!;
+    }
+
     it('should fire a registered event and notify subscribers', () => {
-      const subject = new Subject<PostboyGenericMessage>();
-      const message = { id: 'testEvent' } as PostboyGenericMessage;
-
-      service.register('testEvent', subject);
-
+      const message = new TestMessage();
+      service.record(TestMessage, new Subject<TestMessage>());
       const spy = jest.fn();
-      service.subscribe<PostboyGenericMessage>('testEvent').subscribe(spy);
-      service.fire(message);
-
+      service.sub(TestMessage).subscribe(spy);
+      //
+      service.fire(new TestMessage());
+      //
       expect(spy).toHaveBeenCalledWith(message);
     });
 
     it('should throw an error if no event is registered for the message ID', () => {
-      class TestMessage extends PostboyGenericMessage {
-        static ID = Forger.create<string>()!;
-      }
-
       const message = new TestMessage();
       //
       expect(() => service.fire(message)).toThrow(/.?TestMessage.?/g);
@@ -121,35 +117,31 @@ describe('PostboyService', () => {
   });
 
   describe('fireCallback', () => {
+    class TestMessage extends PostboyCallbackMessage<string> {
+      static ID = Forger.create<string>()!;
+    }
+
     it('should fire a callback event and execute the action', () => {
       expect.assertions(1);
-      class TestMessage extends PostboyCallbackMessage<string> {
-        static ID = Forger.create<string>()!;
-      }
       const text = Forger.create<string>()!;
       const message = new TestMessage();
-      service.record(TestMessage, new Subject<PostboyCallbackMessage<string>>());
+      service.record(TestMessage, new Subject());
+      //
       service.fireCallback(message, (t) => expect(t).toBe(text));
       message.finish(text);
     });
 
     it('should fire a callback event and execute the action - 2', () => {
       expect.assertions(1);
-      class TestMessage extends PostboyCallbackMessage<string> {
-        static ID = Forger.create<string>()!;
-      }
       const text = Forger.create<string>()!;
       const message = new TestMessage();
-      service.record(TestMessage, new Subject<PostboyCallbackMessage<string>>());
+      service.record(TestMessage, new Subject());
+      //
       service.fireCallback(message).subscribe((t) => expect(t).toBe(text));
       message.finish(text);
     });
 
     it('should throw an error if no callback event is registered for the message ID', () => {
-      class TestMessage extends PostboyCallbackMessage<string> {
-        static ID = Forger.create<string>()!;
-      }
-
       //
       const message = new TestMessage();
       //
@@ -159,12 +151,11 @@ describe('PostboyService', () => {
 
   describe('record', () => {
     it('should register a message type with a subject', () => {
-      const subject = new Subject<PostboyGenericMessage>();
-      const messageType = class extends PostboyGenericMessage {
-        static ID = 'testMessage';
-      };
-
-      expect(() => service.record(messageType, subject)).not.toThrow();
+      class TestMessage extends PostboyCallbackMessage<string> {
+        static ID = Forger.create<string>()!;
+      }
+      //
+      expect(() => service.record(TestMessage, new Subject())).not.toThrow();
     });
   });
 });

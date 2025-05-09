@@ -1,10 +1,10 @@
 // postboy-abstract.registrator.spec.ts
 import {BehaviorSubject, ReplaySubject, Subject} from 'rxjs';
-import {PostboyAbstractRegistrator} from "../postboy-abstract.registrator";
-import {PostboyService} from "../postboy.service";
-import {IPostboyDependingService} from "../i-postboy-depending.service";
-import {PostboyGenericMessage} from "../models/postboy-generic-message";
-import {PostboyExecutor} from "../models/postboy-executor";
+import {PostboyAbstractRegistrator} from "../../postboy-abstract.registrator";
+import {PostboyService} from "../../postboy.service";
+import {IPostboyDependingService} from "../../i-postboy-depending.service";
+import {PostboyGenericMessage} from "../../models/postboy-generic-message";
+import {PostboyExecutor} from "../../models/postboy-executor";
 import {Forger} from "@artstesh/forger";
 
 class TestMessage extends PostboyGenericMessage {

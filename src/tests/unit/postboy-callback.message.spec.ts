@@ -1,5 +1,5 @@
 import {firstValueFrom} from 'rxjs';
-import {PostboyCallbackMessage} from "../models/postboy-callback.message";
+import {PostboyCallbackMessage} from "../../models/postboy-callback.message";
 import {Forger} from "@artstesh/forger";
 import {should} from "@artstesh/it-should";
 

@@ -1,4 +1,4 @@
-import {Observable, Subject} from 'rxjs';
+import {Subject} from 'rxjs';
 import {PostboyService} from '../../postboy.service';
 import {PostboyExecutor} from '../../models/postboy-executor';
 import {PostboyGenericMessage} from '../../models/postboy-generic-message';

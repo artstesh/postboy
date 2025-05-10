@@ -1,6 +1,6 @@
 # Introduction
 
-## 1.1. About the Library
+## 1.1 About the Library
 Modern web development often feels like a survival race: components are scattered across dependency trees, services communicate through layers of abstraction, and events multiply like rabbits in the Australian outback. In this chaos, managing communication isn’t just a task—it’s an art of balancing flexibility and order.
 
 **Postboy** was born from this chaos. It’s not just another RxJS-based Event Bus—it’s an attempt to bridge the gap between the power of reactive programming and everyday simplicity. Over years of working with Angular, I’ve watched standard event-handling approaches drown in boilerplate code, while complex state managers morphed into impenetrable "black boxes." Postboy is my answer to these challenges.

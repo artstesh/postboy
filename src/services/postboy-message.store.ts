@@ -1,6 +1,5 @@
 import {PostboySubscription} from "../models/postboy-subscription";
 import {PostboyExecutor} from "../models/postboy-executor";
-import {PostboyGenericMessage} from "../models/postboy-generic-message";
 
 /**
  * The PostboyMessageStore is a utility class for managing message subscriptions and executors.
@@ -19,13 +18,13 @@ export class PostboyMessageStore {
   }
 
   public getMessage(id: string, name: string): PostboySubscription<any> {
-    let msg = this.applications.get(id);
+    const msg = this.applications.get(id);
     if (!msg) throw new Error(`There is no registered event ${name}`);
     return msg;
   }
 
   public getExecutor<T>(id: string): (e: PostboyExecutor<T>) => T {
-    let executorFunction = this.executors.get(id);
+    const executorFunction = this.executors.get(id);
     if (!executorFunction) throw new Error(`There is no registered executor with id ${id}`);
     return executorFunction;
   }

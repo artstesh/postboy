@@ -1,18 +1,18 @@
 // postboy-abstract.registrator.spec.ts
-import {BehaviorSubject, ReplaySubject, Subject} from 'rxjs';
-import {PostboyAbstractRegistrator} from "../../postboy-abstract.registrator";
-import {PostboyService} from "../../postboy.service";
-import {IPostboyDependingService} from "../../i-postboy-depending.service";
-import {PostboyGenericMessage} from "../../models/postboy-generic-message";
-import {PostboyExecutor} from "../../models/postboy-executor";
-import {Forger} from "@artstesh/forger";
+import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
+import { PostboyAbstractRegistrator } from '../../postboy-abstract.registrator';
+import { PostboyService } from '../../postboy.service';
+import { IPostboyDependingService } from '../../i-postboy-depending.service';
+import { PostboyGenericMessage } from '../../models/postboy-generic-message';
+import { PostboyExecutor } from '../../models/postboy-executor';
+import { Forger } from '@artstesh/forger';
 
 class TestMessage extends PostboyGenericMessage {
   static ID = 'test-message';
 }
 
 class TestExec extends PostboyExecutor<string> {
-  static ID = Forger.create<string>({stringSpecial: false})!;
+  static ID = Forger.create<string>({ stringSpecial: false })!;
 }
 
 class TestPostboyRegistrator extends PostboyAbstractRegistrator {
@@ -39,7 +39,7 @@ describe('PostboyAbstractRegistrator', () => {
 
   describe('registerServices', () => {
     it('should register the given services', () => {
-      const services: IPostboyDependingService[] = [{up: jest.fn()}, {up: jest.fn()}];
+      const services: IPostboyDependingService[] = [{ up: jest.fn() }, { up: jest.fn() }];
 
       registrator.registerServices(services);
 
@@ -49,7 +49,7 @@ describe('PostboyAbstractRegistrator', () => {
 
   describe('up', () => {
     it('should call _up and up on registered services', () => {
-      const services: IPostboyDependingService[] = [{up: jest.fn()}, {up: jest.fn()}];
+      const services: IPostboyDependingService[] = [{ up: jest.fn() }, { up: jest.fn() }];
       registrator.registerServices(services);
 
       registrator.up();
@@ -111,7 +111,7 @@ describe('PostboyAbstractRegistrator', () => {
 
   describe('recordHandler', () => {
     it('should call postboyService.recordHandler with provided executor and handler', () => {
-      const handler = {handle: jest.fn()};
+      const handler = { handle: jest.fn() };
       //
       registrator.recordHandler(TestExec, handler);
       //

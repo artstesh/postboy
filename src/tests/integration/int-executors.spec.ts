@@ -1,9 +1,9 @@
-import {TestPostboy} from "./models/test-postboy";
-import {TestReg} from "./models/test-registry";
-import {should} from "@artstesh/it-should";
-import {TestExecutor} from "./models/test-executor";
-import {Forger} from "@artstesh/forger";
-import {TestHandler} from "./models/test-handler";
+import { TestPostboy } from './models/test-postboy';
+import { TestReg } from './models/test-registry';
+import { should } from '@artstesh/it-should';
+import { TestExecutor } from './models/test-executor';
+import { Forger } from '@artstesh/forger';
+import { TestHandler } from './models/test-handler';
 
 describe('Integration.Executors', () => {
   let postboy: TestPostboy;
@@ -17,14 +17,13 @@ describe('Integration.Executors', () => {
   });
 
   it(`should throw if exec not registered`, () => {
-    expect(() => postboy.exec(executor)).toThrow()
+    expect(() => postboy.exec(executor)).toThrow();
   });
 
   [
-    {name: 'Function', func: (r: TestReg) => r.recordExecutor(TestExecutor, e => handler.handle(e))},
-    {name: 'Handler', func: (r: TestReg) => r.recordHandler(TestExecutor, handler)}
+    { name: 'Function', func: (r: TestReg) => r.recordExecutor(TestExecutor, (e) => handler.handle(e)) },
+    { name: 'Handler', func: (r: TestReg) => r.recordHandler(TestExecutor, handler) },
   ].forEach((s) => {
-
     describe(`${s.name} Tests`, () => {
       let registry: TestReg;
 
@@ -39,6 +38,6 @@ describe('Integration.Executors', () => {
         //
         should().string(result).equals(handler.toReturn);
       });
-    })
+    });
   });
-})
+});

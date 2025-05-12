@@ -1,5 +1,5 @@
-import {PostboySubscription} from "../models/postboy-subscription";
-import {PostboyExecutor} from "../models/postboy-executor";
+import { PostboySubscription } from '../models/postboy-subscription';
+import { PostboyExecutor } from '../models/postboy-executor';
 
 /**
  * The PostboyMessageStore is a utility class for managing message subscriptions and executors.

@@ -1,7 +1,6 @@
-import {PostboyMiddleware} from "../../models/postboy-middleware";
-import {PostboyMiddlewareService} from "../../services/postboy-middleware.service";
-import {PostboyMessage} from "../../models/postboy.message";
-
+import { PostboyMiddleware } from '../../models/postboy-middleware';
+import { PostboyMiddlewareService } from '../../services/postboy-middleware.service';
+import { PostboyMessage } from '../../models/postboy.message';
 
 describe('PostboyMiddlewareService', () => {
   let service: PostboyMiddlewareService;
@@ -14,8 +13,7 @@ describe('PostboyMiddlewareService', () => {
     handle = jest.fn();
   }
 
-  class MockMessage extends PostboyMessage {
-  }
+  class MockMessage extends PostboyMessage {}
 
   it('should add middleware successfully', () => {
     const middleware = new MockMiddleware();

@@ -1,8 +1,8 @@
-import {PostboyGenericMessage} from '../models/postboy-generic-message';
-import {MessageHistoryItemMock} from './message-history-item-mock';
+import { PostboyGenericMessage } from '../models/postboy-generic-message';
+import { MessageHistoryItemMock } from './message-history-item-mock';
 
 export class MessageHistoryMock {
-  private _items = new Map<string,MessageHistoryItemMock<any>>();
+  private _items = new Map<string, MessageHistoryItemMock<any>>();
 
   get<T extends PostboyGenericMessage>(id: string): MessageHistoryItemMock<T> {
     return this._items.get(id) ?? new MessageHistoryItemMock();

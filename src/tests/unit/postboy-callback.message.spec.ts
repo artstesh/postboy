@@ -1,6 +1,6 @@
-import {PostboyCallbackMessage} from "../../models/postboy-callback.message";
-import {Forger} from "@artstesh/forger";
-import {should} from "@artstesh/it-should";
+import { PostboyCallbackMessage } from '../../models/postboy-callback.message';
+import { Forger } from '@artstesh/forger';
+import { should } from '@artstesh/it-should';
 
 class TestPostboyCallbackMessage extends PostboyCallbackMessage<string> {
   static ID = 'test';
@@ -16,10 +16,10 @@ describe('PostboyCallbackMessage', () => {
   it('should emit a value with next method', (done) => {
     const value = Forger.create<string>()!;
     //
-    message.result.subscribe(r => {
+    message.result.subscribe((r) => {
       expect(r).toEqual(value);
       done();
-    })
+    });
     //
     message.next(value);
   });
@@ -27,15 +27,15 @@ describe('PostboyCallbackMessage', () => {
   it('should emit and complete with finish method', (done) => {
     const value = Forger.create<string>()!;
     //
-    message.result.subscribe(r => {
+    message.result.subscribe((r) => {
       expect(r).toEqual(value);
       done();
-    })
+    });
     //
     message.finish(value);
   });
 
-  it('should complete the result observable after calling finish', done => {
+  it('should complete the result observable after calling finish', (done) => {
     message.result.subscribe({
       complete: () => {
         should().true(true);

@@ -1,16 +1,16 @@
-import {Observable, Subject} from 'rxjs';
-import {checkId, PostboyGenericMessage} from './models/postboy-generic-message';
-import {LockerStore} from './locker.store';
-import {PostboyLocker} from './models/postboy.locker';
-import {PostboySubscription} from './models/postboy-subscription';
-import {PostboyExecutor} from './models/postboy-executor';
-import {PostboyCallbackMessage} from './models/postboy-callback.message';
-import {MessageType} from './postboy-abstract.registrator';
-import {PostboyExecutionHandler} from './models/postboy-execution.handler';
-import {PostboyMiddlewareService} from "./services/postboy-middleware.service";
-import {PostboyMessageStore} from "./services/postboy-message.store";
-import {PostboyDependencyResolver} from "./services/postboy-dependency.resolver";
-import {PostboyMiddleware} from "./models/postboy-middleware";
+import { Observable, Subject } from 'rxjs';
+import { checkId, PostboyGenericMessage } from './models/postboy-generic-message';
+import { LockerStore } from './locker.store';
+import { PostboyLocker } from './models/postboy.locker';
+import { PostboySubscription } from './models/postboy-subscription';
+import { PostboyExecutor } from './models/postboy-executor';
+import { PostboyCallbackMessage } from './models/postboy-callback.message';
+import { MessageType } from './postboy-abstract.registrator';
+import { PostboyExecutionHandler } from './models/postboy-execution.handler';
+import { PostboyMiddlewareService } from './services/postboy-middleware.service';
+import { PostboyMessageStore } from './services/postboy-message.store';
+import { PostboyDependencyResolver } from './services/postboy-dependency.resolver';
+import { PostboyMiddleware } from './models/postboy-middleware';
 
 export class PostboyService {
   private locker = new LockerStore();
@@ -23,7 +23,6 @@ export class PostboyService {
     this.middleware = rsv.getMiddlewareService();
     this.store = rsv.getMessageStore();
   }
-
 
   /**
    * @deprecated The method should be replaced with lock<T>/unlock<T>
@@ -64,7 +63,7 @@ export class PostboyService {
    * @deprecated The method should be replaced with recordExecutor<T>
    */
   public registerExecutor<E extends PostboyExecutor<T>, T>(id: string, exec: (e: E) => T): void {
-    this.store.registerExecutor(id, exec as ((e: PostboyExecutor<T>) => T));
+    this.store.registerExecutor(id, exec as (e: PostboyExecutor<T>) => T);
   }
 
   /**
@@ -86,7 +85,7 @@ export class PostboyService {
    * @deprecated The method should be replaced with recordWithPipe<T>
    */
   public registerWithPipe<T>(id: string, sub: Subject<T>, pipe: (s: Subject<T>) => Observable<T>): void {
-    this.store.registerMessage(id, new PostboySubscription<T>(sub,pipe));
+    this.store.registerMessage(id, new PostboySubscription<T>(sub, pipe));
   }
 
   public unregister(id: string): void {
@@ -109,8 +108,7 @@ export class PostboyService {
    */
   public fire(message: PostboyGenericMessage): void {
     this.middleware.manage(message);
-    if (this.locker.check(message.id))
-      this.store.getMessage(message.id, message.constructor.name).fire(message);
+    if (this.locker.check(message.id)) this.store.getMessage(message.id, message.constructor.name).fire(message);
   }
 
   /**
@@ -176,7 +174,7 @@ export class PostboyService {
    * @return {void} No return value.
    */
   public recordExecutor<E extends PostboyExecutor<T>, T>(type: new (...args: any[]) => E, exec: (e: E) => T): void {
-    this.store.registerExecutor(checkId(type), exec as ((e: PostboyExecutor<T>) => T));
+    this.store.registerExecutor(checkId(type), exec as (e: PostboyExecutor<T>) => T);
   }
 
   /**

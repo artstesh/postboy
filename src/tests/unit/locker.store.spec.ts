@@ -1,5 +1,5 @@
-import { LockerStore } from './locker.store';
-import { PostboyLocker } from './models/postboy.locker';
+import { LockerStore } from '../../locker.store';
+import { PostboyLocker } from '../../models/postboy.locker';
 import { should } from '@artstesh/it-should';
 import { Forger } from '@artstesh/forger';
 

@@ -13,6 +13,6 @@ export class PostboyMiddlewareService {
   }
 
   public manage(msg: PostboyMessage): void {
-    for (let i = 0; i < this.middlewares.length; i++) this.middlewares[i].handle(msg);
+    for (const item of this.middlewares) item.handle(msg);
   }
 }

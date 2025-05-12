@@ -11,3 +11,5 @@ export * from './models/postboy-execution.handler';
 export * from './models/postboy-executor';
 export * from './models/postboy-middleware';
 export * from './models/postboy.message';
+export * from './services/postboy-middleware.service';
+export * from './services/postboy-message.store';

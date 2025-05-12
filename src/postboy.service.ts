@@ -1,14 +1,14 @@
-import {Observable, Subject} from 'rxjs';
-import {checkId, PostboyGenericMessage} from './models/postboy-generic-message';
-import {PostboySubscription} from './models/postboy-subscription';
-import {PostboyExecutor} from './models/postboy-executor';
-import {PostboyCallbackMessage} from './models/postboy-callback.message';
-import {MessageType} from './postboy-abstract.registrator';
-import {PostboyExecutionHandler} from './models/postboy-execution.handler';
-import {PostboyMiddleware} from "./models/postboy-middleware";
-import {PostboyDependencyResolver} from "./services/postboy-dependency.resolver";
-import {PostboyMiddlewareService} from "./services/postboy-middleware.service";
-import {PostboyMessageStore} from "./services/postboy-message.store";
+import { Observable, Subject } from 'rxjs';
+import { checkId, PostboyGenericMessage } from './models/postboy-generic-message';
+import { PostboySubscription } from './models/postboy-subscription';
+import { PostboyExecutor } from './models/postboy-executor';
+import { PostboyCallbackMessage } from './models/postboy-callback.message';
+import { MessageType } from './postboy-abstract.registrator';
+import { PostboyExecutionHandler } from './models/postboy-execution.handler';
+import { PostboyMiddleware } from './models/postboy-middleware';
+import { PostboyDependencyResolver } from './services/postboy-dependency.resolver';
+import { PostboyMiddlewareService } from './services/postboy-middleware.service';
+import { PostboyMessageStore } from './services/postboy-message.store';
 
 export class PostboyService {
   protected locked = new Set<string>();
@@ -80,8 +80,7 @@ export class PostboyService {
    */
   public fire(message: PostboyGenericMessage): void {
     this.middleware.manage(message);
-    if (!this.locked.has(message.id))
-      this.store.getMessage(message.id, message.constructor.name).fire(message);
+    if (!this.locked.has(message.id)) this.store.getMessage(message.id, message.constructor.name).fire(message);
   }
 
   /**
@@ -157,7 +156,7 @@ export class PostboyService {
    * @return {void} This method does not return any value.
    */
   public recordExecutor<E extends PostboyExecutor<T>, T>(type: MessageType<E>, exec: (e: E) => T): void {
-    this.store.registerExecutor(checkId(type), exec as ((e: PostboyExecutor<T>) => T));
+    this.store.registerExecutor(checkId(type), exec as (e: PostboyExecutor<T>) => T);
   }
 
   /**

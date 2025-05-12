@@ -1,7 +1,7 @@
-import {Subject} from 'rxjs';
-import {PostboyMessageStore} from "../../services/postboy-message.store";
-import {PostboySubscription} from "../../models/postboy-subscription";
-import {Forger} from "@artstesh/forger";
+import { Subject } from 'rxjs';
+import { PostboyMessageStore } from '../../services/postboy-message.store';
+import { PostboySubscription } from '../../models/postboy-subscription';
+import { Forger } from '@artstesh/forger';
 
 describe('PostboyMessageStore', () => {
   let store: PostboyMessageStore;
@@ -24,16 +24,14 @@ describe('PostboyMessageStore', () => {
     });
 
     it('should throw an error if the message does not exist', () => {
-      const name = Forger.create<string>({stringSpecial: false})!;
+      const name = Forger.create<string>({ stringSpecial: false })!;
       const id = Forger.create<string>()!;
       //
-      expect(() => store.getMessage(id, name))
-        .toThrow(new RegExp('.?' + name + '.?', 'g'));
+      expect(() => store.getMessage(id, name)).toThrow(new RegExp('.?' + name + '.?', 'g'));
     });
   });
 
   describe('getExecutor', () => {
-
     it('should retrieve a registered executor', () => {
       const executor = jest.fn();
       const id = Forger.create<string>()!;
@@ -44,9 +42,8 @@ describe('PostboyMessageStore', () => {
     });
 
     it('should throw an error if the executor does not exist', () => {
-      const id = Forger.create<string>({stringSpecial: false})!;
-      expect(() => store.getExecutor(id))
-        .toThrow(new RegExp('.?' + id + '.?', 'g'));
+      const id = Forger.create<string>({ stringSpecial: false })!;
+      expect(() => store.getExecutor(id)).toThrow(new RegExp('.?' + id + '.?', 'g'));
     });
   });
 
@@ -58,8 +55,7 @@ describe('PostboyMessageStore', () => {
       store.registerMessage(id, subscription);
       store.unregister(id);
       //
-      expect(() => store.getMessage(id, name))
-        .toThrow();
+      expect(() => store.getMessage(id, name)).toThrow();
     });
 
     it('should handle unregistering a non-existent message gracefully', () => {

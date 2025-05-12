@@ -1,16 +1,16 @@
-import {Subject} from 'rxjs';
-import {PostboyService} from '../../postboy.service';
-import {PostboyExecutor} from '../../models/postboy-executor';
-import {PostboyGenericMessage} from '../../models/postboy-generic-message';
-import {PostboyCallbackMessage} from '../../models/postboy-callback.message';
-import {Forger} from '@artstesh/forger';
-import {anything, instance, mock, reset, verify, when} from "ts-mockito";
-import {PostboyMiddlewareService} from "../../services/postboy-middleware.service";
-import {PostboyMessageStore} from "../../services/postboy-message.store";
-import {PostboyDependencyResolver} from "../../services/postboy-dependency.resolver";
-import {PostboyMiddleware} from "../../models/postboy-middleware";
-import {PostboySubscription} from "../../models/postboy-subscription";
-import {should} from "@artstesh/it-should";
+import { Subject } from 'rxjs';
+import { PostboyService } from '../../postboy.service';
+import { PostboyExecutor } from '../../models/postboy-executor';
+import { PostboyGenericMessage } from '../../models/postboy-generic-message';
+import { PostboyCallbackMessage } from '../../models/postboy-callback.message';
+import { Forger } from '@artstesh/forger';
+import { anything, instance, mock, reset, verify, when } from 'ts-mockito';
+import { PostboyMiddlewareService } from '../../services/postboy-middleware.service';
+import { PostboyMessageStore } from '../../services/postboy-message.store';
+import { PostboyDependencyResolver } from '../../services/postboy-dependency.resolver';
+import { PostboyMiddleware } from '../../models/postboy-middleware';
+import { PostboySubscription } from '../../models/postboy-subscription';
+import { should } from '@artstesh/it-should';
 
 describe('PostboyService', () => {
   let service: PostboyService;
@@ -66,7 +66,7 @@ describe('PostboyService', () => {
 
     afterEach(() => {
       reset(subscription);
-    })
+    });
 
     it('should apply middleware', () => {
       const message = new TestMessage();
@@ -190,7 +190,7 @@ describe('PostboyService', () => {
 
     afterEach(() => {
       reset(subscription);
-    })
+    });
 
     it('should return sub', () => {
       const expected = Forger.create<number>() as any;

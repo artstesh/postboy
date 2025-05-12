@@ -1,7 +1,7 @@
-import {firstValueFrom} from 'rxjs';
-import {PostboyCallbackMessage} from "../../models/postboy-callback.message";
-import {Forger} from "@artstesh/forger";
-import {should} from "@artstesh/it-should";
+import { firstValueFrom } from 'rxjs';
+import { PostboyCallbackMessage } from '../../models/postboy-callback.message';
+import { Forger } from '@artstesh/forger';
+import { should } from '@artstesh/it-should';
 
 class TestPostboyCallbackMessage extends PostboyCallbackMessage<string> {
   static ID = 'test';
@@ -20,7 +20,9 @@ describe('PostboyCallbackMessage', () => {
     //
     message.next(value);
     //
-    should().string(await resultPromise).equals(value);
+    should()
+      .string(await resultPromise)
+      .equals(value);
   });
 
   it('should emit and complete with finish method', async () => {
@@ -29,10 +31,12 @@ describe('PostboyCallbackMessage', () => {
     //
     message.finish(value);
     //
-    should().string(await resultPromise).equals(value);
+    should()
+      .string(await resultPromise)
+      .equals(value);
   });
 
-  it('should complete the result observable after calling finish', done => {
+  it('should complete the result observable after calling finish', (done) => {
     message.result.subscribe({
       complete: () => {
         should().true(true);

@@ -15,7 +15,7 @@
     "postversion": "git push && git push --tags",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "tslint -p tsconfig.json",
-    "test": "clearjs && jest --config jest.config.js",
+    "test": "npm run clearjs && jest --config jest.config.js",
     "build": "tsc -p tsconfig.json",
     "clearjs": "cd src && del /s *.d.ts.map && del /s *.d.ts && del /s *.js.map && del /s *.js"
   },

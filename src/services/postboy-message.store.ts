@@ -20,8 +20,9 @@ export class PostboyMessageStore {
   }
 
   callbackFired(message: PostboyCallbackMessage<any>): void {
-    this.callbacks.get(message.id)?.push(() => message.complete()) ||
-    this.callbacks.set(message.id, [() => message.complete()]);
+    const existingCallbacks = this.callbacks.get(message.id);
+    existingCallbacks ? existingCallbacks.push(() => message.complete()) :
+      this.callbacks.set(message.id, [() => message.complete()]);
   }
 
   public getMessage(id: string, name: string): PostboySubscription<any> {

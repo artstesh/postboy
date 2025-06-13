@@ -1,11 +1,11 @@
-import {TestPostboy} from './models/test-postboy';
-import {TestMessage} from './models/test-message';
-import {TestCallbackMessage} from './models/test-callback-message';
-import {should} from '@artstesh/it-should';
-import {TestExecutor} from "./models/test-executor";
-import {Forger} from "@artstesh/forger";
-import {TestMiddleware} from "./models/test-middleware";
-import {TestReg} from "./models/test-registry";
+import { TestPostboy } from './models/test-postboy';
+import { TestMessage } from './models/test-message';
+import { TestCallbackMessage } from './models/test-callback-message';
+import { should } from '@artstesh/it-should';
+import { TestExecutor } from './models/test-executor';
+import { Forger } from '@artstesh/forger';
+import { TestMiddleware } from './models/test-middleware';
+import { TestReg } from './models/test-registry';
 
 describe('Integration.Middleware', () => {
   let postboy: TestPostboy;

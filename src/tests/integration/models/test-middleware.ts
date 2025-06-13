@@ -1,7 +1,7 @@
-import {PostboyMiddleware} from "../../../models/postboy-middleware";
-import {PostboyMessage} from "../../../models/postboy.message";
+import { PostboyMiddleware } from '../../../models/postboy-middleware';
+import { PostboyMessage } from '../../../models/postboy.message';
 
-export class TestMiddleware implements PostboyMiddleware{
+export class TestMiddleware implements PostboyMiddleware {
   fired?: PostboyMessage;
 
   handle(message: PostboyMessage): void {

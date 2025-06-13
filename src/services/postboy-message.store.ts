@@ -1,6 +1,6 @@
-import {PostboySubscription} from '../models/postboy-subscription';
-import {PostboyExecutor} from '../models/postboy-executor';
-import {PostboyCallbackMessage} from "../models/postboy-callback.message";
+import { PostboySubscription } from '../models/postboy-subscription';
+import { PostboyExecutor } from '../models/postboy-executor';
+import { PostboyCallbackMessage } from '../models/postboy-callback.message';
 
 /**
  * The PostboyMessageStore is a utility class for managing message subscriptions and executors.
@@ -21,8 +21,9 @@ export class PostboyMessageStore {
 
   callbackFired(message: PostboyCallbackMessage<any>): void {
     const existingCallbacks = this.callbacks.get(message.id);
-    existingCallbacks ? existingCallbacks.push(() => message.complete()) :
-      this.callbacks.set(message.id, [() => message.complete()]);
+    existingCallbacks
+      ? existingCallbacks.push(() => message.complete())
+      : this.callbacks.set(message.id, [() => message.complete()]);
   }
 
   public getMessage(id: string, name: string): PostboySubscription<any> {
@@ -40,7 +41,7 @@ export class PostboyMessageStore {
   public unregister(id: string): void {
     this.messages.get(id)?.finish();
     this.messages.delete(id);
-    this.callbacks.get(id)?.forEach(c => c());
+    this.callbacks.get(id)?.forEach((c) => c());
     this.callbacks.delete(id);
     this.executors.delete(id);
   }

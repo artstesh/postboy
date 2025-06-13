@@ -4,7 +4,7 @@ import { TestCallbackMessage } from './models/test-callback-message';
 import { TestReg } from './models/test-registry';
 import { skip, Subject, tap } from 'rxjs';
 import { should } from '@artstesh/it-should';
-import {Forger} from "@artstesh/forger";
+import { Forger } from '@artstesh/forger';
 
 describe('Integration.Messages', () => {
   let postboy: TestPostboy;
@@ -84,7 +84,7 @@ describe('Integration.Messages', () => {
     const registry = new TestReg(postboy);
     registry.recordSubject(TestCallbackMessage);
     const message = new TestCallbackMessage();
-    message.result.subscribe({complete: () => done()});
+    message.result.subscribe({ complete: () => done() });
     postboy.fireCallback(message);
     //
     registry.down();

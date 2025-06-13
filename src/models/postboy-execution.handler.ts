@@ -11,5 +11,11 @@ import { PostboyExecutor } from './postboy-executor';
  * @template E The type of the executor extending the PostboyExecutor.
  */
 export abstract class PostboyExecutionHandler<R, E extends PostboyExecutor<R>> {
+  /**
+   * Abstract method to handle the specified executor and return a result.
+   *
+   * @param {E} executor - The executor that will be processed by the method.
+   * @return {R} The result obtained after handling the executor.
+   */
   abstract handle(executor: E): R;
 }

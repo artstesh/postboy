@@ -23,6 +23,11 @@ export abstract class PostboyAbstractRegistrator {
     this.services = services;
   }
 
+  /**
+   * Initiates the 'up' process for the current instance and all associated services.
+   *
+   * @return {void} Does not return a value.
+   */
   public up(): void {
     this._up();
     this.services.forEach((s) => s.up());

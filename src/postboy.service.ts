@@ -93,6 +93,7 @@ export class PostboyService {
    */
   public fireCallback<T>(message: PostboyCallbackMessage<T>, action?: (e: T) => void): Observable<T> {
     this.middleware.manage(message);
+    this.store.callbackFired(message);
     message.result.subscribe(action);
     if (!this.locked.has(message.id))
       setTimeout(() => this.store.getMessage(message.id, message.constructor.name).fire(message));

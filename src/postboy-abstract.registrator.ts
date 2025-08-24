@@ -36,6 +36,7 @@ export abstract class PostboyAbstractRegistrator {
   protected abstract _up(): void;
 
   public down(): void {
+    this.services.forEach((s) => !!s.down && s.down());
     this.services = [];
     this.ids.forEach((id) => this.postboy.unregister(id));
   }

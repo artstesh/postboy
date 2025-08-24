@@ -69,6 +69,7 @@ export abstract class PostboyAbstractRegistrator {
   public registerSubject = <T>(id: string) => this.register(id, new Subject<T>());
 
   public down(): void {
+    this.services.forEach((s) => !!s.down && s.down());
     this.services = [];
     this.ids.forEach((id) => this.postboy.unregister(id));
   }

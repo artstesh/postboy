@@ -1,15 +1,15 @@
-import {Observable, Subject} from 'rxjs';
-import {checkId, PostboyGenericMessage} from './models/postboy-generic-message';
-import {PostboySubscription} from './models/postboy-subscription';
-import {PostboyExecutor} from './models/postboy-executor';
-import {PostboyCallbackMessage} from './models/postboy-callback.message';
-import {MessageType, PostboyAbstractRegistrator} from './postboy-abstract.registrator';
-import {PostboyExecutionHandler} from './models/postboy-execution.handler';
-import {PostboyMiddleware} from './models/postboy-middleware';
-import {PostboyDependencyResolver} from './services/postboy-dependency.resolver';
-import {PostboyMiddlewareService} from './services/postboy-middleware.service';
-import {PostboyMessageStore} from './services/postboy-message.store';
-import {PostboyNamespaceStore} from "./services/postboy-namespace.store";
+import { Observable, Subject } from 'rxjs';
+import { checkId, PostboyGenericMessage } from './models/postboy-generic-message';
+import { PostboySubscription } from './models/postboy-subscription';
+import { PostboyExecutor } from './models/postboy-executor';
+import { PostboyCallbackMessage } from './models/postboy-callback.message';
+import { MessageType, PostboyAbstractRegistrator } from './postboy-abstract.registrator';
+import { PostboyExecutionHandler } from './models/postboy-execution.handler';
+import { PostboyMiddleware } from './models/postboy-middleware';
+import { PostboyDependencyResolver } from './services/postboy-dependency.resolver';
+import { PostboyMiddlewareService } from './services/postboy-middleware.service';
+import { PostboyMessageStore } from './services/postboy-message.store';
+import { PostboyNamespaceStore } from './services/postboy-namespace.store';
 
 export class PostboyService {
   protected locked = new Set<string>();

@@ -1,7 +1,7 @@
 import { PostboyMiddlewareService } from './postboy-middleware.service';
 import { PostboyMessageStore } from './postboy-message.store';
-import {PostboyNamespaceStore} from "./postboy-namespace.store";
-import {PostboyService} from "../postboy.service";
+import { PostboyNamespaceStore } from './postboy-namespace.store';
+import { PostboyService } from '../postboy.service';
 
 export class PostboyDependencyResolver {
   /**

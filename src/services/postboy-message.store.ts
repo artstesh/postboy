@@ -47,8 +47,8 @@ export class PostboyMessageStore {
   }
 
   public dispose(): void {
-    this.messages.forEach((m,id) => this.unregister(id));
-    this.callbacks.forEach(fs => fs.forEach(f => f()));
+    this.messages.forEach((m, id) => this.unregister(id));
+    this.callbacks.forEach((fs) => fs.forEach((f) => f()));
     this.messages.clear();
     this.executors.clear();
     this.callbacks.clear();

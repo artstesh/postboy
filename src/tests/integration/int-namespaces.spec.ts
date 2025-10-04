@@ -5,7 +5,7 @@ import { TestReg } from './models/test-registry';
 import { skip, Subject, tap } from 'rxjs';
 import { should } from '@artstesh/it-should';
 import { Forger } from '@artstesh/forger';
-import {PostboyAbstractRegistrator} from "../../postboy-abstract.registrator";
+import { PostboyAbstractRegistrator } from '../../postboy-abstract.registrator';
 
 describe('Integration.Namespaces', () => {
   let postboy: TestPostboy;

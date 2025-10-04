@@ -1,10 +1,10 @@
 import { PostboyService } from './postboy.service';
-import {BehaviorSubject, Observable, pipe, ReplaySubject, Subject} from 'rxjs';
+import { BehaviorSubject, Observable, pipe, ReplaySubject, Subject } from 'rxjs';
 import { IPostboyDependingService } from './i-postboy-depending.service';
 import { PostboyExecutor } from './models/postboy-executor';
 import { checkId, PostboyGenericMessage } from './models/postboy-generic-message';
 import { PostboyExecutionHandler } from './models/postboy-execution.handler';
-import {IdGenerator} from "./utils/id.generator";
+import { IdGenerator } from './utils/id.generator';
 
 export type MessageType<T extends PostboyGenericMessage> = new (...args: any[]) => T;
 
@@ -16,7 +16,10 @@ export abstract class PostboyAbstractRegistrator {
   private services: IPostboyDependingService[] = [];
   private readonly _namespace: string;
 
-  constructor(protected postboy: PostboyService, namespace: string | null = null) {
+  constructor(
+    protected postboy: PostboyService,
+    namespace: string | null = null,
+  ) {
     this._namespace = namespace ?? IdGenerator.get();
   }
 
@@ -86,7 +89,10 @@ export abstract class PostboyAbstractRegistrator {
    * @param exec A callback function that executes the logic using an instance of the specified executor type.
    * @return void
    */
-  public recordExecutor<E extends PostboyExecutor<T>, T>(type: new (...args: any[]) => E, exec: (e: E) => T): PostboyAbstractRegistrator {
+  public recordExecutor<E extends PostboyExecutor<T>, T>(
+    type: new (...args: any[]) => E,
+    exec: (e: E) => T,
+  ): PostboyAbstractRegistrator {
     this.postboy.recordExecutor(type, exec);
     return this;
   }
@@ -119,7 +125,10 @@ export abstract class PostboyAbstractRegistrator {
    * Defaults to 1 if not specified.
    * @returns The result of invoking the `record` method with the given message type and configured ReplaySubject.
    */
-  public recordReplay<T extends PostboyGenericMessage>(type: MessageType<T>, bufferSize = 1): PostboyAbstractRegistrator {
+  public recordReplay<T extends PostboyGenericMessage>(
+    type: MessageType<T>,
+    bufferSize = 1,
+  ): PostboyAbstractRegistrator {
     this.record(type, new ReplaySubject<T>(bufferSize));
     return this;
   }

@@ -1,6 +1,6 @@
-import {PostboyAbstractRegistrator} from "../postboy-abstract.registrator";
-import {NamespaceRegistrator} from "./namespace-registrator";
-import {PostboyService} from "../postboy.service";
+import { PostboyAbstractRegistrator } from '../postboy-abstract.registrator';
+import { NamespaceRegistrator } from './namespace-registrator';
+import { PostboyService } from '../postboy.service';
 
 /**
  * Represents a store for managing namespaces in the Postboy system.
@@ -9,8 +9,7 @@ import {PostboyService} from "../postboy.service";
 export class PostboyNamespaceStore {
   private spaces: Map<string, PostboyAbstractRegistrator> = new Map();
 
-  constructor(private postboy: PostboyService) {
-  }
+  constructor(private postboy: PostboyService) {}
 
   /**
    * Adds a new namespace to the registry.
@@ -32,7 +31,7 @@ export class PostboyNamespaceStore {
    * @param {string} space - The name of the space to be removed.
    * @return {void} This method does not return a value.
    */
-  public eliminateSpace(space: string): void  {
+  public eliminateSpace(space: string): void {
     if (!this.spaces.has(space)) return;
     this.spaces.get(space)?.down();
     this.spaces.delete(space);

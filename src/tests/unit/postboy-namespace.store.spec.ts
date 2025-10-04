@@ -1,8 +1,8 @@
 // postboy-namespace.store.spec.ts
-import {Forger} from "@artstesh/forger";
-import {PostboyNamespaceStore} from "../../services/postboy-namespace.store";
-import {PostboyService} from "../../postboy.service";
-import {PostboyAbstractRegistrator} from "../../postboy-abstract.registrator";
+import { Forger } from '@artstesh/forger';
+import { PostboyNamespaceStore } from '../../services/postboy-namespace.store';
+import { PostboyService } from '../../postboy.service';
+import { PostboyAbstractRegistrator } from '../../postboy-abstract.registrator';
 
 describe('PostboyNamespaceStore', () => {
   let postboyService: PostboyService;

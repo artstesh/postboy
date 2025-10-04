@@ -1,24 +1,27 @@
-import { Observable, Subject } from 'rxjs';
-import { checkId, PostboyGenericMessage } from './models/postboy-generic-message';
-import { PostboySubscription } from './models/postboy-subscription';
-import { PostboyExecutor } from './models/postboy-executor';
-import { PostboyCallbackMessage } from './models/postboy-callback.message';
-import { MessageType } from './postboy-abstract.registrator';
-import { PostboyExecutionHandler } from './models/postboy-execution.handler';
-import { PostboyMiddleware } from './models/postboy-middleware';
-import { PostboyDependencyResolver } from './services/postboy-dependency.resolver';
-import { PostboyMiddlewareService } from './services/postboy-middleware.service';
-import { PostboyMessageStore } from './services/postboy-message.store';
+import {Observable, Subject} from 'rxjs';
+import {checkId, PostboyGenericMessage} from './models/postboy-generic-message';
+import {PostboySubscription} from './models/postboy-subscription';
+import {PostboyExecutor} from './models/postboy-executor';
+import {PostboyCallbackMessage} from './models/postboy-callback.message';
+import {MessageType, PostboyAbstractRegistrator} from './postboy-abstract.registrator';
+import {PostboyExecutionHandler} from './models/postboy-execution.handler';
+import {PostboyMiddleware} from './models/postboy-middleware';
+import {PostboyDependencyResolver} from './services/postboy-dependency.resolver';
+import {PostboyMiddlewareService} from './services/postboy-middleware.service';
+import {PostboyMessageStore} from './services/postboy-message.store';
+import {PostboyNamespaceStore} from "./services/postboy-namespace.store";
 
 export class PostboyService {
   protected locked = new Set<string>();
   private middleware: PostboyMiddlewareService;
   private store: PostboyMessageStore;
+  private namespaceStore?: PostboyNamespaceStore;
+  private dependencyResolver: PostboyDependencyResolver;
 
   constructor(resolver?: PostboyDependencyResolver) {
-    const rsv = resolver || new PostboyDependencyResolver();
-    this.middleware = rsv.getMiddlewareService();
-    this.store = rsv.getMessageStore();
+    this.dependencyResolver = resolver || new PostboyDependencyResolver();
+    this.middleware = this.dependencyResolver.getMiddlewareService();
+    this.store = this.dependencyResolver.getMessageStore();
   }
 
   /**
@@ -172,5 +175,38 @@ export class PostboyService {
     handler: PostboyExecutionHandler<R, E>,
   ): void {
     this.store.registerExecutor(checkId(executor), (e) => handler.handle(e as E));
+  }
+
+  /**
+   * Adds a namespace to the namespace store.
+   *
+   * @param {string} space - The name of the namespace to be added.
+   * @return {PostboyAbstractRegistrator} The instance of the namespace after adding the specified namespace.
+   */
+  public addNamespace(space: string): PostboyAbstractRegistrator {
+    if (!this.namespaceStore) this.namespaceStore = this.dependencyResolver.getNamespaceStore(this);
+    return this.namespaceStore.addSpace(space);
+  }
+
+  /**
+   * Removes the specified namespace from the namespace store.
+   *
+   * @param {string} space - The name of the namespace to be removed.
+   * @return {void} This method does not return a value.
+   */
+  public eliminateNamespace(space: string): void {
+    return this.namespaceStore?.eliminateSpace(space);
+  }
+
+  /**
+   * Disposes of resources and cleans up any internal components or stores associated with the instance.
+   * This method ensures that all resources are properly released to avoid memory leaks.
+   *
+   * @return {void} This method does not return a value.
+   */
+  public dispose(): void {
+    this.namespaceStore?.dispose();
+    this.store.dispose();
+    this.middleware.dispose();
   }
 }

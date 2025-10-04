@@ -45,4 +45,12 @@ export class PostboyMessageStore {
     this.callbacks.delete(id);
     this.executors.delete(id);
   }
+
+  public dispose(): void {
+    this.messages.forEach((m,id) => this.unregister(id));
+    this.callbacks.forEach(fs => fs.forEach(f => f()));
+    this.messages.clear();
+    this.executors.clear();
+    this.callbacks.clear();
+  }
 }

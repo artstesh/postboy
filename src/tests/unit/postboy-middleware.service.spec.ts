@@ -55,4 +55,15 @@ describe('PostboyMiddlewareService', () => {
     //
     expect(() => service.manage(msg)).not.toThrow();
   });
+
+  it('should remove middleware on dispose()', () => {
+    const middleware = new MockMiddleware();
+    service.addMiddleware(middleware);
+    service.dispose();
+    //
+    middleware.handle.mockClear();
+    service.manage(new MockMessage());
+    //
+    expect(middleware.handle).not.toHaveBeenCalled();
+  });
 });

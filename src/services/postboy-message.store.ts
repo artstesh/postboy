@@ -10,10 +10,14 @@ export class PostboyMessageStore {
   protected executors = new Map<string, (e: PostboyExecutor<any>) => any>();
 
   public registerMessage(id: string, sub: PostboySubscription<any>): void {
+    // tslint:disable-next-line:no-console
+    if(this.applications.has(id)) console.warn(`Message with id ${id} already registered. Overriding...`);
     this.applications.set(id, sub);
   }
 
   public registerExecutor(id: string, executor: (e: PostboyExecutor<any>) => any): void {
+    // tslint:disable-next-line:no-console
+    if (this.executors.has(id)) console.warn(`Executor with id ${id} already registered. Overriding...`);
     this.executors.set(id, executor);
   }
 

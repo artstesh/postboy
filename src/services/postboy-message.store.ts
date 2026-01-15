@@ -11,7 +11,7 @@ export class PostboyMessageStore {
 
   public registerMessage(id: string, sub: PostboySubscription<any>): void {
     // tslint:disable-next-line:no-console
-    if(this.applications.has(id)) console.warn(`Message with id ${id} already registered. Overriding...`);
+    if (this.applications.has(id)) console.warn(`Message with id ${id} already registered. Overriding...`);
     this.applications.set(id, sub);
   }
 

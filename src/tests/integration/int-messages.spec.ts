@@ -2,7 +2,7 @@ import { TestPostboy } from './models/test-postboy';
 import { TestMessage } from './models/test-message';
 import { TestCallbackMessage } from './models/test-callback-message';
 import { TestReg } from './models/test-registry';
-import {combineLatest, share, shareReplay, skip, Subject, tap} from 'rxjs';
+import { combineLatest, share, shareReplay, skip, Subject, tap } from 'rxjs';
 import { should } from '@artstesh/it-should';
 import { Forger } from '@artstesh/forger';
 
@@ -100,7 +100,12 @@ describe('Integration.Messages', () => {
 
   it('should be able to be cooled with pipe', () => {
     let count = 0;
-    new TestReg(postboy).recordWithPipe(TestMessage, new Subject(), (s) => s.pipe(tap(() => count++),share()));
+    new TestReg(postboy).recordWithPipe(TestMessage, new Subject(), (s) =>
+      s.pipe(
+        tap(() => count++),
+        share(),
+      ),
+    );
     //
     combineLatest([postboy.sub(TestMessage), postboy.sub(TestMessage)]).subscribe();
     postboy.fire(new TestMessage());

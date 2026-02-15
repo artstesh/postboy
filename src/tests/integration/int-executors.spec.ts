@@ -7,7 +7,7 @@ import { TestHandler } from './models/test-handler';
 
 describe('Integration.Executors', () => {
   let postboy: TestPostboy;
-  let executor: TestExecutor;
+  let executor: TestExecutor<string>;
   let handler: TestHandler;
 
   beforeEach(() => {
@@ -34,7 +34,7 @@ describe('Integration.Executors', () => {
       });
 
       it(`should exec correctly`, () => {
-        const result = postboy.exec<string>(executor)!;
+        const result = postboy.exec(executor)!;
         //
         should().string(result).equals(handler.toReturn);
       });

@@ -1,4 +1,4 @@
-import {PostboyExecutor} from "../../../models/postboy-executor";
+import { PostboyExecutor } from '../../../models/postboy-executor';
 
 export class TestExecutor<T> extends PostboyExecutor<T> {
   static readonly ID = 'test-executor';

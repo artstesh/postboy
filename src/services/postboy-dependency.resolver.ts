@@ -2,6 +2,7 @@ import { PostboyMiddlewareService } from './postboy-middleware.service';
 import { PostboyMessageStore } from './postboy-message.store';
 import { PostboyNamespaceStore } from './postboy-namespace.store';
 import { PostboyService } from '../postboy.service';
+import {PostboyContextService} from "./postboy-context.service";
 
 export class PostboyDependencyResolver {
   /**
@@ -31,4 +32,5 @@ export class PostboyDependencyResolver {
    * @returns {PostboyNamespaceStore} A new instance of PostboyNamespaceStore associated with the given PostboyService.
    */
   getNamespaceStore = (postboy: PostboyService) => new PostboyNamespaceStore(postboy);
+  getPostboyContextService = (active: boolean) => new PostboyContextService(active);
 }

@@ -49,6 +49,12 @@ describe('Integration.Messages', () => {
           //
           should().true(sub.closed);
         });
+
+        it(`should fire sub on once`, (done) => {
+          postboy.once(message.type).subscribe(() => done());
+          //
+          postboy.fire(message);
+        });
       });
     });
 
@@ -68,6 +74,10 @@ describe('Integration.Messages', () => {
           .subscribe(() => done());
         //
         postboy.fire(message);
+      });
+
+      it(`should fire sub on once`, (done) => {
+        postboy.once(message.type).subscribe(() => done());
       });
 
       it(`should complete subs on down`, () => {

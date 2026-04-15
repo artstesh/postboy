@@ -1,4 +1,4 @@
-import { Observable, Subject } from 'rxjs';
+import {first, Observable, Subject} from 'rxjs';
 import { checkId, PostboyGenericMessage } from './models/postboy-generic-message';
 import { PostboySubscription } from './models/postboy-subscription';
 import { PostboyExecutor } from './models/postboy-executor';
@@ -10,6 +10,8 @@ import { PostboyDependencyResolver } from './services/postboy-dependency.resolve
 import { PostboyMiddlewareService } from './services/postboy-middleware.service';
 import { PostboyMessageStore } from './services/postboy-message.store';
 import { PostboyNamespaceStore } from './services/postboy-namespace.store';
+import {PostboyContextService} from "./services/postboy-context.service";
+import {PostboySettings} from "./models/postboy.settings";
 
 export class PostboyService {
   protected locked = new Set<string>();
@@ -17,11 +19,15 @@ export class PostboyService {
   private store: PostboyMessageStore;
   private namespaceStore?: PostboyNamespaceStore;
   private dependencyResolver: PostboyDependencyResolver;
+  private context: PostboyContextService;
+  private settings: PostboySettings;
 
-  constructor(resolver?: PostboyDependencyResolver) {
+  constructor(settings?: Partial<PostboySettings>,resolver?: PostboyDependencyResolver) {
+    this.settings = new PostboySettings(settings);
     this.dependencyResolver = resolver || new PostboyDependencyResolver();
     this.middleware = this.dependencyResolver.getMiddlewareService();
     this.store = this.dependencyResolver.getMessageStore();
+    this.context = this.dependencyResolver.getPostboyContextService(this.settings.metadata);
   }
 
   /**
@@ -82,8 +88,11 @@ export class PostboyService {
    * @throws {Error} Throws an error if no registered event is found for the provided message ID.
    */
   public fire(message: PostboyGenericMessage): void {
-    this.middleware.manage(message);
-    if (!this.locked.has(message.id)) this.store.getMessage(message.id, message.constructor.name).fire(message);
+    const context = this.context.createChild(message);
+    this.context.run(context, () => {
+      this.middleware.manage(message);
+      if (!this.locked.has(message.id)) this.store.getMessage(message.id, message.constructor.name).fire(message);
+    });
   }
 
   /**
@@ -95,12 +104,15 @@ export class PostboyService {
    * @return {void} This method does not return any value.
    */
   public fireCallback<T>(message: PostboyCallbackMessage<T>, action?: (e: T) => void): Observable<T> {
-    this.middleware.manage(message);
-    this.store.callbackFired(message);
-    message.result.subscribe(action);
-    if (!this.locked.has(message.id))
-      setTimeout(() => this.store.getMessage(message.id, message.constructor.name).fire(message));
-    return message.result;
+    const context = this.context.createChild(message);
+    return this.context.run(context, () => {
+      this.middleware.manage(message);
+      this.store.callbackFired(message);
+      message.result.subscribe(action);
+      if (!this.locked.has(message.id))
+        setTimeout(() => this.store.getMessage(message.id, message.constructor.name).fire(message));
+      return message.result;
+    });
   }
 
   /**
@@ -111,8 +123,11 @@ export class PostboyService {
    * @throws {Error} If the specified executor is not registered.
    */
   public exec<T>(executor: PostboyExecutor<T>): T {
-    this.middleware.manage(executor);
-    return this.store.getExecutor<T>(executor.id)(executor);
+    const context = this.context.createChild(executor);
+    return this.context.run(context, () => {
+      this.middleware.manage(executor);
+      return this.store.getExecutor<T>(executor.id)(executor);
+    });
   }
 
   /**
@@ -123,6 +138,16 @@ export class PostboyService {
    */
   public sub<T extends PostboyGenericMessage>(type: MessageType<T>): Observable<T> {
     return this.store.getMessage(checkId(type), type.name).sub();
+  }
+
+  /**
+   * Subscribes to a specific message type and automatically unsubscribes after receiving the first message.
+   *
+   * @param type The type of message to subscribe to.
+   * @return An observable that emits the first message of the specified type and then completes.
+   */
+  public once<T extends PostboyGenericMessage>(type: MessageType<T>): Observable<T> {
+    return this.sub(type).pipe(first());
   }
 
   /**

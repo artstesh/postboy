@@ -1,4 +1,4 @@
-import {first, Observable, Subject} from 'rxjs';
+import { first, Observable, Subject } from 'rxjs';
 import { checkId, PostboyGenericMessage } from './models/postboy-generic-message';
 import { PostboySubscription } from './models/postboy-subscription';
 import { PostboyExecutor } from './models/postboy-executor';
@@ -10,8 +10,8 @@ import { PostboyDependencyResolver } from './services/postboy-dependency.resolve
 import { PostboyMiddlewareService } from './services/postboy-middleware.service';
 import { PostboyMessageStore } from './services/postboy-message.store';
 import { PostboyNamespaceStore } from './services/postboy-namespace.store';
-import {PostboyContextService} from "./services/postboy-context.service";
-import {PostboySettings} from "./models/postboy.settings";
+import { PostboyContextService } from './services/postboy-context.service';
+import { PostboySettings } from './models/postboy.settings';
 
 export class PostboyService {
   protected locked = new Set<string>();
@@ -22,7 +22,7 @@ export class PostboyService {
   private context: PostboyContextService;
   private settings: PostboySettings;
 
-  constructor(settings?: Partial<PostboySettings>,resolver?: PostboyDependencyResolver) {
+  constructor(settings?: Partial<PostboySettings>, resolver?: PostboyDependencyResolver) {
     this.settings = new PostboySettings(settings);
     this.dependencyResolver = resolver || new PostboyDependencyResolver();
     this.middleware = this.dependencyResolver.getMiddlewareService();

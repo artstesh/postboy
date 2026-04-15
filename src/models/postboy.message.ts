@@ -1,4 +1,4 @@
-import {PostboyMessageMetadata} from "./postboy-message-metadata";
+import { PostboyMessageMetadata } from './postboy-message-metadata';
 
 export abstract class PostboyMessage {
   public metadata: PostboyMessageMetadata = {};
@@ -7,7 +7,7 @@ export abstract class PostboyMessage {
   }
 
   setMetadata(metadata: Partial<PostboyMessageMetadata>): this {
-    this.metadata = {...this.metadata, ...metadata};
+    this.metadata = { ...this.metadata, ...metadata };
     return this;
   }
 }

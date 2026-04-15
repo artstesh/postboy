@@ -11,7 +11,7 @@ import { PostboyDependencyResolver } from '../../services/postboy-dependency.res
 import { PostboyMiddleware } from '../../models/postboy-middleware';
 import { PostboySubscription } from '../../models/postboy-subscription';
 import { should } from '@artstesh/it-should';
-import {PostboyContextService} from "../../services/postboy-context.service";
+import { PostboyContextService } from '../../services/postboy-context.service';
 
 describe('PostboyService', () => {
   let service: PostboyService;
@@ -23,7 +23,7 @@ describe('PostboyService', () => {
     const resolver = mock(PostboyDependencyResolver);
     when(resolver.getMiddlewareService()).thenReturn(instance(middleware));
     when(resolver.getMessageStore()).thenReturn(instance(store));
-    when(resolver.getPostboyContextService).thenReturn(()=>instance(context));
+    when(resolver.getPostboyContextService).thenReturn(() => instance(context));
     when(context.run).thenReturn((c, f) => f());
     service = new PostboyService({}, instance(resolver));
   });

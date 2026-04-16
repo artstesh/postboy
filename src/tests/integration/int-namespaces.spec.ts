@@ -6,6 +6,8 @@ import { skip, Subject, tap } from 'rxjs';
 import { should } from '@artstesh/it-should';
 import { Forger } from '@artstesh/forger';
 import { PostboyAbstractRegistrator } from '../../postboy-abstract.registrator';
+import {AddNamespace} from "../../messages/add-namespace.executor";
+import {EliminateNamespace} from "../../messages/eliminate-namespace.executor";
 
 describe('Integration.Namespaces', () => {
   let postboy: TestPostboy;
@@ -28,7 +30,7 @@ describe('Integration.Namespaces', () => {
 
       beforeEach(() => {
         namespace = Forger.create<string>()!;
-        postboy.addNamespace(namespace).recordSubject(message.type);
+        postboy.exec(new AddNamespace(namespace)).recordSubject(message.type);
       });
 
       it(`should fire messages`, (done) => {
@@ -40,7 +42,7 @@ describe('Integration.Namespaces', () => {
       it(`should complete subs on down`, () => {
         const sub = postboy.sub(message.type).subscribe(() => {});
         //
-        postboy.eliminateNamespace(namespace);
+        postboy.exec(new EliminateNamespace(namespace));
         //
         should().true(sub.closed);
       });
@@ -49,17 +51,17 @@ describe('Integration.Namespaces', () => {
 
   it('should unsubscribe callback messages', (done) => {
     const namespace = Forger.create<string>()!;
-    postboy.addNamespace(namespace).recordSubject(TestCallbackMessage);
+    postboy.exec(new AddNamespace(namespace)).recordSubject(TestCallbackMessage);
     const message = new TestCallbackMessage();
     message.result.subscribe({ complete: () => done() });
     postboy.fireCallback(message);
     //
-    postboy.eliminateNamespace(namespace);
+    postboy.exec(new EliminateNamespace(namespace));
   });
 
   it('should fulfil callback messages', (done) => {
     const namespace = Forger.create<string>()!;
-    postboy.addNamespace(namespace).recordSubject(TestCallbackMessage);
+    postboy.exec(new AddNamespace(namespace)).recordSubject(TestCallbackMessage);
     const message = new TestCallbackMessage();
     message.result.subscribe(() => done());
     //

@@ -13,3 +13,4 @@ export * from './models/postboy-middleware';
 export * from './models/postboy.message';
 export * from './services/postboy-middleware.service';
 export * from './services/postboy-message.store';
+export * from './messages/index';

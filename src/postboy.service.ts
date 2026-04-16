@@ -1,23 +1,33 @@
-import { first, Observable, Subject } from 'rxjs';
-import { checkId, PostboyGenericMessage } from './models/postboy-generic-message';
-import { PostboySubscription } from './models/postboy-subscription';
-import { PostboyExecutor } from './models/postboy-executor';
-import { PostboyCallbackMessage } from './models/postboy-callback.message';
-import { MessageType, PostboyAbstractRegistrator } from './postboy-abstract.registrator';
-import { PostboyExecutionHandler } from './models/postboy-execution.handler';
-import { PostboyMiddleware } from './models/postboy-middleware';
-import { PostboyDependencyResolver } from './services/postboy-dependency.resolver';
-import { PostboyMiddlewareService } from './services/postboy-middleware.service';
-import { PostboyMessageStore } from './services/postboy-message.store';
-import { PostboyNamespaceStore } from './services/postboy-namespace.store';
-import { PostboyContextService } from './services/postboy-context.service';
-import { PostboySettings } from './models/postboy.settings';
+import {first, Observable, Subject} from 'rxjs';
+import {checkId, PostboyGenericMessage} from './models/postboy-generic-message';
+import {PostboySubscription} from './models/postboy-subscription';
+import {PostboyExecutor} from './models/postboy-executor';
+import {PostboyCallbackMessage} from './models/postboy-callback.message';
+import {MessageType, PostboyAbstractRegistrator} from './postboy-abstract.registrator';
+import {PostboyExecutionHandler} from './models/postboy-execution.handler';
+import {PostboyMiddleware} from './models/postboy-middleware';
+import {PostboyDependencyResolver} from './services/postboy-dependency.resolver';
+import {PostboyMiddlewareService} from './services/postboy-middleware.service';
+import {PostboyMessageStore} from './services/postboy-message.store';
+import {PostboyNamespaceStore} from './services/postboy-namespace.store';
+import {PostboyContextService} from './services/postboy-context.service';
+import {PostboySettings} from './models/postboy.settings';
+import {AddNamespace} from "./messages/add-namespace.executor";
+import {EliminateNamespace} from "./messages/eliminate-namespace.executor";
+import {AddMiddleware} from "./messages/add-middleware.executor";
+import {RemoveMiddleware} from "./messages/remove-middleware.executor";
+import {LockMessage} from "./messages/lock-message.executor";
+import {UnlockMessage} from "./messages/unlock-message.executor";
+import {DisconnectMessage} from "./messages/disconnect-message.executor";
+import {ConnectMessage} from "./messages/connect.message.executor";
+import {ConnectExecutor} from "./messages/connect-executor.executor";
+import {ConnectHandler} from "./messages/connect-handler.executor";
 
 export class PostboyService {
   protected locked = new Set<string>();
   private middleware: PostboyMiddlewareService;
   private store: PostboyMessageStore;
-  private namespaceStore?: PostboyNamespaceStore;
+  private namespaceStore: PostboyNamespaceStore;
   private dependencyResolver: PostboyDependencyResolver;
   private context: PostboyContextService;
   private settings: PostboySettings;
@@ -27,12 +37,37 @@ export class PostboyService {
     this.dependencyResolver = resolver || new PostboyDependencyResolver();
     this.middleware = this.dependencyResolver.getMiddlewareService();
     this.store = this.dependencyResolver.getMessageStore();
+    this.namespaceStore = this.dependencyResolver.getNamespaceStore();
     this.context = this.dependencyResolver.getPostboyContextService(this.settings.metadata);
+    this.registerInfrastructureMessages();
+  }
+
+  private registerInfrastructureMessages() {
+    this.store.registerExecutor(DisconnectMessage.ID, (e) => this.store.unregister((e as DisconnectMessage).messageId));
+    this.store.registerExecutor(UnlockMessage.ID, (e) => this.locked.delete(checkId((e as UnlockMessage<any>).type)));
+    this.store.registerExecutor(LockMessage.ID, (e) => this.locked.add(checkId((e as LockMessage<any>).type)));
+    this.store.registerExecutor(AddMiddleware.ID, (e) => this.middleware.addMiddleware((e as AddMiddleware).middleware));
+    this.store.registerExecutor(RemoveMiddleware.ID, (e) => this.middleware.removeMiddleware((e as RemoveMiddleware).middleware));
+    this.store.registerExecutor(AddNamespace.ID, (e) => this.namespaceStore.addSpace((e as AddNamespace).space, this));
+    this.store.registerExecutor(EliminateNamespace.ID, (e) => this.namespaceStore.eliminateSpace((e as EliminateNamespace).space));
+    this.store.registerExecutor(ConnectMessage.ID, e => {
+      const {type, sub, pipe} = e as ConnectMessage<any>;
+      this.store.registerMessage(checkId(type), new PostboySubscription<any>(sub, pipe));
+    });
+    this.store.registerExecutor(ConnectExecutor.ID, e => {
+      const {type, exec} = e as ConnectExecutor<any, any>;
+      this.store.registerExecutor(checkId(type), exec);
+    });
+    this.store.registerExecutor(ConnectHandler.ID, e => {
+      const {executor, handler} = e as ConnectHandler<any, any>;
+      this.store.registerExecutor(checkId(executor), (e) => handler.handle(e));
+    });
   }
 
   /**
    * Locks a specific message type to prevent further modifications or actions.
    *
+   * @deprecated The method should be replaced with firing {@link LockMessage} message.
    * @param {MessageType<T>} type - The message type to be locked. It must extend from the `PostboyGenericMessage`.
    * @return {void} This method does not return a value.
    */
@@ -43,6 +78,7 @@ export class PostboyService {
   /**
    * Unlocks a previously locked message type by removing its ID from the locked set.
    *
+   * @deprecated The method should be replaced with firing {@link UnlockMessage} message.
    * @param {MessageType<T>} type - The message type to unlock, which is a generic type extending PostboyGenericMessage.
    * @return {void} This method does not return any value.
    */
@@ -53,6 +89,7 @@ export class PostboyService {
   /**
    * Adds a middleware to the middleware stack.
    *
+   * @deprecated The method should be replaced with firing {@link AddMiddleware} message.
    * @param {PostboyMiddleware} middleware - The middleware instance to be added.
    * @return {void}
    */
@@ -63,6 +100,7 @@ export class PostboyService {
   /**
    * Removes a middleware from the current middleware stack.
    *
+   * @deprecated The method should be replaced with firing {@link RemoveMiddleware} message.
    * @param {PostboyMiddleware} middleware - The middleware instance to be removed.
    * @return {void} No return value.
    */
@@ -73,6 +111,7 @@ export class PostboyService {
   /**
    * Unregisters a message identified by the given ID from the store.
    *
+   * @deprecated The method should be replaced with firing {@link DisconnectMessage} message.
    * @param {string} id - The unique identifier of the item to unregister.
    * @return {void} No value is returned.
    */
@@ -153,6 +192,7 @@ export class PostboyService {
   /**
    * Registers a given message type and its associated subject subscription with the system.
    *
+   * @deprecated The method should be replaced with firing {@link ConnectMessage} message.
    * @param type The constructor function of the message type that extends the PostboyGenericMessage.
    * @param sub The Subject instance for the provided message type, used for managing subscriptions.
    * @return {void} No return value.
@@ -164,6 +204,7 @@ export class PostboyService {
   /**
    * Registers a generic message type with a Subject and a transformation pipe.
    *
+   * @deprecated The method should be replaced with firing {@link ConnectMessage} message.
    * @param {MessageType<T>} type - The constructor of the message type being registered.
    * @param {Subject<T>} sub - The Subject instance used to handle incoming messages of the specified type.
    * @param {(s: Subject<T>) => Observable<T>} pipe - A function that applies a transformation or processing logic to the Subject and returns an Observable.
@@ -180,6 +221,7 @@ export class PostboyService {
   /**
    * Registers an executor for a specified message type.
    *
+   * @deprecated The method should be replaced with firing {@link ConnectExecutor} message.
    * @param {MessageType<E>} type - The message type for which the executor is being registered.
    * @param {(e: E) => T} exec - The executor function that will handle messages of the specified type.
    * @return {void} This method does not return any value.
@@ -191,6 +233,7 @@ export class PostboyService {
   /**
    * Registers a handler for a specific executor type.
    *
+   * @deprecated The method should be replaced with firing {@link ConnectHandler} message.
    * @param executor The constructor of the executor class that extends `PostboyExecutor<R>`.
    * @param handler An instance of `PostboyExecutionHandler<R, E>` that defines the logic for handling the executor.
    * @return void
@@ -205,17 +248,18 @@ export class PostboyService {
   /**
    * Adds a namespace to the namespace store.
    *
+   * @deprecated The method should be replaced with firing {@link AddNamespace} message.
    * @param {string} space - The name of the namespace to be added.
    * @return {PostboyAbstractRegistrator} The instance of the namespace after adding the specified namespace.
    */
   public addNamespace(space: string): PostboyAbstractRegistrator {
-    if (!this.namespaceStore) this.namespaceStore = this.dependencyResolver.getNamespaceStore(this);
-    return this.namespaceStore.addSpace(space);
+    return this.namespaceStore.addSpace(space, this);
   }
 
   /**
    * Removes the specified namespace from the namespace store.
    *
+   * @deprecated The method should be replaced with firing {@link EliminateNamespace} message.
    * @param {string} space - The name of the namespace to be removed.
    * @return {void} This method does not return a value.
    */
@@ -233,5 +277,6 @@ export class PostboyService {
     this.namespaceStore?.dispose();
     this.store.dispose();
     this.middleware.dispose();
+    this.context.dispose();
   }
 }

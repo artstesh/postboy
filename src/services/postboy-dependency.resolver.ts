@@ -28,9 +28,14 @@ export class PostboyDependencyResolver {
    * Creates and initializes a new instance of PostboyNamespaceStore using the provided PostboyService instance.
    *
    * @function getNamespaceStore
-   * @param {PostboyService} postboy - An instance of the PostboyService used to create the namespace store.
    * @returns {PostboyNamespaceStore} A new instance of PostboyNamespaceStore associated with the given PostboyService.
    */
-  getNamespaceStore = (postboy: PostboyService) => new PostboyNamespaceStore(postboy);
+  getNamespaceStore = () => new PostboyNamespaceStore();
+  /**
+   * A factory function that creates an instance of PostboyContextService.
+   *
+   * @param {boolean} active - Determines whether the created PostboyContextService instance is active.
+   * @returns {PostboyContextService} A new instance of PostboyContextService with the specified active state.
+   */
   getPostboyContextService = (active: boolean) => new PostboyContextService(active);
 }

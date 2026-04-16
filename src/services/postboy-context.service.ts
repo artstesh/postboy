@@ -43,4 +43,8 @@ export class PostboyContextService {
     message.setMetadata({ correlationId: data.correlationId, causationId: data.parentMessageId, tags: data.tags });
     return data;
   }
+
+  public dispose(): void {
+    this.storage.disable();
+  }
 }

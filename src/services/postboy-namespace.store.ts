@@ -9,17 +9,16 @@ import { PostboyService } from '../postboy.service';
 export class PostboyNamespaceStore {
   private spaces: Map<string, PostboyAbstractRegistrator> = new Map();
 
-  constructor(private postboy: PostboyService) {}
-
   /**
-   * Adds a new namespace to the registry.
+   * Adds a new space or retrieves an existing one if it already exists.
    *
-   * @param {string} space - The name of the namespace to add or retrieve.
-   * @return {PostboyAbstractRegistrator} An instance of the registrator corresponding to the specified namespace.
+   * @param {string} space - The name of the space to add or retrieve.
+   * @param {PostboyService} postboy - The PostboyService instance used to create a namespace registrator.
+   * @return {PostboyAbstractRegistrator} The registrator associated with the specified space.
    */
-  public addSpace(space: string): PostboyAbstractRegistrator {
+  public addSpace(space: string, postboy: PostboyService): PostboyAbstractRegistrator {
     if (this.spaces.has(space)) return this.spaces.get(space)!;
-    const registrator = new NamespaceRegistrator(this.postboy);
+    const registrator = new NamespaceRegistrator(postboy);
     this.spaces.set(space, registrator);
     return registrator;
   }

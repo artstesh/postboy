@@ -1,18 +1,24 @@
 // postboy-abstract.registrator.spec.ts
-import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
-import { PostboyAbstractRegistrator } from '../../postboy-abstract.registrator';
-import { PostboyService } from '../../postboy.service';
-import { IPostboyDependingService } from '../../i-postboy-depending.service';
-import { PostboyGenericMessage } from '../../models/postboy-generic-message';
-import { PostboyExecutor } from '../../models/postboy-executor';
-import { Forger } from '@artstesh/forger';
+import {BehaviorSubject, ReplaySubject, Subject} from 'rxjs';
+import {PostboyAbstractRegistrator} from '../../postboy-abstract.registrator';
+import {IPostboyDependingService} from '../../i-postboy-depending.service';
+import {PostboyGenericMessage} from '../../models/postboy-generic-message';
+import {PostboyExecutor} from '../../models/postboy-executor';
+import {Forger} from '@artstesh/forger';
+import {PostboyServiceMock} from "@artstesh/postboy-testing";
+import {instance, mock, verify} from "ts-mockito";
+import {should} from "@artstesh/it-should";
+import {DisconnectMessage} from "../../messages/disconnect-message.executor";
+import {ConnectMessage} from "../../messages/connect.message.executor";
+import {ConnectExecutor} from "../../messages/connect-executor.executor";
+import {ConnectHandler} from "../../messages/connect-handler.executor";
 
 class TestMessage extends PostboyGenericMessage {
   static ID = 'test-message';
 }
 
 class TestExec extends PostboyExecutor<string> {
-  static ID = Forger.create<string>({ stringSpecial: false })!;
+  static ID = Forger.create<string>({stringSpecial: false})!;
 }
 
 class TestPostboyRegistrator extends PostboyAbstractRegistrator {
@@ -22,100 +28,94 @@ class TestPostboyRegistrator extends PostboyAbstractRegistrator {
 }
 
 describe('PostboyAbstractRegistrator', () => {
-  let postboyService: jest.Mocked<PostboyService>;
+  let postboy: PostboyServiceMock;
   let registrator: TestPostboyRegistrator;
 
   beforeEach(() => {
-    postboyService = {
-      unregister: jest.fn(),
-      record: jest.fn(),
-      recordWithPipe: jest.fn(),
-      recordExecutor: jest.fn(),
-      recordHandler: jest.fn(),
-    } as unknown as jest.Mocked<PostboyService>;
-
-    registrator = new TestPostboyRegistrator(postboyService);
-  });
-
-  describe('registerServices', () => {
-    it('should register the given services', () => {
-      const services: IPostboyDependingService[] = [{ up: jest.fn() }, { up: jest.fn() }];
-
-      registrator.registerServices(services);
-
-      expect((registrator as any).services).toEqual(services);
-    });
+    postboy = new PostboyServiceMock();
+    registrator = new TestPostboyRegistrator(postboy as any);
   });
 
   describe('up', () => {
     it('should call _up and up on registered services', () => {
-      const services: IPostboyDependingService[] = [{ up: jest.fn() }, { up: jest.fn() }];
-      registrator.registerServices(services);
-
+      const service = mock<IPostboyDependingService>();
+      registrator.registerServices([instance(service)]);
+      //
       registrator.up();
-
-      services.forEach((service) => {
-        expect(service.up).toHaveBeenCalled();
-      });
+      //
+      verify(service.up()).once();
     });
   });
 
   describe('down', () => {
     it('should unregister all id entries and clear services', () => {
-      (registrator as any).ids = ['id1', 'id2'];
-      const unregisterSpy = jest.spyOn(postboyService, 'unregister');
+      const service = mock<IPostboyDependingService>();
+      registrator.record(TestMessage, new Subject());
+      registrator.recordExecutor(TestExec, () => '');
+      registrator.registerServices([instance(service)]);
+      registrator.up();
       //
       registrator.down();
       //
-      expect(unregisterSpy).toHaveBeenCalledWith('id1');
-      expect(unregisterSpy).toHaveBeenCalledWith('id2');
-      expect(unregisterSpy).toHaveBeenCalledTimes(2);
-      expect((registrator as any).services).toEqual([]);
+      verify(service.down?.()).once();
+      should().array(postboy.history(DisconnectMessage).all).length(2);
     });
   });
 
   describe('record', () => {
-    it('should add id and call postboyService.record', () => {
+    it('should add id and call postboy.record', () => {
       const subject = new Subject<TestMessage>();
       //
       const result = registrator.record(TestMessage, subject);
       //
-      expect((registrator as any).ids).toContain(TestMessage.ID);
-      expect(postboyService.record).toHaveBeenCalledWith(TestMessage, subject);
-      expect(result).toBe(registrator);
+      const history = postboy.history(ConnectMessage);
+      should().array(history.all).length(1);
+      should().true(history.last.type === TestMessage)
+      should().true(result === registrator);
     });
   });
 
   describe('recordWithPipe', () => {
-    it('should add id and call postboyService.recordWithPipe', () => {
+    it('should add id and call postboy.recordWithPipe', () => {
       const subject = new Subject<TestMessage>();
       const pipeFn = jest.fn();
       //
       const result = registrator.recordWithPipe(TestMessage, subject, pipeFn);
       //
-      expect((registrator as any).ids).toContain(TestMessage.ID);
-      expect(postboyService.recordWithPipe).toHaveBeenCalledWith(TestMessage, subject, pipeFn);
-      expect(result).toBe(registrator);
+      const history = postboy.history(ConnectMessage);
+      should().array(history.all).length(1);
+      should().true(history.last.type === TestMessage)
+      should().true(history.last.sub === subject)
+      should().true(history.last.pipe === pipeFn)
+      should().true(result === registrator);
     });
   });
 
   describe('recordExecutor', () => {
-    it('should call postboyService.recordExecutor with provided executor and logic', () => {
+    it('should call postboy.recordExecutor with provided executor and logic', () => {
       const executorLogic = jest.fn();
       //
-      registrator.recordExecutor(TestExec, executorLogic);
+      const result = registrator.recordExecutor(TestExec, executorLogic);
       //
-      expect(postboyService.recordExecutor).toHaveBeenCalledWith(TestExec, executorLogic);
+      const history = postboy.history(ConnectExecutor);
+      should().array(history.all).length(1);
+      should().true(history.last.type === TestExec);
+      should().true(history.last.exec === executorLogic);
+      should().true(result === registrator);
     });
   });
 
   describe('recordHandler', () => {
-    it('should call postboyService.recordHandler with provided executor and handler', () => {
-      const handler = { handle: jest.fn() };
+    it('should call postboy.recordHandler with provided executor and handler', () => {
+      const handler = {handle: jest.fn()};
       //
-      registrator.recordHandler(TestExec, handler);
+      const result = registrator.recordHandler(TestExec, handler);
       //
-      expect(postboyService.recordHandler).toHaveBeenCalledWith(TestExec, handler);
+      const history = postboy.history(ConnectHandler);
+      should().array(history.all).length(1);
+      should().true(history.last.handler === handler);
+      should().true(history.last.executor === TestExec);
+      should().true(result === registrator);
     });
   });
 
@@ -123,25 +123,37 @@ describe('PostboyAbstractRegistrator', () => {
     it('should call record with ReplaySubject and given bufferSize', () => {
       const bufferSize = Forger.create<number>()!;
       //
-      registrator.recordReplay(TestMessage, bufferSize);
+      const result = registrator.recordReplay(TestMessage, bufferSize);
       //
-      expect(postboyService.record).toHaveBeenCalledWith(TestMessage, expect.any(ReplaySubject));
+      const history = postboy.history(ConnectMessage);
+      should().array(history.all).length(1);
+      should().true(history.last.sub instanceof ReplaySubject);
+      should().true(history.last.type === TestMessage);
+      should().true(result === registrator);
     });
   });
 
   describe('recordBehavior', () => {
     it('should call record with BehaviorSubject and initial value', () => {
-      registrator.recordBehavior(TestMessage, new TestMessage());
+      const result =  registrator.recordBehavior(TestMessage, new TestMessage());
       //
-      expect(postboyService.record).toHaveBeenCalledWith(TestMessage, expect.any(BehaviorSubject));
+      const history = postboy.history(ConnectMessage);
+      should().array(history.all).length(1);
+      should().true(history.last.sub instanceof BehaviorSubject);
+      should().true(history.last.type === TestMessage);
+      should().true(result === registrator);
     });
   });
 
   describe('recordSubject', () => {
     it('should call record with a new Subject instance', () => {
-      registrator.recordSubject(TestMessage);
+      const result =  registrator.recordSubject(TestMessage);
       //
-      expect(postboyService.record).toHaveBeenCalledWith(TestMessage, expect.any(Subject));
+
+      const history = postboy.history(ConnectMessage);
+      should().array(history.all).length(1);
+      should().true(history.last.type === TestMessage);
+      should().true(result === registrator);
     });
   });
 });

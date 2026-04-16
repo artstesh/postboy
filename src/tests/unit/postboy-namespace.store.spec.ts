@@ -10,14 +10,14 @@ describe('PostboyNamespaceStore', () => {
 
   beforeEach(() => {
     postboyService = new PostboyService();
-    store = new PostboyNamespaceStore(postboyService);
+    store = new PostboyNamespaceStore();
   });
 
   describe('addSpace', () => {
     it('should add a new namespace if it does not exist', () => {
       const spaceName = Forger.create<string>()!;
       //
-      const result = store.addSpace(spaceName);
+      const result = store.addSpace(spaceName,postboyService);
       //
       expect(result).toBeInstanceOf(PostboyAbstractRegistrator);
     });
@@ -25,8 +25,8 @@ describe('PostboyNamespaceStore', () => {
     it('should return the same namespace registrator if it already exists', () => {
       const spaceName = Forger.create<string>()!;
       //
-      const firstInstance = store.addSpace(spaceName);
-      const secondInstance = store.addSpace(spaceName);
+      const firstInstance = store.addSpace(spaceName,postboyService);
+      const secondInstance = store.addSpace(spaceName,postboyService);
       //
       expect(secondInstance).toBe(firstInstance);
     });
@@ -36,9 +36,9 @@ describe('PostboyNamespaceStore', () => {
     it('should remove a space if it exists', () => {
       const spaceName = Forger.create<string>()!;
       //
-      const firstInstance = store.addSpace(spaceName);
+      const firstInstance = store.addSpace(spaceName,postboyService);
       store.eliminateSpace(spaceName);
-      const secondInstance = store.addSpace(spaceName);
+      const secondInstance = store.addSpace(spaceName,postboyService);
       //
       expect(secondInstance).not.toBe(firstInstance);
     });
@@ -54,9 +54,9 @@ describe('PostboyNamespaceStore', () => {
     it('should call down on all registrators and clear all spaces', () => {
       const spaceName = Forger.create<string>()!;
       //
-      const firstInstance = store.addSpace(spaceName);
+      const firstInstance = store.addSpace(spaceName,postboyService);
       store.dispose();
-      const secondInstance = store.addSpace(spaceName);
+      const secondInstance = store.addSpace(spaceName,postboyService);
       //
       expect(secondInstance).not.toBe(firstInstance);
     });

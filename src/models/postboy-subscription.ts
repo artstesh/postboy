@@ -18,9 +18,9 @@ export class PostboySubscription<T> {
    */
   constructor(
     private subscription: Subject<T>,
-    pipe: (s: Subject<T>) => Observable<T>,
+    pipe?: (s: Subject<T>) => Observable<T>,
   ) {
-    this._subscription = pipe(subscription);
+    this._subscription = !!pipe ? pipe(subscription) : subscription.asObservable();
   }
 
   /**

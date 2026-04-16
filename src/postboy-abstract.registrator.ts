@@ -5,6 +5,10 @@ import { PostboyExecutor } from './models/postboy-executor';
 import { checkId, PostboyGenericMessage } from './models/postboy-generic-message';
 import { PostboyExecutionHandler } from './models/postboy-execution.handler';
 import { IdGenerator } from './utils/id.generator';
+import {ConnectMessage} from "./messages/connect.message.executor";
+import {DisconnectMessage} from "./messages/disconnect-message.executor";
+import {ConnectExecutor} from "./messages/connect-executor.executor";
+import {ConnectHandler} from "./messages/connect-handler.executor";
 
 export type MessageType<T extends PostboyGenericMessage> = new (...args: any[]) => T;
 
@@ -48,7 +52,7 @@ export abstract class PostboyAbstractRegistrator {
   public down(): void {
     this.services.forEach((s) => !!s.down && s.down());
     this.services = [];
-    this.ids.forEach((id) => this.postboy.unregister(id));
+    this.ids.forEach((id) => this.postboy.exec(new DisconnectMessage(id)));
   }
 
   /**
@@ -60,7 +64,7 @@ export abstract class PostboyAbstractRegistrator {
    */
   public record<T extends PostboyGenericMessage>(type: MessageType<T>, sub: Subject<T>): PostboyAbstractRegistrator {
     this.ids.push(checkId(type));
-    this.postboy.record(type, sub);
+    this.postboy.exec(new ConnectMessage(type, sub));
     return this;
   }
 
@@ -78,7 +82,7 @@ export abstract class PostboyAbstractRegistrator {
     pipe: (s: Subject<T>) => Observable<T>,
   ): PostboyAbstractRegistrator {
     this.ids.push(checkId(type));
-    this.postboy.recordWithPipe(type, sub, pipe);
+    this.postboy.exec(new ConnectMessage(type, sub, pipe));
     return this;
   }
 
@@ -93,7 +97,8 @@ export abstract class PostboyAbstractRegistrator {
     type: new (...args: any[]) => E,
     exec: (e: E) => T,
   ): PostboyAbstractRegistrator {
-    this.postboy.recordExecutor(type, exec);
+    this.ids.push(checkId(type));
+    this.postboy.exec(new ConnectExecutor(type, exec));
     return this;
   }
 
@@ -108,7 +113,8 @@ export abstract class PostboyAbstractRegistrator {
     executor: new (...args: any[]) => E,
     handler: PostboyExecutionHandler<R, E>,
   ): PostboyAbstractRegistrator {
-    this.postboy.recordHandler(executor, handler);
+    this.ids.push(checkId(executor));
+    this.postboy.exec(new ConnectHandler(executor, handler));
     return this;
   }
 

@@ -20,30 +20,69 @@ describe('Integration.Middleware', () => {
     postboy.exec(new AddMiddleware(middleware));
   });
 
-  it(`should pass GenericMessage through`, () => {
-    let message = new TestMessage();
-    registry.recordSubject(TestMessage);
-    //
-    postboy.fire(message);
-    //
-    should().true(middleware.fired === message);
-  });
+  afterEach(() => {
+    registry.down();
+  })
 
-  it(`should pass CallbackMessage through`, () => {
-    let message = new TestCallbackMessage();
+  describe('generic message', () => {
+    let message: TestMessage;
+
+    beforeEach(() => {
+      message = new TestMessage();
+      registry.recordSubject(TestMessage);
+    })
+
+    it(`should pass by if cannot handle`, () => {
+      middleware._canHandle = false;
+      //
+      postboy.fire(message);
+      //
+      should().false(middleware._before);
+      should().false(middleware._after);
+      should().false(middleware._onError);
+    });
+
+    it(`should manage before & after`, () => {
+      middleware._canHandle = true;
+      //
+      postboy.fire(message);
+      //
+      should().true(middleware._before?.message === message);
+      should().true(middleware._after?.message === message);
+      should().false(middleware._onError);
+    });
+
+    it(`should manage onError`, () => {
+      middleware._canHandle = true;
+      middleware._throw = true;
+      //
+      postboy.fire(message)
+      //
+      // expect(() => postboy.fire(message)).toThrow();
+      should().true(middleware._onError);
+    });
+  })
+
+  it(`should pass Callback by if cannot handle`, () => {
+    middleware._canHandle = false;
     registry.recordSubject(TestCallbackMessage);
     //
-    postboy.fire(message);
+    postboy.fire(new TestCallbackMessage());
     //
-    should().true(middleware.fired === message);
+    should().false(middleware._before);
+    should().false(middleware._after);
+    should().false(middleware._onError);
   });
 
-  it(`should pass TestExecutor through`, () => {
+  it(`should pass Executor by if cannot handle`, () => {
     let message = new TestExecutor(Forger.create<string>()!);
     registry.recordExecutor(TestExecutor, () => {});
+    middleware._canHandle = false;
     //
     postboy.exec(message);
     //
-    should().true(middleware.fired === message);
+    should().false(middleware._before);
+    should().false(middleware._after);
+    should().false(middleware._onError);
   });
 });

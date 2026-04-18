@@ -1,69 +1,118 @@
-import { PostboyMiddleware } from '../../models/postboy-middleware';
-import { PostboyMiddlewareService } from '../../services/postboy-middleware.service';
-import { PostboyMessage } from '../../models/postboy.message';
+import {PostboyMiddlewareService} from '../../services/postboy-middleware.service';
+import {PostboyMessage} from '../../models/postboy.message';
+import {anything, instance, mock, reset, verify, when} from "ts-mockito";
+import {PostboyMiddleware} from "../../services/postboy-middleware";
+import {MiddlewareStage} from "../../models/middleware-stage.enum";
+import {PostboyMessageContext} from "../../models/postboy-message.context";
+import {Forger} from "@artstesh/forger";
+import {MiddlewareDecision} from "../../models/middleware-decision.enum";
+import {CancelError} from "../../models/cancel-error";
 
 describe('PostboyMiddlewareService', () => {
   let service: PostboyMiddlewareService;
+  let middleware= mock(PostboyMiddleware)
 
   beforeEach(() => {
     service = new PostboyMiddlewareService();
+    service.addMiddleware(instance(middleware));
   });
 
-  class MockMiddleware implements PostboyMiddleware {
-    handle = jest.fn();
-  }
+  afterEach(() => {
+    reset(middleware);
+  })
 
   class MockMessage extends PostboyMessage {}
 
-  it('should add middleware successfully', () => {
-    const middleware = new MockMiddleware();
-    service.addMiddleware(middleware);
-    const msg = new MockMessage();
-    //
-    service.manage(msg);
-    //
-    expect(middleware.handle).toHaveBeenCalledWith(msg);
-  });
+  describe('before', () => {
+    let stage: MiddlewareStage;
+    let message: MockMessage;
+    let context: PostboyMessageContext;
 
-  it('should remove middleware successfully', () => {
-    const middleware = new MockMiddleware();
-    service.addMiddleware(middleware);
-    service.removeMiddleware(middleware);
-    //
-    middleware.handle.mockClear();
-    service.manage(new MockMessage());
-    //
-    expect(middleware.handle).not.toHaveBeenCalled();
-  });
+    beforeEach(() => {
+      stage = Forger.create<MiddlewareStage>()!;
+      message = new MockMessage();
+      context = Forger.create<PostboyMessageContext>()!;
+    })
+
+    it('should pass over if cannot handle', () => {
+      when(middleware.canHandle).thenReturn(() => false);
+      //
+      expect(() => service.before(stage, message, context)).not.toThrow();
+    });
+
+    it('should pass over if MiddlewareDecision.Continue', () => {
+      when(middleware.canHandle).thenReturn(() => true);
+      when(middleware.before).thenReturn(() => MiddlewareDecision.Continue);
+      //
+      expect(() => service.before(stage, message, context)).not.toThrow();
+    });
+
+    it('should catch errors', () => {
+      const error = new Error();
+      when(middleware.canHandle).thenReturn(() => true);
+      when(middleware.before).thenThrow(error);
+      //
+      service.before(stage, message, context);
+      //
+      verify(middleware.onError(anything(), anything())).once();
+    });
+
+    it('should throw if MiddlewareDecision.Interrupt', () => {
+      when(middleware.canHandle).thenReturn(() => true);
+      when(middleware.before).thenReturn(() => MiddlewareDecision.Interrupt);
+      //
+      expect(() => service.before(stage, message, context)).toThrow(CancelError);
+    });
+  })
+
+  describe('after', () => {
+    let stage: MiddlewareStage;
+    let message: MockMessage;
+    let context: PostboyMessageContext;
+
+    beforeEach(() => {
+      stage = Forger.create<MiddlewareStage>()!;
+      message = new MockMessage();
+      context = Forger.create<PostboyMessageContext>()!;
+    })
+
+    it('should pass over if cannot handle', () => {
+      when(middleware.canHandle).thenReturn(() => false);
+      //
+      expect(() => service.after(stage, message, context)).not.toThrow();
+    });
+
+    it('should catch errors', () => {
+      const error = new Error();
+      when(middleware.canHandle).thenReturn(() => true);
+      when(middleware.after).thenThrow(error);
+      //
+      service.after(stage, message, context);
+      //
+      verify(middleware.onError(anything(), anything())).once();
+    });
+  })
 
   it('should call all middlewares handle method when manage is invoked', () => {
-    const middleware1 = new MockMiddleware();
-    const middleware2 = new MockMiddleware();
-    service.addMiddleware(middleware1);
-    service.addMiddleware(middleware2);
-    const msg = new MockMessage();
+    service.dispose();
+    const list = Array.from({ length: 3 }, () => mock(PostboyMiddleware));
+    list.forEach(m => service.addMiddleware(instance(m)));
+    list.forEach(m => when(m.canHandle).thenReturn(() => true));
     //
-    service.manage(msg);
+    service.afterPublish(new MockMessage(), Forger.create<PostboyMessageContext>()!);
     //
-
-    expect(middleware1.handle).toHaveBeenCalledWith(msg);
-    expect(middleware2.handle).toHaveBeenCalledWith(msg);
-  });
-
-  it('should not call any middleware if the list is empty', () => {
-    const msg = new MockMessage();
-    //
-    expect(() => service.manage(msg)).not.toThrow();
+    list.forEach(m => verify(m.after(anything(), anything())).once());
   });
 
   it('should remove middleware on dispose()', () => {
-    const middleware = new MockMiddleware();
-    service.addMiddleware(middleware);
     service.dispose();
     //
-    middleware.handle.mockClear();
-    service.manage(new MockMessage());
+    verify(middleware.dispose()).once();
+  });
+
+  it('should dispose middleware on removeMiddleware()', () => {
+    service.removeMiddleware(instance(middleware));
     //
-    expect(middleware.handle).not.toHaveBeenCalled();
+    verify(middleware.dispose()).once();
   });
 });

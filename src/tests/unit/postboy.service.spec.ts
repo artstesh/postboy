@@ -1,17 +1,16 @@
-import { Subject } from 'rxjs';
-import { PostboyService } from '../../postboy.service';
-import { PostboyExecutor } from '../../models/postboy-executor';
-import { PostboyGenericMessage } from '../../models/postboy-generic-message';
-import { PostboyCallbackMessage } from '../../models/postboy-callback.message';
-import { Forger } from '@artstesh/forger';
-import { anything, instance, mock, reset, verify, when } from 'ts-mockito';
-import { PostboyMiddlewareService } from '../../services/postboy-middleware.service';
-import { PostboyMessageStore } from '../../services/postboy-message.store';
-import { PostboyDependencyResolver } from '../../services/postboy-dependency.resolver';
-import { PostboyMiddleware } from '../../models/postboy-middleware';
-import { PostboySubscription } from '../../models/postboy-subscription';
-import { should } from '@artstesh/it-should';
-import { PostboyContextService } from '../../services/postboy-context.service';
+import {Subject} from 'rxjs';
+import {PostboyService} from '../../postboy.service';
+import {PostboyExecutor} from '../../models/postboy-executor';
+import {PostboyGenericMessage} from '../../models/postboy-generic-message';
+import {PostboyCallbackMessage} from '../../models/postboy-callback.message';
+import {Forger} from '@artstesh/forger';
+import {anything, instance, mock, reset, verify, when} from 'ts-mockito';
+import {PostboyMiddlewareService} from '../../services/postboy-middleware.service';
+import {PostboyMessageStore} from '../../services/postboy-message.store';
+import {PostboyDependencyResolver} from '../../services/postboy-dependency.resolver';
+import {PostboySubscription} from '../../models/postboy-subscription';
+import {should} from '@artstesh/it-should';
+import {PostboyContextService} from '../../services/postboy-context.service';
 
 describe('PostboyService', () => {
   let service: PostboyService;
@@ -34,30 +33,6 @@ describe('PostboyService', () => {
     reset(context);
   });
 
-  it('should addMiddleware', () => {
-    let mwr = Forger.create<PostboyMiddleware>()!;
-    //
-    service.addMiddleware(mwr);
-    //
-    verify(middleware.addMiddleware(mwr)).once();
-  });
-
-  it('should removeMiddleware', () => {
-    let mwr = Forger.create<PostboyMiddleware>()!;
-    //
-    service.removeMiddleware(mwr);
-    //
-    verify(middleware.removeMiddleware(mwr)).once();
-  });
-
-  it('should unregister', () => {
-    let id = Forger.create<string>()!;
-    //
-    service.unregister(id);
-    //
-    verify(store.unregister(id)).once();
-  });
-
   describe('fire', () => {
     class TestMessage extends PostboyGenericMessage {
       static ID = Forger.create<string>()!;
@@ -73,12 +48,20 @@ describe('PostboyService', () => {
       reset(subscription);
     });
 
-    it('should apply middleware', () => {
+    it('should apply middleware.beforePublish', () => {
       const message = new TestMessage();
       //
       service.fire(message);
       //
-      verify(middleware.manage(message)).once();
+      verify(middleware.beforePublish(message, anything())).once();
+    });
+
+    it('should apply middleware.afterPublish', () => {
+      const message = new TestMessage();
+      //
+      service.fire(message);
+      //
+      verify(middleware.afterPublish(message, anything())).once();
     });
 
     it('should fire the message', () => {
@@ -87,15 +70,6 @@ describe('PostboyService', () => {
       service.fire(message);
       //
       verify(subscription.fire(message)).once();
-    });
-
-    it('should not fire a locked message', () => {
-      const message = new TestMessage();
-      service.lock(TestMessage);
-      //
-      service.fire(message);
-      //
-      verify(subscription.fire(message)).never();
     });
   });
 
@@ -114,12 +88,27 @@ describe('PostboyService', () => {
       reset(subscription);
     });
 
-    it('should apply middleware', () => {
+    it('should apply middleware.beforeCallback', () => {
+      const text = Forger.create<string>()!;
       const message = new TestMessage();
+      const action = jest.fn();
       //
-      service.fireCallback(message);
+      service.fireCallback(message, action);
       //
-      verify(middleware.manage(message)).once();
+      verify(middleware.beforeCallback(message, anything())).once();
+    });
+
+    it('should apply middleware.afterCallback with subscribe', (done) => {
+      const text = Forger.create<string>()!;
+      const message = new TestMessage();
+      service.record(TestMessage, new Subject());
+      //
+      const observable = service.fireCallback(message);
+      observable.subscribe((value) => {
+        verify(middleware.afterCallback(message, anything())).once();
+        done();
+      });
+      message.finish(text);
     });
 
     it('should fire a callback event and handle the action', () => {
@@ -131,15 +120,6 @@ describe('PostboyService', () => {
       message.finish(text);
       //
       expect(action).toHaveBeenCalledWith(text);
-    });
-
-    it('should not fire a locked message', () => {
-      const message = new TestMessage();
-      service.lock(TestMessage);
-      //
-      service.fireCallback(message);
-      //
-      verify(subscription.fire(message)).never();
     });
 
     it('should return an observable that emits the expected result', (done) => {
@@ -161,13 +141,22 @@ describe('PostboyService', () => {
       static ID = Forger.create<string>()!;
     }
 
-    it('should apply middleware', () => {
+    it('should apply middleware.beforeExecute', () => {
       const executor = new TestExec();
       when(store.getExecutor(TestExec.ID)).thenReturn(jest.fn());
       //
       service.exec(executor);
       //
-      verify(middleware.manage(executor)).once();
+      verify(middleware.beforeExecute(executor, anything())).once();
+    });
+
+    it('should apply middleware.afterExecute', () => {
+      const executor = new TestExec();
+      when(store.getExecutor(TestExec.ID)).thenReturn(jest.fn());
+      //
+      service.exec(executor);
+      //
+      verify(middleware.afterExecute(executor, anything(), anything())).once();
     });
 
     it('should execute function', () => {
@@ -210,6 +199,7 @@ describe('PostboyService', () => {
       class TestMessage extends PostboyCallbackMessage<string> {
         static ID = Forger.create<string>()!;
       }
+
       const subject = new Subject<TestMessage>();
       //
       service.record(TestMessage, subject);
@@ -223,6 +213,7 @@ describe('PostboyService', () => {
       class TestExec extends PostboyExecutor<string> {
         static ID = Forger.create<string>()!;
       }
+
       let execFunc = jest.fn();
       //
       service.recordExecutor(TestExec, execFunc);

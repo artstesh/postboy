@@ -1,33 +1,8 @@
-import { Forger } from '@artstesh/forger';
 import {TestCallbackMessage} from "../models/test-callback-message";
 
 export class CallbackMessageFixture {
-  static create(overrides: Partial<TestCallbackMessage> = {}): TestCallbackMessage {
-    return Object.assign(
-      new TestCallbackMessage(),
-      {
-        id: Forger.create<string>()!,
-        type: Forger.create<string>()!,
-      },
-      overrides,
-    );
-  }
-
-  static type(value?: string): string {
-    return value ?? Forger.create<string>()!;
-  }
-
-  static id(value?: string): string {
-    return value ?? Forger.create<string>()!;
-  }
-
-  static pair(overrides: Partial<TestCallbackMessage> = {}) {
-    const message = this.create(overrides);
-    return {
-      message,
-      type: message.type,
-      id: message.id,
-    };
+  static create(): TestCallbackMessage {
+    return new TestCallbackMessage();
   }
 }
 

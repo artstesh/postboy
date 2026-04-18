@@ -14,8 +14,8 @@ export class ScenarioActions {
     this.world.getPostboy().fire(message);
   }
 
-  fireCallback(message: PostboyCallbackMessage<any>): void {
-    this.world.getPostboy().fireCallback(message);
+  fireCallback(message: PostboyCallbackMessage<any>,action?: (e: any) => void): void {
+    this.world.getPostboy().fireCallback(message).subscribe(action ?? (() => {}));
   }
 
   subscribe(type: MessageType<any>, handler: (...args: any[]) => void = () => {}): Subscription {

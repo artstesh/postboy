@@ -1,11 +1,11 @@
-import { TestPostboy } from './models/test-postboy';
-import { TestMessage } from './models/test-message';
-import { TestCallbackMessage } from './models/test-callback-message';
+import { TestPostboy } from '../shared/models/test-postboy';
+import { TestMessage } from '../shared/models/test-message';
+import { TestCallbackMessage } from '../shared/models/test-callback-message';
 import { should } from '@artstesh/it-should';
-import { TestExecutor } from './models/test-executor';
+import { TestExecutor } from '../shared/models/test-executor';
 import { Forger } from '@artstesh/forger';
-import { TestMiddleware } from './models/test-middleware';
-import { TestReg } from './models/test-registry';
+import { TestMiddleware } from '../shared/models/test-middleware';
+import { TestReg } from '../shared/models/test-registry';
 import {AddMiddleware} from "../../messages/add-middleware.executor";
 
 describe('Integration.Middleware', () => {

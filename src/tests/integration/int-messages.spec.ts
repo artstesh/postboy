@@ -1,7 +1,7 @@
-import { TestPostboy } from './models/test-postboy';
-import { TestMessage } from './models/test-message';
-import { TestCallbackMessage } from './models/test-callback-message';
-import { TestReg } from './models/test-registry';
+import { TestPostboy } from '../shared/models/test-postboy';
+import { TestMessage } from '../shared/models/test-message';
+import { TestCallbackMessage } from '../shared/models/test-callback-message';
+import { TestReg } from '../shared/models/test-registry';
 import { combineLatest, share, shareReplay, skip, Subject, tap } from 'rxjs';
 import { should } from '@artstesh/it-should';
 import { Forger } from '@artstesh/forger';

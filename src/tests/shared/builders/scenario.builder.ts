@@ -1,0 +1,106 @@
+import { PostboyWorld } from '../harness/postboy-world';
+import { RegistryBuilder } from './registry.builder';
+import {TestMessage} from "../models/test-message";
+import {TestCallbackMessage} from "../models/test-callback-message";
+import {ScenarioActions} from "../actions/scenario.actions";
+import {PostboyMessage} from "../../../models/postboy.message";
+import {MessageFixture} from "../fixtures/message.fixture";
+
+export class ScenarioBuilder {
+  private readonly world: PostboyWorld;
+  private registryBuilder: RegistryBuilder | null = null;
+  private _message: any = null;
+
+  constructor(world: PostboyWorld = new PostboyWorld()) {
+    this.world = world;
+    this.world.createPostboy();
+  }
+
+  message(): this {
+    this._message = this.world.createMessage(MessageFixture.message());
+    return this;
+  }
+
+  callbackMessage(): this {
+    this._message = this.world.createCallbackMessage<string, TestCallbackMessage>(MessageFixture.callbackMessage());
+    return this;
+  }
+
+  subjectRegistry(): this {
+    this.ensureMessage();
+    this.registryBuilder = new RegistryBuilder(this.world.getPostboy()).subject(this._message.type);
+    this.world.createRegistry(this.registryBuilder.build());
+    return this;
+  }
+
+  replayRegistry(): this {
+    this.ensureMessage();
+    this.registryBuilder = new RegistryBuilder(this.world.getPostboy()).replay(this._message.type);
+    this.world.createRegistry(this.registryBuilder.build());
+    return this;
+  }
+
+  behaviorRegistry(initialValue: any): this {
+    this.ensureMessage();
+    this.registryBuilder = new RegistryBuilder(this.world.getPostboy()).behavior(this._message.type, initialValue);
+    this.world.createRegistry(this.registryBuilder.build());
+    return this;
+  }
+
+  actions(): ScenarioActions {
+    return new ScenarioActions(this.world);
+  }
+
+  getWorld(): PostboyWorld {
+    return this.world;
+  }
+
+  getMessage(): any {
+    this.ensureMessage();
+    return this._message;
+  }
+
+  private ensureMessage(): void {
+    if (!this._message) {
+      throw new Error('ScenarioBuilder: message is not created yet');
+    }
+  }
+}
+
+/*
+import { ScenarioBuilder } from '../../shared/builders/scenario.builder';
+
+it('should deliver message to subscriber', () => {
+  const scenario = new ScenarioBuilder()
+    .message()
+    .subjectRegistry();
+
+  const actions = scenario.actions();
+  const message = scenario.getMessage();
+  const received: any[] = [];
+
+  actions.subscribe(message.type, (value) => received.push(value));
+  actions.fire(message);
+
+  expect(received).toHaveLength(1);
+});
+
+---
+
+it('should complete callback message', () => {
+  const scenario = new ScenarioBuilder()
+    .callbackMessage()
+    .subjectRegistry();
+
+  const actions = scenario.actions();
+  const message = scenario.getMessage();
+
+  let completed = false;
+  message.result.subscribe({ complete: () => (completed = true) });
+
+  actions.fireCallback(message);
+  message.finish('ok');
+
+  expect(completed).toBe(true);
+});
+ */

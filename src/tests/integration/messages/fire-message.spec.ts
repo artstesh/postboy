@@ -1,11 +1,9 @@
-import { Subject, tap } from 'rxjs';
-import { RegistryBuilder } from '../../shared/builders/registry.builder';
-import { ScenarioBuilder } from '../../shared/builders/scenario.builder';
-import { TestAssertions } from '../../shared/harness/assertions';
+import {Subject, tap} from 'rxjs';
+import {RegistryBuilder} from '../../shared/builders/registry.builder';
+import {ScenarioBuilder} from '../../shared/builders/scenario.builder';
+import {TestAssertions} from '../../shared/harness/assertions';
 import {PostboyMessage} from "../../../models/postboy.message";
-import {MessageFixture} from "../../shared/fixtures/message.fixture";
 import {SubscriptionBuilder} from "../../shared/builders/subscription.builder";
-import {collectObservable} from "../../shared/utils/observables";
 import {TestMessage} from "../../shared/models/test-message";
 
 describe('Integration.Messages.FireMessage', () => {
@@ -27,23 +25,12 @@ describe('Integration.Messages.FireMessage', () => {
   });
 
   it('should support pipe-based processing before delivery', () => {
-    const scenario = new ScenarioBuilder()
-      .message();
-
-    const world = scenario.getWorld();
-    const message = scenario.getMessage();
     const trace: string[] = [];
-    const source$ = new Subject<PostboyMessage>();
+    const scenario = new ScenarioBuilder()
+      .message().withPipeRegistry((s) =>
+        s.pipe(tap(() => trace.push('pipe'))));
 
-    world.createRegistry(
-      new RegistryBuilder(world.getPostboy())
-        .withPipe(message.type, source$, (s) =>
-          s.pipe(
-            tap(() => trace.push('pipe')),
-          ),
-        )
-        .build(),
-    );
+    const message = scenario.getMessage();
 
     scenario.actions().subscribe(message.type, () => trace.push('subscriber'));
     scenario.actions().fire(message);
@@ -51,9 +38,17 @@ describe('Integration.Messages.FireMessage', () => {
     TestAssertions.should().array(trace).equal(['pipe', 'subscriber']);
   });
 
-  it('should throw when message is not registered', () => {
+  it('should throw when fire not registered message', () => {
+    const scenario = new ScenarioBuilder().message();
     TestAssertions.throws(() => {
-      new ScenarioBuilder().actions().fire(MessageFixture.message());
+      new ScenarioBuilder().actions().fire(scenario.getMessage());
+    });
+  });
+
+  it('should throw when sub not registered message', () => {
+    const scenario = new ScenarioBuilder().message();
+    TestAssertions.throws(() => {
+      new ScenarioBuilder().actions().subscribe(scenario.getMessage());
     });
   });
 });

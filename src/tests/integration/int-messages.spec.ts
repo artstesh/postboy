@@ -14,13 +14,6 @@ describe('Integration.Messages', () => {
   });
 
   [new TestMessage(), new TestCallbackMessage()].forEach((message) => {
-    it(`should throw if fire not registered ${message.id}`, () => {
-      expect(() => postboy.fire(message)).toThrow();
-    });
-
-    it(`should throw if sub not registered ${message.id}`, () => {
-      expect(() => postboy.sub(message.type)).toThrow();
-    });
 
     [
       { name: 'Subject', func: (r: TestReg) => r.recordSubject(message.type) },
@@ -34,12 +27,6 @@ describe('Integration.Messages', () => {
           registry = new TestReg(postboy);
           registry.ups.push(s.func);
           registry.up();
-        });
-
-        it(`should fire messages`, (done) => {
-          postboy.sub(message.type).subscribe(() => done());
-          //
-          postboy.fire(message);
         });
 
         it(`should complete subs on down`, () => {

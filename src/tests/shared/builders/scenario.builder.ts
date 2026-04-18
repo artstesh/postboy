@@ -5,6 +5,7 @@ import {TestCallbackMessage} from "../models/test-callback-message";
 import {ScenarioActions} from "../actions/scenario.actions";
 import {PostboyMessage} from "../../../models/postboy.message";
 import {MessageFixture} from "../fixtures/message.fixture";
+import {Observable, Subject} from "rxjs";
 
 export class ScenarioBuilder {
   private readonly world: PostboyWorld;
@@ -43,6 +44,13 @@ export class ScenarioBuilder {
   behaviorRegistry(initialValue: any): this {
     this.ensureMessage();
     this.registryBuilder = new RegistryBuilder(this.world.getPostboy()).behavior(this._message.type, initialValue);
+    this.world.createRegistry(this.registryBuilder.build());
+    return this;
+  }
+
+  withPipeRegistry<T extends PostboyMessage = PostboyMessage>(func:(s: Subject<T>) => Observable<T>): this {
+    this.ensureMessage();
+    this.registryBuilder = new RegistryBuilder(this.world.getPostboy()).withPipe(this._message.type, new Subject<T>(), (s) => func(s));
     this.world.createRegistry(this.registryBuilder.build());
     return this;
   }

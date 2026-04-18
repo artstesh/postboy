@@ -6,6 +6,7 @@ import {MessageType} from "../postboy-abstract.registrator";
  * A specialized executor that handles the unlocking process for messages of a specified type.
  * Unlocks a previously locked message, making it available for processing again.
  *
+ * @deprecated Use {@link PostboyMiddleware}
  * @template T - The type parameter extending {@link PostboyGenericMessage}, representing the message type handled by the executor.
  * @extends {PostboyExecutor<void>}
  */

@@ -1,49 +1,136 @@
-import { PostboyMiddleware } from '../models/postboy-middleware';
-import { PostboyMessage } from '../models/postboy.message';
+import {PostboyMessage} from '../models/postboy.message';
+import {PostboyMessageContext} from '../models/postboy-message.context';
+import {PostboyExecutor} from '../models/postboy-executor';
+import {PipelineContext} from "../models/pipeline-context";
+import {PostboyMiddleware} from "./postboy-middleware";
+import {MiddlewareStage} from "../models/middleware-stage.enum";
+import {MiddlewareDecision} from "../models/middleware-decision.enum";
+import {CancelError} from "../models/cancel-error";
+import {PipelineResult} from "../models/pipeline-result";
 
-/**
- * A service class that manages middleware functions for processing PostboyMessage objects.
- * It provides methods to add, remove, and execute middlewares in sequence.
- */
+
 export class PostboyMiddlewareService {
   protected middlewares: PostboyMiddleware[] = [];
 
-  /**
-   * Adds a middleware function to the collection of middlewares.
-   *
-   * @param {PostboyMiddleware} middleware - The middleware function to be added.
-   * @return {void}
-   */
   public addMiddleware(middleware: PostboyMiddleware): void {
     this.middlewares.push(middleware);
   }
 
-  /**
-   * Removes a middleware from the list of registered middlewares.
-   *
-   * @param {PostboyMiddleware} middleware - The middleware instance to be removed.
-   * @return {void} No return value.
-   */
   public removeMiddleware(middleware: PostboyMiddleware): void {
-    this.middlewares = this.middlewares.filter((m) => m !== middleware);
+    this.middlewares = this.middlewares.filter((m) => {
+      if (m !== middleware) return true
+      m.dispose();
+      return false
+    });
   }
 
-  /**
-   * Manages the processing of a PostboyMessage by sequentially applying all middlewares.
-   *
-   * @param {PostboyMessage} msg - The message object to be processed by the middlewares.
-   * @return {void} - This method does not return any value.
-   */
-  public manage(msg: PostboyMessage): void {
-    for (const item of this.middlewares) item.handle(msg);
-  }
-
-  /**
-   * Disposes of the current object by clearing its middlewares array.
-   *
-   * @return {void} This method does not return a value.
-   */
   public dispose(): void {
+    this.middlewares.forEach((m) => m.dispose());
     this.middlewares = [];
+  }
+
+  public before<T extends PostboyMessage>(
+    stage: MiddlewareStage,
+    message: T,
+    messageContext?: PostboyMessageContext,
+  ): void {
+    let result: PipelineResult = {cancelled: false};
+    for (const middleware of this.middlewares) {
+      const context = this.buildContext(stage, message, messageContext);
+
+      if (!middleware.canHandle(context)) continue;
+      try {
+        const decision = middleware.before(context);
+        if (decision === MiddlewareDecision.Interrupt)
+          result = {cancelled: true, cancelledBy: middleware.name};
+      } catch (error) {
+        middleware.onError(context, error);
+      }
+    }
+    if (result.cancelled) this.throwIfCancelled(stage, result.cancelledBy, message.id);
+  }
+
+  public after<T extends PostboyMessage, R = unknown>(
+    stage: MiddlewareStage,
+    message: T,
+    messageContext?: PostboyMessageContext,
+    result?: R,
+  ): void {
+    for (const middleware of this.middlewares) {
+      const context = this.buildContext(stage, message, messageContext);
+      if (!middleware.canHandle(context)) continue;
+      try {
+        middleware.after(context, result);
+      } catch (error) {
+        middleware.onError(context, error);
+      }
+    }
+  }
+
+  public beforePublish(
+    message: PostboyMessage,
+    messageContext?: PostboyMessageContext,
+  ): void {
+    this.before(MiddlewareStage.Publish, message, messageContext);
+  }
+
+  public afterPublish(
+    message: PostboyMessage,
+    messageContext?: PostboyMessageContext,
+  ): void {
+    this.after(MiddlewareStage.Publish, message, messageContext);
+  }
+
+  public beforeCallback(
+    message: PostboyMessage,
+    messageContext?: PostboyMessageContext,
+  ): void {
+    this.before(MiddlewareStage.Callback, message, messageContext);
+  }
+
+  public afterCallback(
+    message: PostboyMessage,
+    messageContext?: PostboyMessageContext,
+    result?: unknown,
+  ): void {
+    this.after(MiddlewareStage.Callback, message, messageContext, result);
+  }
+
+  public beforeExecute<T>(
+    message: PostboyExecutor<T>,
+    messageContext?: PostboyMessageContext,
+  ): void {
+    this.before(MiddlewareStage.Execute, message, messageContext);
+  }
+
+  public afterExecute<T>(
+    message: PostboyExecutor<T>,
+    result: T,
+    messageContext?: PostboyMessageContext,
+  ): void {
+    this.after(MiddlewareStage.Execute, message, messageContext, result);
+  }
+
+  private buildContext<T extends PostboyMessage>(
+    stage: MiddlewareStage,
+    message: T,
+    messageContext?: PostboyMessageContext,
+  ): PipelineContext<T> {
+    return {stage, message, messageContext};
+  }
+
+  private throwIfCancelled(
+    stage: MiddlewareStage,
+    cancelledBy?: string,
+    messageId?: string,
+    namespace?: string,
+  ): never {
+    throw new CancelError({
+      stage,
+      middleware: cancelledBy,
+      messageId,
+      namespace,
+      reason: cancelledBy ? `Cancelled by middleware "${cancelledBy}"` : undefined,
+    });
   }
 }

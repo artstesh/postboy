@@ -5,6 +5,7 @@ import {PostboyExecutor} from "../models/postboy-executor";
 /**
  * Locks a specific message type to prevent firing of them.
  *
+ * @deprecated Use {@link PostboyMiddleware}
  * This class is used to handle operations associated with locking mechanisms
  * for a specified message type.
  *

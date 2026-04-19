@@ -39,9 +39,8 @@ describe('Integration.Messages.FireMessage', () => {
   });
 
   it('should throw when fire not registered message', () => {
-    const scenario = new ScenarioBuilder().useMessage();
     TestAssertions.throws(() => {
-      new ScenarioBuilder().actions().fire();
+      new ScenarioBuilder().useMessage().actions().fire();
     });
   });
 

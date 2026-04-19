@@ -18,10 +18,10 @@ describe('Integration.Messages.Callback', () => {
     TestAssertions.should.string(result).equals(expected);
   });
 
-  it('should throw when fire not registered message', () => {
+  it('should throw when fire not registered message2', () => {
+    const scenario = new ScenarioBuilder().useCallback();
     TestAssertions.throws(() => {
-      const scenario = new ScenarioBuilder().useCallback();
-      TestAssertions.throws(() => scenario.actions().fireCallback(scenario.getMessage()));
+      new ScenarioBuilder().actions().fireCallback(scenario.getMessage());
     });
   });
 

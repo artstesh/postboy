@@ -6,7 +6,6 @@ import {PostboyMiddleware} from "./postboy-middleware";
 import {MiddlewareStage} from "../models/middleware-stage.enum";
 import {MiddlewareDecision} from "../models/middleware-decision.enum";
 import {CancelError} from "../models/cancel-error";
-import {PipelineResult} from "../models/pipeline-result";
 
 
 export class PostboyMiddlewareService {
@@ -34,20 +33,11 @@ export class PostboyMiddlewareService {
     message: T,
     messageContext?: PostboyMessageContext,
   ): void {
-    let result: PipelineResult = {cancelled: false};
     for (const middleware of this.middlewares) {
       const context = this.buildContext(stage, message, messageContext);
-
       if (!middleware.canHandle(context)) continue;
-      try {
-        const decision = middleware.before(context);
-        if (decision === MiddlewareDecision.Interrupt)
-          result = {cancelled: true, cancelledBy: middleware.name};
-      } catch (error) {
-        middleware.onError(context, error);
-      }
+      if (middleware.before(context) === MiddlewareDecision.Interrupt) this.throwIfCancelled(stage, middleware.name, message.id);
     }
-    if (result.cancelled) this.throwIfCancelled(stage, result.cancelledBy, message.id);
   }
 
   public after<T extends PostboyMessage, R = unknown>(
@@ -59,11 +49,7 @@ export class PostboyMiddlewareService {
     for (const middleware of this.middlewares) {
       const context = this.buildContext(stage, message, messageContext);
       if (!middleware.canHandle(context)) continue;
-      try {
-        middleware.after(context, result);
-      } catch (error) {
-        middleware.onError(context, error);
-      }
+      middleware.after(context, result);
     }
   }
 

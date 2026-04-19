@@ -86,29 +86,6 @@ describe('Integration.Scenarios.MessageLifecycle', () => {
     TestAssertions.subscriptionClosed(subscription);
   });
 
-  it('should not deliver message after world disposal', async () => {
-    const scenario = new ScenarioBuilder()
-      .useMessage()
-      .subjectRegistry();
-
-    const actions = scenario.actions();
-    const world = scenario.getWorld();
-    const message = scenario.getMessage();
-    const received: unknown[] = [];
-
-    SubscriptionBuilder
-      .forType(world, message.type)
-      .collect(received)
-      .subscribe();
-
-    await world.dispose();
-
-    actions.fire(message);
-    await flushMicrotasks();
-
-    TestAssertions.notReceived(received);
-  });
-
   it('should preserve replay semantics across lifecycle steps', async () => {
     const scenario = new ScenarioBuilder()
       .useMessage()

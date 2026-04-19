@@ -32,7 +32,7 @@ export class ScenarioBuilder {
   }
 
   useExecutor(): this {
-    this._message = this.world.createExecutor<string, TestExecutor<any>>(MessageFixture.executor());
+    this._message = this.world.createHandler<string, TestExecutor<any>>(MessageFixture.executor(), MessageFixture.handler());
     return this;
   }
 
@@ -85,7 +85,6 @@ export class ScenarioBuilder {
   }
 
   actions(): ScenarioActions {
-    this.ensureMessage();
     return new ScenarioActions(this.world, this.getMessage());
   }
 
@@ -94,7 +93,6 @@ export class ScenarioBuilder {
   }
 
   getMessage(): any {
-    this.ensureMessage();
     return this._message;
   }
 
@@ -104,41 +102,3 @@ export class ScenarioBuilder {
     }
   }
 }
-
-/*
-import { ScenarioBuilder } from '../../shared/builders/scenario.builder';
-
-it('should deliver message to subscriber', () => {
-  const scenario = new ScenarioBuilder()
-    .message()
-    .subjectRegistry();
-
-  const actions = scenario.actions();
-  const message = scenario.getMessage();
-  const received: any[] = [];
-
-  actions.subscribe(message.type, (value) => received.push(value));
-  actions.fire(message);
-
-  expect(received).toHaveLength(1);
-});
-
----
-
-it('should complete callback message', () => {
-  const scenario = new ScenarioBuilder()
-    .callbackMessage()
-    .subjectRegistry();
-
-  const actions = scenario.actions();
-  const message = scenario.getMessage();
-
-  let completed = false;
-  message.result.subscribe({ complete: () => (completed = true) });
-
-  actions.fireCallback(message);
-  message.finish('ok');
-
-  expect(completed).toBe(true);
-});
- */

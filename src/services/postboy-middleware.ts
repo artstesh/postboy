@@ -43,13 +43,6 @@ export abstract class PostboyMiddleware {
   }
 
   /**
-   * Called when middleware or pipeline throws.
-   */
-  public onError(_context: PipelineContext, _error: unknown): void {
-    // noop
-  }
-
-  /**
    * Optional cleanup hook.
    */
   public dispose(): void {

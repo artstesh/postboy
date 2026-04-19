@@ -1,8 +1,6 @@
-import { ScenarioBuilder } from '../../shared/builders/scenario.builder';
-import { SubscriptionBuilder } from '../../shared/builders/subscription.builder';
-import { MiddlewareFixture } from '../../shared/fixtures/middleware.fixture';
-import { TestAssertions } from '../../shared/harness/assertions';
-import { flushMicrotasks, waitFor, waitForValue } from '../../shared/utils/async';
+import {ScenarioBuilder} from '../../shared/builders/scenario.builder';
+import {SubscriptionBuilder} from '../../shared/builders/subscription.builder';
+import {waitForValue} from '../../shared/utils/async';
 import {TestMessage} from "../../shared/models/test-message";
 
 describe('Integration.Middleware.Dispose', () => {

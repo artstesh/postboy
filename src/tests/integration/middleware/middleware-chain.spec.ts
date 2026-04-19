@@ -20,6 +20,45 @@ describe('Integration.Middleware.Chain', () => {
   })
 
   it('should pass message through all active middleware and deliver to subscriber', async () => {
+    const actions = scenario.actions();
+
+    const trace: string[] = [];
+
+    scenario.useMiddleware()
+      .active({
+        onBefore: () => trace.push('first:before'),
+        onAfter: () => trace.push('first:after'),
+      })
+      .active({
+        onBefore: () => trace.push('second:before'),
+        onAfter: () => trace.push('second:after'),
+      });
+
+    const received: unknown[] = [];
+
+    SubscriptionBuilder
+      .forType(scenario.getWorld(), message.type)
+      .collect(received)
+      .subscribe();
+
+    actions.fire(message);
+
+    const value = await waitForValue(() => received[0], {
+      timeoutMs: 100,
+      intervalMs: 5,
+    });
+
+    expect(value).toEqual(message);
+    expect(trace).toEqual([
+      'first:before',
+      'second:before',
+      'first:after',
+      'second:after',
+    ]);
+    TestAssertions.receivedOne(received, message);
+  });
+
+  it('should ignore middleware that cannot handle', async () => {
     const world = scenario.getWorld();
     const actions = scenario.actions();
     const message = scenario.getMessage();
@@ -31,7 +70,7 @@ describe('Integration.Middleware.Chain', () => {
         onBefore: () => trace.push('first:before'),
         onAfter: () => trace.push('first:after'),
       })
-      .active({
+      .skipped({
         onBefore: () => trace.push('second:before'),
         onAfter: () => trace.push('second:after'),
       });
@@ -53,9 +92,7 @@ describe('Integration.Middleware.Chain', () => {
     expect(value).toEqual(message);
     expect(trace).toEqual([
       'first:before',
-      'second:before',
       'first:after',
-      'second:after',
     ]);
     TestAssertions.receivedOne(received, message);
   });

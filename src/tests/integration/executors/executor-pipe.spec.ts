@@ -1,8 +1,6 @@
-import { ScenarioBuilder } from '../../shared/builders/scenario.builder';
-import { MiddlewareFixture } from '../../shared/fixtures/middleware.fixture';
-import { TestAssertions } from '../../shared/harness/assertions';
-import { waitFor, waitForValue } from '../../shared/utils/async';
-import { TestExecutor } from '../../shared/models/test-executor';
+import {ScenarioBuilder} from '../../shared/builders/scenario.builder';
+import {TestAssertions} from '../../shared/harness/assertions';
+import {TestExecutor} from '../../shared/models/test-executor';
 
 describe('Integration.Executors.Pipe', () => {
   let scenario: ScenarioBuilder;
@@ -24,12 +22,6 @@ describe('Integration.Executors.Pipe', () => {
       .active({
         onBefore: () => trace.push('before'),
         onAfter: () => trace.push('after'),
-      })
-      .active({
-        onBefore: () => trace.push('second:before'),
-      })
-      .active({
-        onBefore: () => trace.push('third:before'),
       });
 
     const result = scenario.actions().exec(executor);

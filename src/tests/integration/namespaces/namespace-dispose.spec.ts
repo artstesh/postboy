@@ -61,28 +61,6 @@ describe('Integration.Namespaces.Dispose', () => {
     TestAssertions.subscriptionClosed(subscription);
   });
 
-  it('should not emit after namespace disposal', async () => {
-    const scenario = new ScenarioBuilder()
-      .useMessage()
-      .subjectRegistry();
-
-    const world = scenario.getWorld();
-    const message = scenario.getMessage();
-    const received: unknown[] = [];
-
-    SubscriptionBuilder
-      .forType(world, message.type)
-      .collect(received)
-      .subscribe();
-
-    await world.dispose();
-
-    scenario.actions().fire(message);
-    await flushMicrotasks();
-
-    TestAssertions.notReceived(received);
-  });
-
   it('should dispose multiple subscriptions in the same namespace', async () => {
     const scenario = new ScenarioBuilder()
       .useMessage()

@@ -54,7 +54,6 @@ The middleware abstraction has been redesigned to support:
 - `canHandle(...)`
 - `before(...)`
 - `after(...)`
-- `onError(...)`
 - `dispose()`
 
 This replaces the older simpler middleware contract and aligns middleware behavior with the new pipeline model.
@@ -73,7 +72,6 @@ The previous approach was limited because middleware could only act as a single,
 - distinguish between publishing, callback handling, and execution
 - react before and after each stage
 - cancel processing in a controlled way
-- report errors more consistently
 - be composed more cleanly across the library
 
 This is a foundation for richer cross-cutting behavior in future versions.
@@ -89,7 +87,6 @@ If you use custom middleware, you will need to update it to the new middleware c
    - `canHandle`
    - `before`
    - `after`
-   - `onError`
 3. Use the provided pipeline context to determine which stage is being processed.
 4. If you want to stop processing, return the interrupt decision from `before`.
 
@@ -104,7 +101,6 @@ If you use custom middleware, you will need to update it to the new middleware c
 - Review each custom middleware and map its logic to the new stages.
 - Move validation logic to `before`.
 - Move side effects and logging to `after`.
-- Move exception handling to `onError`.
 - Test publishing, callbacks, and execution separately to confirm the middleware still behaves as expected.
 
 ## Notes

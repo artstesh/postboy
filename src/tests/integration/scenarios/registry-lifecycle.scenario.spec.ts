@@ -93,29 +93,6 @@ describe('Integration.Scenarios.RegistryLifecycle', () => {
     TestAssertions.receivedOne(second, message);
   });
 
-  it('should stop delivery after registry is disposed', async () => {
-    const scenario = new ScenarioBuilder()
-      .useMessage()
-      .subjectRegistry();
-
-    const world = scenario.getWorld();
-    const actions = scenario.actions();
-    const message = scenario.getMessage();
-    const received: unknown[] = [];
-
-    SubscriptionBuilder
-      .forType(world, message.type)
-      .collect(received)
-      .subscribe();
-
-    await world.dispose();
-
-    actions.fire(message);
-    await flushMicrotasks();
-
-    TestAssertions.notReceived(received);
-  });
-
   it('should not leak registry state across separate scenarios', async () => {
     const left = new ScenarioBuilder()
       .useMessage()

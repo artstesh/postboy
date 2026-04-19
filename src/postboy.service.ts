@@ -100,9 +100,12 @@ export class PostboyService {
 
     return this.context.run(context, () => {
       this.middleware.beforeCallback(message, context);
-      this.store.callbackFired(message);
+      const msg = this.store.getMessage(message.id, message.constructor.name);
       if (action) message.result.subscribe(action);
-      if (!this.locked.has(message.id)) setTimeout(() => this.store.getMessage(message.id, message.constructor.name).fire(message));
+      this.store.callbackFired(message);
+      if (!this.locked.has(message.id)) {
+        queueMicrotask(() => msg.fire(message));
+      }
       return message.result.pipe(tap(() => this.middleware.afterCallback(message, context)));
     });
   }

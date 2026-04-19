@@ -9,17 +9,20 @@ import {MessageType} from "../../../postboy-abstract.registrator";
 import {PostboyExecutor} from "../../../models/postboy-executor";
 
 export class ScenarioActions {
-  constructor(private readonly world: PostboyWorld, private message: PostboyMessage) {}
+  constructor(private readonly world: PostboyWorld, private message?: PostboyMessage) {}
 
   fire(message?: PostboyMessage): void {
-    this.world.getPostboy().fire(message ?? this.message);
+    if (!message && !this.message) throw new Error('ScenarioActions: message is not created yet');
+    this.world.getPostboy().fire(message ?? this.message!);
   }
 
   exec(ex?: PostboyExecutor<any>): any {
+    if (!this.message && !ex) throw new Error('ScenarioActions: message is not created yet');
     return this.world.getPostboy().exec(ex ?? this.message as PostboyExecutor<any>);
   }
 
   fireCallback(message?: PostboyCallbackMessage<any>,action?: (e: any) => void): void {
+    if (!this.message && !message) throw new Error('ScenarioActions: message is not created yet');
     this.world.getPostboy().fireCallback(message ?? this.message as PostboyCallbackMessage<any>).subscribe(action ?? (() => {}));
   }
 

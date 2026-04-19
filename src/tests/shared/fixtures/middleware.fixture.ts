@@ -8,7 +8,6 @@ export type MiddlewareHooks = {
   throwOnBefore?: boolean;
   onBefore?: (context: PipelineContext) => void;
   onAfter?: (context: PipelineContext, result?: unknown) => void;
-  onError?: (context: PipelineContext, error?: unknown) => void;
 };
 
 export class MiddlewareFixture {
@@ -33,14 +32,6 @@ export class MiddlewareFixture {
         middleware.targetMessages.has(context.message.id) &&  hooks.onAfter?.(context, result);
         return originalAfter(context, result);
       }) as typeof middleware.after;
-    }
-
-    if (hooks.onError) {
-      const originalOnError = middleware.onError.bind(middleware);
-      middleware.onError = ((context: PipelineContext, error?: unknown) => {
-        middleware.targetMessages.has(context.message.id) &&  hooks.onError?.(context, error);
-        return originalOnError(context, error);
-      }) as typeof middleware.onError;
     }
 
     return middleware;

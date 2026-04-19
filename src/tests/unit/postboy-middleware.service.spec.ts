@@ -47,16 +47,6 @@ describe('PostboyMiddlewareService', () => {
       expect(() => service.before(stage, message, context)).not.toThrow();
     });
 
-    it('should catch errors', () => {
-      const error = new Error();
-      when(middleware.canHandle).thenReturn(() => true);
-      when(middleware.before).thenThrow(error);
-      //
-      service.before(stage, message, context);
-      //
-      verify(middleware.onError(anything(), anything())).once();
-    });
-
     it('should throw if MiddlewareDecision.Interrupt', () => {
       when(middleware.canHandle).thenReturn(() => true);
       when(middleware.before).thenReturn(() => MiddlewareDecision.Interrupt);
@@ -80,16 +70,6 @@ describe('PostboyMiddlewareService', () => {
       when(middleware.canHandle).thenReturn(() => false);
       //
       expect(() => service.after(stage, message, context)).not.toThrow();
-    });
-
-    it('should catch errors', () => {
-      const error = new Error();
-      when(middleware.canHandle).thenReturn(() => true);
-      when(middleware.after).thenThrow(error);
-      //
-      service.after(stage, message, context);
-      //
-      verify(middleware.onError(anything(), anything())).once();
     });
   })
 

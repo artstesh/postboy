@@ -9,6 +9,7 @@ export class TestHandler extends PostboyExecutionHandler<string, TestExecutor<an
   }
 
   handle(executor: TestExecutor<any>): string {
+    if (this._throwOnHandle) throw new Error('Throwing on handle');
     return this.toReturn;
   }
 

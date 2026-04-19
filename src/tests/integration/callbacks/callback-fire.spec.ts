@@ -1,7 +1,8 @@
-import { ScenarioBuilder } from '../../shared/builders/scenario.builder';
-import { TestAssertions } from '../../shared/harness/assertions';
-import { waitFor, waitForValue } from '../../shared/utils/async';
-import { toArray } from '../../shared/utils/observables';
+import {ScenarioBuilder} from '../../shared/builders/scenario.builder';
+import {TestAssertions} from '../../shared/harness/assertions';
+import {waitFor, waitForValue} from '../../shared/utils/async';
+import {toArray} from '../../shared/utils/observables';
+import {MessageFixture} from "../../shared/fixtures/message.fixture";
 
 describe('Integration.Callbacks.Fire', () => {
   it('should fire callback message and emit result value', async () => {
@@ -70,12 +71,8 @@ describe('Integration.Callbacks.Fire', () => {
   });
 
   it('should throw when callback message is not registered', () => {
-    const scenario = new ScenarioBuilder().useCallback();
-    const message = scenario.getMessage();
-
-    TestAssertions.throws(() => {
-      scenario.actions().fireCallback(message);
-    });
+    TestAssertions.throws(() =>
+      new ScenarioBuilder().getWorld().getPostboy().fireCallback(MessageFixture.callbackMessage()));
   });
 
   it('should not complete before finish is called', async () => {

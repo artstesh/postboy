@@ -9,5 +9,7 @@ module.exports = {
     }]
   },
   coverageDirectory: '../coverage',
-  rootDir: 'src', collectCoverage: true
+  rootDir: 'src', collectCoverage: true,
+  coveragePathIgnorePatterns: [
+    'src/tests/'],
 };

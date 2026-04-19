@@ -12,15 +12,21 @@ export class TestMiddleware extends PostboyMiddleware {
   _decision: MiddlewareDecision = MiddlewareDecision.Continue;
   _result?: any;
   _error?: any;
+  targetMessages = new Set<string>();
+
+  constructor(messageIds: string[]) {
+    super();
+    this.targetMessages = new Set(messageIds);
+  }
 
   canHandle(_context: PipelineContext): boolean {
-    return this._canHandle;
+    return this.targetMessages.has(_context.message.id) ? this._canHandle : true;
   }
 
   before(_context: PipelineContext): MiddlewareDecision {
     if (this._throw) throw new Error();
     this._before = _context;
-    return this._decision;
+    return this.targetMessages.has(_context.message.id) ? this._decision : MiddlewareDecision.Continue;
   }
 
   after(_context: PipelineContext, _result?: unknown): void {

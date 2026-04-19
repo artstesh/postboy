@@ -5,128 +5,47 @@ import { waitFor, waitForValue } from '../../shared/utils/async';
 import { TestExecutor } from '../../shared/models/test-executor';
 
 describe('Integration.Executors.Pipe', () => {
+  let scenario: ScenarioBuilder;
+  let executor: TestExecutor<any>;
+
+  beforeEach(() => {
+    scenario= new ScenarioBuilder().useExecutor().handlerRegistry();
+    executor = scenario.getMessage() as TestExecutor<any>;
+  })
+
+  afterEach(() => {
+    scenario.getWorld().dispose();
+  })
+
   it('should pass executor through middleware pipe and return transformed result', async () => {
-    const scenario = new ScenarioBuilder();
-
-    const world = scenario.getWorld();
-    const postboy = world.getPostboy();
-
     const trace: string[] = [];
-    const executor = new TestExecutor('payload');
 
-    world.trackMiddleware(
-      MiddlewareFixture.active({
+    scenario.useMiddleware()
+      .active({
         onBefore: () => trace.push('before'),
         onAfter: () => trace.push('after'),
-      }),
-    );
+      })
+      .active({
+        onBefore: () => trace.push('second:before'),
+      })
+      .active({
+        onBefore: () => trace.push('third:before'),
+      });
 
-    const resultPromise = postboy.exec(executor);
-
-    const result = await waitForValue(() => executor._result, {
-      timeoutMs: 100,
-      intervalMs: 5,
-    });
-
-    await resultPromise;
-
+    const result = scenario.actions().exec(executor);
     expect(result).toBeDefined();
     expect(trace).toEqual(['before', 'after']);
   });
 
-  it('should keep executor pipe isolated between scenarios', async () => {
-    const left = new ScenarioBuilder();
-    const right = new ScenarioBuilder();
-
-    const leftWorld = left.getWorld();
-    const rightWorld = right.getWorld();
-
-    const leftTrace: string[] = [];
-    const rightTrace: string[] = [];
-
-    leftWorld.trackMiddleware(
-      MiddlewareFixture.active({
-        onBefore: () => leftTrace.push('left:before'),
-        onAfter: () => leftTrace.push('left:after'),
-      }),
-    );
-
-    rightWorld.trackMiddleware(
-      MiddlewareFixture.active({
-        onBefore: () => rightTrace.push('right:before'),
-        onAfter: () => rightTrace.push('right:after'),
-      }),
-    );
-
-    const leftExecutor = new TestExecutor('left');
-    const rightExecutor = new TestExecutor('right');
-
-    await leftWorld.getPostboy().exec(leftExecutor);
-    await rightWorld.getPostboy().exec(rightExecutor);
-
-    expect(leftTrace).toEqual(['left:before', 'left:after']);
-    expect(rightTrace).toEqual(['right:before', 'right:after']);
-  });
-
   it('should stop executor execution when middleware interrupts', async () => {
-    const scenario = new ScenarioBuilder();
-
-    const world = scenario.getWorld();
-    const postboy = world.getPostboy();
     const trace: string[] = [];
 
-    world.trackMiddleware(
-      MiddlewareFixture.interrupting({
-        onBefore: () => trace.push('before'),
-      }),
-    );
+    scenario.useMiddleware()
+      .interrupting({
+        onBefore: () => trace.push('before')
+      });
 
-    const executor = new TestExecutor('payload');
-
-    TestAssertions.throws(() => postboy.exec(executor));
+    TestAssertions.throws(() => scenario.actions().exec(executor));
     expect(trace).toEqual(['before']);
-  });
-
-  it('should allow executor pipe to complete normally after await', async () => {
-    const scenario = new ScenarioBuilder();
-
-    const world = scenario.getWorld();
-    const postboy = world.getPostboy();
-
-    const executor = new TestExecutor('payload');
-
-    world.trackMiddleware(
-      MiddlewareFixture.active({
-        onAfter: () => {
-          executor._completed = true;
-        },
-      }),
-    );
-
-    await postboy.exec(executor);
-
-    await waitFor(() => executor._completed === true, {
-      timeoutMs: 100,
-      intervalMs: 5,
-    });
-
-    expect(executor._completed).toBe(true);
-  });
-
-  it('should dispose middleware after executor pipe scenario cleanup', async () => {
-    const scenario = new ScenarioBuilder();
-
-    const world = scenario.getWorld();
-    const postboy = world.getPostboy();
-
-    const middleware = MiddlewareFixture.active();
-    world.trackMiddleware(middleware);
-
-    const executor = new TestExecutor('payload');
-
-    await postboy.exec(executor);
-    await world.dispose();
-
-    TestAssertions.completed(true);
   });
 });

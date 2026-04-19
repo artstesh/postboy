@@ -3,9 +3,7 @@ import {should, VerifierFactory} from '@artstesh/it-should';
 
 export class TestAssertions {
 
-  static should(): VerifierFactory {
-    return should();
-  }
+  static should = should();
 
   static subscriptionOpen(sub: Subscription): void {
     expect(sub.closed).toBe(false);

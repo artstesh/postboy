@@ -6,16 +6,21 @@ import { SubscriptionBuilder } from '../builders/subscription.builder';
 import {PostboyMessage} from "../../../models/postboy.message";
 import {PostboyCallbackMessage} from "../../../models/postboy-callback.message";
 import {MessageType} from "../../../postboy-abstract.registrator";
+import {PostboyExecutor} from "../../../models/postboy-executor";
 
 export class ScenarioActions {
-  constructor(private readonly world: PostboyWorld) {}
+  constructor(private readonly world: PostboyWorld, private message: PostboyMessage) {}
 
-  fire(message: PostboyMessage): void {
-    this.world.getPostboy().fire(message);
+  fire(message?: PostboyMessage): void {
+    this.world.getPostboy().fire(message ?? this.message);
   }
 
-  fireCallback(message: PostboyCallbackMessage<any>,action?: (e: any) => void): void {
-    this.world.getPostboy().fireCallback(message).subscribe(action ?? (() => {}));
+  exec(ex?: PostboyExecutor<any>): any {
+    return this.world.getPostboy().exec(ex ?? this.message as PostboyExecutor<any>);
+  }
+
+  fireCallback(message?: PostboyCallbackMessage<any>,action?: (e: any) => void): void {
+    this.world.getPostboy().fireCallback(message ?? this.message as PostboyCallbackMessage<any>).subscribe(action ?? (() => {}));
   }
 
   subscribe(type: MessageType<any>, handler: (...args: any[]) => void = () => {}): Subscription {

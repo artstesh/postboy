@@ -6,7 +6,7 @@ import { flushMicrotasks, waitForValue } from '../../shared/utils/async';
 describe('Integration.Scenarios.RegistryLifecycle', () => {
   it('should register registry, deliver messages and dispose cleanly', async () => {
     const scenario = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .subjectRegistry();
 
     const world = scenario.getWorld();
@@ -36,7 +36,7 @@ describe('Integration.Scenarios.RegistryLifecycle', () => {
 
   it('should preserve replay registry state until disposal', async () => {
     const scenario = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .replayRegistry();
 
     const world = scenario.getWorld();
@@ -66,7 +66,7 @@ describe('Integration.Scenarios.RegistryLifecycle', () => {
 
   it('should keep multiple registry subscribers isolated within the same lifecycle', async () => {
     const scenario = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .subjectRegistry();
 
     const world = scenario.getWorld();
@@ -95,7 +95,7 @@ describe('Integration.Scenarios.RegistryLifecycle', () => {
 
   it('should stop delivery after registry is disposed', async () => {
     const scenario = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .subjectRegistry();
 
     const world = scenario.getWorld();
@@ -118,11 +118,11 @@ describe('Integration.Scenarios.RegistryLifecycle', () => {
 
   it('should not leak registry state across separate scenarios', async () => {
     const left = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .subjectRegistry();
 
     const right = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .subjectRegistry();
 
     const leftWorld = left.getWorld();

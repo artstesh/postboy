@@ -6,7 +6,7 @@ import { flushMicrotasks, waitForValue } from '../../shared/utils/async';
 describe('Integration.Scenarios.SubscriptionLifecycle', () => {
   it('should create subscription, receive value and close on dispose', async () => {
     const scenario = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .subjectRegistry();
 
     const world = scenario.getWorld();
@@ -38,7 +38,7 @@ describe('Integration.Scenarios.SubscriptionLifecycle', () => {
 
   it('should support once subscription lifecycle', async () => {
     const scenario = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .subjectRegistry();
 
     const world = scenario.getWorld();
@@ -71,7 +71,7 @@ describe('Integration.Scenarios.SubscriptionLifecycle', () => {
 
   it('should keep subscription open until explicit unsubscribe', async () => {
     const scenario = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .subjectRegistry();
 
     const world = scenario.getWorld();
@@ -102,7 +102,7 @@ describe('Integration.Scenarios.SubscriptionLifecycle', () => {
 
   it('should not receive values after unsubscribe', async () => {
     const scenario = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .subjectRegistry();
 
     const world = scenario.getWorld();
@@ -126,7 +126,7 @@ describe('Integration.Scenarios.SubscriptionLifecycle', () => {
 
   it('should close all subscriptions on world dispose', async () => {
     const scenario = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .subjectRegistry();
 
     const world = scenario.getWorld();

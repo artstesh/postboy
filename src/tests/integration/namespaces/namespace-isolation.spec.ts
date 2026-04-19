@@ -6,11 +6,11 @@ import { flushMicrotasks, waitForValue } from '../../shared/utils/async';
 describe('Integration.Namespaces.Isolation', () => {
   it('should isolate message delivery between two independent worlds', async () => {
     const left = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .subjectRegistry();
 
     const right = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .subjectRegistry();
 
     const leftWorld = left.getWorld();
@@ -54,11 +54,11 @@ describe('Integration.Namespaces.Isolation', () => {
 
   it('should not leak subscriptions from one world into another', async () => {
     const left = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .subjectRegistry();
 
     const right = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .subjectRegistry();
 
     const leftWorld = left.getWorld();
@@ -94,11 +94,11 @@ describe('Integration.Namespaces.Isolation', () => {
 
   it('should keep replay state isolated between independent worlds', async () => {
     const left = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .replayRegistry();
 
     const right = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .replayRegistry();
 
     const leftWorld = left.getWorld();
@@ -139,11 +139,11 @@ describe('Integration.Namespaces.Isolation', () => {
 
   it('should dispose one world without affecting another', async () => {
     const left = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .subjectRegistry();
 
     const right = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .subjectRegistry();
 
     const leftWorld = left.getWorld();

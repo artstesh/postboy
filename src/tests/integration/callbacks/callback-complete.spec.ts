@@ -5,7 +5,7 @@ import { waitFor } from '../../shared/utils/async';
 describe('Integration.Callbacks.Complete', () => {
   it('should complete callback message', async () => {
     const scenario = new ScenarioBuilder()
-      .callbackMessage()
+      .useCallback()
       .subjectRegistry();
 
     const actions = scenario.actions();
@@ -37,7 +37,7 @@ describe('Integration.Callbacks.Complete', () => {
 
   it('should complete callback result only once', async () => {
     const scenario = new ScenarioBuilder()
-      .callbackMessage()
+      .useCallback()
       .subjectRegistry();
 
     const actions = scenario.actions();
@@ -64,7 +64,7 @@ describe('Integration.Callbacks.Complete', () => {
 
   it('should allow callback completion through the full lifecycle', async () => {
     const scenario = new ScenarioBuilder()
-      .callbackMessage()
+      .useCallback()
       .subjectRegistry();
 
     const actions = scenario.actions();

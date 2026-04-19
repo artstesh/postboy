@@ -6,7 +6,7 @@ import { flushMicrotasks, waitFor } from '../../shared/utils/async';
 describe('Integration.Callbacks.Dispose', () => {
   it('should close callback result subscription on world dispose', async () => {
     const scenario = new ScenarioBuilder()
-      .callbackMessage()
+      .useCallback()
       .subjectRegistry();
 
     const world = scenario.getWorld();
@@ -36,7 +36,7 @@ describe('Integration.Callbacks.Dispose', () => {
 
   it('should not emit callback result after world disposal', async () => {
     const scenario = new ScenarioBuilder()
-      .callbackMessage()
+      .useCallback()
       .subjectRegistry();
 
     const world = scenario.getWorld();
@@ -58,7 +58,7 @@ describe('Integration.Callbacks.Dispose', () => {
 
   it('should dispose callback subscribers together with the namespace', async () => {
     const scenario = new ScenarioBuilder()
-      .callbackMessage()
+      .useCallback()
       .subjectRegistry();
 
     const world = scenario.getWorld();
@@ -86,7 +86,7 @@ describe('Integration.Callbacks.Dispose', () => {
 
   it('should keep callback disposal idempotent', async () => {
     const scenario = new ScenarioBuilder()
-      .callbackMessage()
+      .useCallback()
       .subjectRegistry();
 
     const world = scenario.getWorld();

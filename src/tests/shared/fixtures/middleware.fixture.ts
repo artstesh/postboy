@@ -2,7 +2,7 @@ import { MiddlewareDecision } from '../../../models/middleware-decision.enum';
 import { PipelineContext } from '../../../models/pipeline-context';
 import { TestMiddleware } from '../models/test-middleware';
 
-type MiddlewareHooks = {
+export type MiddlewareHooks = {
   canHandle?: boolean;
   decision?: MiddlewareDecision;
   throwOnBefore?: boolean;
@@ -12,8 +12,8 @@ type MiddlewareHooks = {
 };
 
 export class MiddlewareFixture {
-  static create(hooks: MiddlewareHooks = {}): TestMiddleware {
-    const middleware = new TestMiddleware();
+  static create(acceptable: string[],hooks: MiddlewareHooks): TestMiddleware {
+    const middleware = new TestMiddleware(acceptable);
 
     middleware._canHandle = hooks.canHandle ?? true;
     middleware._decision = hooks.decision ?? MiddlewareDecision.Continue;
@@ -22,7 +22,7 @@ export class MiddlewareFixture {
     if (hooks.onBefore) {
       const originalBefore = middleware.before.bind(middleware);
       middleware.before = ((context: PipelineContext) => {
-        hooks.onBefore?.(context);
+        middleware.targetMessages.has(context.message.id) &&  hooks.onBefore?.(context);
         return originalBefore(context);
       }) as typeof middleware.before;
     }
@@ -30,7 +30,7 @@ export class MiddlewareFixture {
     if (hooks.onAfter) {
       const originalAfter = middleware.after.bind(middleware);
       middleware.after = ((context: PipelineContext, result?: unknown) => {
-        hooks.onAfter?.(context, result);
+        middleware.targetMessages.has(context.message.id) &&  hooks.onAfter?.(context, result);
         return originalAfter(context, result);
       }) as typeof middleware.after;
     }
@@ -38,7 +38,7 @@ export class MiddlewareFixture {
     if (hooks.onError) {
       const originalOnError = middleware.onError.bind(middleware);
       middleware.onError = ((context: PipelineContext, error?: unknown) => {
-        hooks.onError?.(context, error);
+        middleware.targetMessages.has(context.message.id) &&  hooks.onError?.(context, error);
         return originalOnError(context, error);
       }) as typeof middleware.onError;
     }
@@ -46,38 +46,34 @@ export class MiddlewareFixture {
     return middleware;
   }
 
-  static active(hooks: Omit<MiddlewareHooks, 'canHandle' | 'decision' | 'throwOnBefore'> = {}): TestMiddleware {
-    return this.create({
+  static active(acceptable: string[],hooks: Omit<MiddlewareHooks, 'canHandle' | 'decision' | 'throwOnBefore'>={}): TestMiddleware {
+    return this.create(acceptable,{
       canHandle: true,
       decision: MiddlewareDecision.Continue,
       ...hooks,
     });
   }
 
-  static interrupting(hooks: Omit<MiddlewareHooks, 'canHandle' | 'decision' | 'throwOnBefore'> = {}): TestMiddleware {
-    return this.create({
+  static interrupting(acceptable: string[],hooks: Omit<MiddlewareHooks, 'canHandle' | 'decision' | 'throwOnBefore'>={}): TestMiddleware {
+    return this.create(acceptable,{
       canHandle: true,
       decision: MiddlewareDecision.Interrupt,
       ...hooks,
     });
   }
 
-  static throwing(hooks: Omit<MiddlewareHooks, 'canHandle' | 'decision' | 'throwOnBefore'> = {}): TestMiddleware {
-    return this.create({
+  static throwing(acceptable: string[],hooks: Omit<MiddlewareHooks, 'canHandle' | 'decision' | 'throwOnBefore'>={}): TestMiddleware {
+    return this.create(acceptable,{
       canHandle: true,
       throwOnBefore: true,
       ...hooks,
     });
   }
 
-  static skipped(hooks: Omit<MiddlewareHooks, 'canHandle' | 'decision' | 'throwOnBefore'> = {}): TestMiddleware {
-    return this.create({
+  static skipped(acceptable: string[],hooks: Omit<MiddlewareHooks, 'canHandle' | 'decision' | 'throwOnBefore'>={}): TestMiddleware {
+    return this.create(acceptable,{
       canHandle: false,
       ...hooks,
     });
-  }
-
-  static chain(...middlewares: TestMiddleware[]): TestMiddleware[] {
-    return middlewares;
   }
 }

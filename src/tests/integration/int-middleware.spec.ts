@@ -16,7 +16,7 @@ describe('Integration.Middleware', () => {
   beforeEach(() => {
     postboy = new TestPostboy();
     registry = new TestReg(postboy);
-    middleware = new TestMiddleware();
+    middleware = new TestMiddleware([TestMessage.ID]);
     postboy.exec(new AddMiddleware(middleware));
   });
 

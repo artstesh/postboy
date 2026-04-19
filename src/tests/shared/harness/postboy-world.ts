@@ -4,11 +4,18 @@ import {TestReg} from "../models/test-registry";
 import {PostboyMessage} from "../../../models/postboy.message";
 import {PostboyCallbackMessage} from "../../../models/postboy-callback.message";
 import {PostboyMiddleware} from "../../../services/postboy-middleware";
+import {PostboyExecutionHandler} from "../../../models/postboy-execution.handler";
+import {PostboyExecutor} from "../../../models/postboy-executor";
+import {TestHandler} from "../models/test-handler";
+import {Forger} from "@artstesh/forger";
+import {AddMiddleware} from "../../../messages";
 
 export type PostboyWorldState = {
   postboy?: TestPostboy;
   registry?: TestReg;
   message?: PostboyMessage;
+  executor?: PostboyExecutor<any>;
+  handler?: TestHandler;
   callbackMessage?: PostboyCallbackMessage<any>;
   middleware?: PostboyMiddleware[];
   subscriptions?: any[];
@@ -35,6 +42,17 @@ export class PostboyWorld extends TestWorld<PostboyWorldState> {
     return message;
   }
 
+  createExecutor<R,TMessage extends PostboyExecutor<any> = PostboyExecutor<any>>(executor: TMessage): TMessage {
+    this.set('executor', executor);
+    return executor;
+  }
+
+  createHandler<R,TMessage extends PostboyExecutor<any> = PostboyExecutor<any>>(executor: TMessage, handler: TestHandler): TMessage {
+    this.set('executor', executor);
+    this.set('handler', handler);
+    return executor;
+  }
+
   addSubscription(sub: { unsubscribe: () => void }): this {
     return this.addCleanup(() => sub.unsubscribe());
   }
@@ -48,6 +66,7 @@ export class PostboyWorld extends TestWorld<PostboyWorldState> {
     const list = this.tryGet('middleware') ?? [];
     list.push(middleware);
     this.set('middleware', list);
+    this.getPostboy().exec(new AddMiddleware(middleware));
     return this;
   }
 

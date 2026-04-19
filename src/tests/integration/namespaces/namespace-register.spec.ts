@@ -6,7 +6,7 @@ import { flushMicrotasks, waitForValue } from '../../shared/utils/async';
 describe('Integration.Namespaces.Register', () => {
   it('should register namespace and deliver messages', async () => {
     const scenario = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .subjectRegistry();
 
     const actions = scenario.actions();
@@ -31,7 +31,7 @@ describe('Integration.Namespaces.Register', () => {
 
   it('should allow replay registry to deliver last value to late subscriber', async () => {
     const scenario = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .replayRegistry();
 
     const actions = scenario.actions();
@@ -55,7 +55,7 @@ describe('Integration.Namespaces.Register', () => {
 
   it('should support multiple subscriptions for the same registered namespace', async () => {
     const scenario = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .subjectRegistry();
 
     const actions = scenario.actions();
@@ -83,7 +83,7 @@ describe('Integration.Namespaces.Register', () => {
 
   it('should keep registration active until dispose', async () => {
     const scenario = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .subjectRegistry();
 
     const world = scenario.getWorld();
@@ -111,7 +111,7 @@ describe('Integration.Namespaces.Register', () => {
   });
 
   it('should not emit without registration', () => {
-    const scenario = new ScenarioBuilder().message();
+    const scenario = new ScenarioBuilder().useMessage();
     const actions = scenario.actions();
     const message = scenario.getMessage();
 

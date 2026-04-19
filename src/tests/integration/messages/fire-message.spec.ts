@@ -9,7 +9,7 @@ import {TestMessage} from "../../shared/models/test-message";
 describe('Integration.Messages.FireMessage', () => {
   it('should deliver fired message to subscriber', () => {
     const scenario = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .subjectRegistry();
 
     const message = scenario.getMessage();
@@ -18,7 +18,7 @@ describe('Integration.Messages.FireMessage', () => {
       .collect(received)
       .subscribe();
     //
-    scenario.actions().fire(message);
+    scenario.actions().fire();
     //
     subscription.unsubscribe();
     TestAssertions.receivedOne(received, message);
@@ -27,26 +27,26 @@ describe('Integration.Messages.FireMessage', () => {
   it('should support pipe-based processing before delivery', () => {
     const trace: string[] = [];
     const scenario = new ScenarioBuilder()
-      .message().withPipeRegistry((s) =>
+      .useMessage().withPipeRegistry((s) =>
         s.pipe(tap(() => trace.push('pipe'))));
 
     const message = scenario.getMessage();
 
     scenario.actions().subscribe(message.type, () => trace.push('subscriber'));
-    scenario.actions().fire(message);
+    scenario.actions().fire();
 
-    TestAssertions.should().array(trace).equal(['pipe', 'subscriber']);
+    TestAssertions.should.array(trace).equal(['pipe', 'subscriber']);
   });
 
   it('should throw when fire not registered message', () => {
-    const scenario = new ScenarioBuilder().message();
+    const scenario = new ScenarioBuilder().useMessage();
     TestAssertions.throws(() => {
-      new ScenarioBuilder().actions().fire(scenario.getMessage());
+      new ScenarioBuilder().actions().fire();
     });
   });
 
   it('should throw when sub not registered message', () => {
-    const scenario = new ScenarioBuilder().message();
+    const scenario = new ScenarioBuilder().useMessage();
     TestAssertions.throws(() => {
       new ScenarioBuilder().actions().subscribe(scenario.getMessage());
     });

@@ -6,7 +6,7 @@ import { toArray } from '../../shared/utils/observables';
 describe('Integration.Callbacks.Fire', () => {
   it('should fire callback message and emit result value', async () => {
     const scenario = new ScenarioBuilder()
-      .callbackMessage()
+      .useCallback()
       .subjectRegistry();
 
     const actions = scenario.actions();
@@ -29,7 +29,7 @@ describe('Integration.Callbacks.Fire', () => {
 
   it('should complete callback message after finish', async () => {
     const scenario = new ScenarioBuilder()
-      .callbackMessage()
+      .useCallback()
       .subjectRegistry();
 
     const actions = scenario.actions();
@@ -55,7 +55,7 @@ describe('Integration.Callbacks.Fire', () => {
 
   it('should support observable collection for callback result', async () => {
     const scenario = new ScenarioBuilder()
-      .callbackMessage()
+      .useCallback()
       .subjectRegistry();
 
     const actions = scenario.actions();
@@ -70,7 +70,7 @@ describe('Integration.Callbacks.Fire', () => {
   });
 
   it('should throw when callback message is not registered', () => {
-    const scenario = new ScenarioBuilder().callbackMessage();
+    const scenario = new ScenarioBuilder().useCallback();
     const message = scenario.getMessage();
 
     TestAssertions.throws(() => {
@@ -80,7 +80,7 @@ describe('Integration.Callbacks.Fire', () => {
 
   it('should not complete before finish is called', async () => {
     const scenario = new ScenarioBuilder()
-      .callbackMessage()
+      .useCallback()
       .subjectRegistry();
 
     const actions = scenario.actions();

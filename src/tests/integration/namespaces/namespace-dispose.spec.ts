@@ -6,7 +6,7 @@ import { flushMicrotasks, waitForValue } from '../../shared/utils/async';
 describe('Integration.Namespaces.Dispose', () => {
   it('should close subscription when world is disposed', async () => {
     const scenario = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .subjectRegistry();
 
     const world = scenario.getWorld();
@@ -35,7 +35,7 @@ describe('Integration.Namespaces.Dispose', () => {
 
   it('should close replay subscription on dispose and not leak between scenarios', async () => {
     const scenario = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .replayRegistry();
 
     const world = scenario.getWorld();
@@ -63,7 +63,7 @@ describe('Integration.Namespaces.Dispose', () => {
 
   it('should not emit after namespace disposal', async () => {
     const scenario = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .subjectRegistry();
 
     const world = scenario.getWorld();
@@ -85,7 +85,7 @@ describe('Integration.Namespaces.Dispose', () => {
 
   it('should dispose multiple subscriptions in the same namespace', async () => {
     const scenario = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .subjectRegistry();
 
     const world = scenario.getWorld();
@@ -125,7 +125,7 @@ describe('Integration.Namespaces.Dispose', () => {
 
   it('should allow dispose to be called more than once safely', async () => {
     const scenario = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .subjectRegistry();
 
     const world = scenario.getWorld();

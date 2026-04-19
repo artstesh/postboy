@@ -6,7 +6,7 @@ import { flushMicrotasks, waitForValue } from '../../shared/utils/async';
 describe('Integration.Scenarios.MessageLifecycle', () => {
   it('should register, fire and deliver message through the full lifecycle', async () => {
     const scenario = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .subjectRegistry();
 
     const actions = scenario.actions();
@@ -32,7 +32,7 @@ describe('Integration.Scenarios.MessageLifecycle', () => {
 
   it('should keep message available for multiple subscribers during lifecycle', async () => {
     const scenario = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .subjectRegistry();
 
     const actions = scenario.actions();
@@ -61,7 +61,7 @@ describe('Integration.Scenarios.MessageLifecycle', () => {
 
   it('should allow once subscription to complete after first delivery', async () => {
     const scenario = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .subjectRegistry();
 
     const actions = scenario.actions();
@@ -88,7 +88,7 @@ describe('Integration.Scenarios.MessageLifecycle', () => {
 
   it('should not deliver message after world disposal', async () => {
     const scenario = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .subjectRegistry();
 
     const actions = scenario.actions();
@@ -111,7 +111,7 @@ describe('Integration.Scenarios.MessageLifecycle', () => {
 
   it('should preserve replay semantics across lifecycle steps', async () => {
     const scenario = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .replayRegistry();
 
     const actions = scenario.actions();

@@ -8,7 +8,7 @@ import { collectObservable, runMarbles, toArray } from '../../shared/utils/obser
 describe('Integration.Messages.Replay', () => {
   it('should replay the latest value to a late subscriber', async () => {
     const scenario = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .replayRegistry();
 
     const world = scenario.getWorld();
@@ -30,7 +30,7 @@ describe('Integration.Messages.Replay', () => {
 
   it('should emit already fired value through observable collection', async () => {
     const scenario = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .replayRegistry();
 
     const world = scenario.getWorld();
@@ -45,7 +45,7 @@ describe('Integration.Messages.Replay', () => {
 
   it('should allow waiting for replayed value asynchronously', async () => {
     const scenario = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .replayRegistry();
 
     const world = scenario.getWorld();
@@ -66,7 +66,7 @@ describe('Integration.Messages.Replay', () => {
 
   it('should keep replay behavior stable for multiple subscribers', async () => {
     const scenario = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .replayRegistry();
 
     const world = scenario.getWorld();
@@ -103,7 +103,7 @@ describe('Integration.Messages.Replay', () => {
 
   it('should not emit additional values after replayed emission is consumed', async () => {
     const scenario = new ScenarioBuilder()
-      .message()
+      .useMessage()
       .replayRegistry();
 
     const world = scenario.getWorld();

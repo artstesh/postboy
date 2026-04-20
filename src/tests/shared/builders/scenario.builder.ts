@@ -18,7 +18,7 @@ export class ScenarioBuilder {
 
   constructor(world: PostboyWorld = new PostboyWorld()) {
     this.world = world;
-    this.world.createPostboy();
+    !this.world.getPostboy() && this.world.createPostboy();
   }
 
   useMessage(): this {
@@ -38,7 +38,7 @@ export class ScenarioBuilder {
 
   executeRegistry<R>(func: (message: PostboyExecutor<any>) => R): this {
     this.ensureMessage();
-    this.registryBuilder = new RegistryBuilder(this.world.getPostboy()).executor(this._message!.type, e => func(e));
+    this.registryBuilder = new RegistryBuilder(this.world.getPostboy()).executor((this._message as TestExecutor<any>).type, e => func(e));
     this.world.createRegistry(this.registryBuilder.build());
     return this;
   }
@@ -51,28 +51,28 @@ export class ScenarioBuilder {
 
   handlerRegistry<T>(toReturn?: T): this {
     this.ensureMessage();
-    this.registryBuilder = new RegistryBuilder(this.world.getPostboy()).handler(this._message!.type, MessageFixture.handler(toReturn));
+    this.registryBuilder = new RegistryBuilder(this.world.getPostboy()).handler((this._message as TestExecutor<any>).type, MessageFixture.handler(toReturn));
     this.world.createRegistry(this.registryBuilder.build());
     return this;
   }
 
   subjectRegistry(): this {
     this.ensureMessage();
-    this.registryBuilder = new RegistryBuilder(this.world.getPostboy()).subject(this._message!.type);
+    this.registryBuilder = new RegistryBuilder(this.world.getPostboy()).subject((this._message as TestMessage | TestCallbackMessage).type);
     this.world.createRegistry(this.registryBuilder.build());
     return this;
   }
 
   replayRegistry(): this {
     this.ensureMessage();
-    this.registryBuilder = new RegistryBuilder(this.world.getPostboy()).replay(this._message!.type);
+    this.registryBuilder = new RegistryBuilder(this.world.getPostboy()).replay((this._message as TestMessage | TestCallbackMessage).type);
     this.world.createRegistry(this.registryBuilder.build());
     return this;
   }
 
   behaviorRegistry(initialValue: any): this {
     this.ensureMessage();
-    this.registryBuilder = new RegistryBuilder(this.world.getPostboy()).behavior(this._message!.type, initialValue);
+    this.registryBuilder = new RegistryBuilder(this.world.getPostboy()).behavior((this._message as TestMessage | TestCallbackMessage).type, initialValue);
     this.world.createRegistry(this.registryBuilder.build());
     return this;
   }

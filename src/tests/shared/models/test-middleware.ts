@@ -18,7 +18,7 @@ export class TestMiddleware extends PostboyMiddleware {
   }
 
   canHandle(_context: PipelineContext): boolean {
-    return this.targetMessages.has(_context.message.id) ? this._canHandle : true;
+    return this.targetMessages.has(_context.message.id) ? this._canHandle : false;
   }
 
   before(_context: PipelineContext): MiddlewareDecision {

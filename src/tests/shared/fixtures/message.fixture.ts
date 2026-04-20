@@ -6,11 +6,12 @@ import {TestHandler} from "../models/test-handler";
 
 export class MessageFixture {
   static message(): TestMessage {
-    return new TestMessage();
+    let testMessage = new TestMessage(Forger.create<string>()!);
+    return testMessage;
   }
 
   static callbackMessage(): TestCallbackMessage {
-    return new TestCallbackMessage();
+    return new TestCallbackMessage(Forger.create<string>()!);
   }
 
   static executor(): TestExecutor<any> {

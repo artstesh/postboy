@@ -1,32 +1,47 @@
-import { ScenarioBuilder } from '../../shared/builders/scenario.builder';
-import { SubscriptionBuilder } from '../../shared/builders/subscription.builder';
-import { TestAssertions } from '../../shared/harness/assertions';
-import { flushMicrotasks, waitForValue } from '../../shared/utils/async';
+import {ScenarioBuilder} from '../../shared/builders/scenario.builder';
+import {SubscriptionBuilder} from '../../shared/builders/subscription.builder';
+import {TestAssertions} from '../../shared/harness/assertions';
+import {delay, flushMicrotasks, waitForValue} from '../../shared/utils/async';
+import {Forger} from "@artstesh/forger";
+import {AddNamespace, EliminateNamespace} from "../../../messages";
+import {TestMessage} from "../../shared/models/test-message";
+import {PostboyAbstractRegistrator} from "../../../postboy-abstract.registrator";
 
 describe('Integration.Namespaces.Register', () => {
+  let scenario: ScenarioBuilder;
+  let namespace: string;
+  let registrator: PostboyAbstractRegistrator;
+
+  beforeEach(() => {
+    scenario = new ScenarioBuilder().useMessage();
+    namespace = Forger.create<string>()!;
+    registrator = scenario.getWorld().getPostboy().exec(new AddNamespace(namespace));
+  })
+
+  afterEach(() => {
+    scenario.getWorld().dispose();
+  })
+
   it('should register namespace and deliver messages', async () => {
-    const scenario = new ScenarioBuilder()
-      .useMessage()
-      .subjectRegistry();
-
-    const actions = scenario.actions();
+    registrator.recordSubject(scenario.getMessage().type);
     const message = scenario.getMessage();
-    const received: unknown[] = [];
+    const received: TestMessage[] = [];
+    SubscriptionBuilder.forType(scenario.getWorld(), message.type).collect(received).subscribe();
+    //
+    scenario.actions().fire(message);
+    await waitForValue(() => received[0]);
+    //
+    TestAssertions.should.array(received).equal([message]);
+  });
 
-    SubscriptionBuilder
-      .forType(scenario.getWorld(), message.type)
-      .collect(received)
-      .subscribe();
-
-    actions.fire(message);
-
-    const value = await waitForValue(() => received[0], {
-      timeoutMs: 100,
-      intervalMs: 5,
-    });
-
-    expect(value).toEqual(message);
-    TestAssertions.receivedOne(received, message);
+  it('should dispose cleanly', async () => {
+    registrator.recordSubject(scenario.getMessage().type);
+    //
+    const sub = SubscriptionBuilder.forType(scenario.getWorld(), scenario.getMessage().type).subscribe();
+    //
+    scenario.getWorld().getPostboy().exec(new EliminateNamespace(namespace));
+    //
+    TestAssertions.subscriptionClosed(sub);
   });
 
   it('should allow replay registry to deliver last value to late subscriber', async () => {

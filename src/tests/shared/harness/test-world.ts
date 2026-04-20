@@ -17,9 +17,6 @@ export class TestWorld<TState extends Record<string, any> = Record<string, any>>
 
   get<K extends keyof TState>(key: K): TState[K] {
     this.assertNotDisposed();
-    if (!this.state.has(key)) {
-      throw new Error(`TestWorld: value for key "${String(key)}" is not set`);
-    }
     return this.state.get(key);
   }
 

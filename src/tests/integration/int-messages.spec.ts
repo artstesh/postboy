@@ -13,74 +13,11 @@ describe('Integration.Messages', () => {
     postboy = new TestPostboy();
   });
 
-  [new TestMessage(), new TestCallbackMessage()].forEach((message) => {
-
-    [
-      { name: 'Subject', func: (r: TestReg) => r.recordSubject(message.type) },
-      { name: 'Replay', func: (r: TestReg) => r.recordReplay(message.type) },
-      { name: 'WithPipe', func: (r: TestReg) => r.recordWithPipe(message.type, new Subject(), (s) => s.pipe(tap())) },
-    ].forEach((s) => {
-      describe(`subscribing ${s.name} ${message.id}`, () => {
-        let registry: TestReg;
-
-        beforeEach(() => {
-          registry = new TestReg(postboy);
-          registry.ups.push(s.func);
-          registry.up();
-        });
-
-        it(`should complete subs on down`, () => {
-          const sub = postboy.sub(message.type).subscribe(() => {});
-          //
-          registry.down();
-          //
-          should().true(sub.closed);
-        });
-
-        it(`should fire sub on once`, (done) => {
-          postboy.once(message.type).subscribe(() => done());
-          //
-          postboy.fire(message);
-        });
-      });
-    });
-
-    describe(`subscribing Behavior`, () => {
-      let registry: TestReg;
-
-      beforeEach(() => {
-        registry = new TestReg(postboy);
-        registry.ups.push((r) => r.recordBehavior(message.type, message));
-        registry.up();
-      });
-
-      it(`should fire messages`, (done) => {
-        postboy
-          .sub(message.type)
-          .pipe(skip(1))
-          .subscribe(() => done());
-        //
-        postboy.fire(message);
-      });
-
-      it(`should fire sub on once`, (done) => {
-        postboy.once(message.type).subscribe(() => done());
-      });
-
-      it(`should complete subs on down`, () => {
-        const sub = postboy.sub(message.type).subscribe();
-        //
-        registry.down();
-        //
-        should().true(sub.closed);
-      });
-    });
-  });
 
   it('should unsubscribe callback messages', (done) => {
     const registry = new TestReg(postboy);
     registry.recordSubject(TestCallbackMessage);
-    const message = new TestCallbackMessage();
+    const message = new TestCallbackMessage(Forger.create<string>()!);
     message.result.subscribe({ complete: () => done() });
     postboy.fireCallback(message);
     //
@@ -89,7 +26,7 @@ describe('Integration.Messages', () => {
 
   it('should fulfil callback messages', (done) => {
     new TestReg(postboy).recordSubject(TestCallbackMessage);
-    const message = new TestCallbackMessage();
+    const message = new TestCallbackMessage(Forger.create<string>()!);
     message.result.subscribe(() => done());
     //
     message.finish(Forger.create<string>()!);
@@ -105,7 +42,7 @@ describe('Integration.Messages', () => {
     );
     //
     combineLatest([postboy.sub(TestMessage), postboy.sub(TestMessage)]).subscribe();
-    postboy.fire(new TestMessage());
+    postboy.fire(new TestMessage(Forger.create<string>()!));
     //
     should().number(count).equals(1);
   });

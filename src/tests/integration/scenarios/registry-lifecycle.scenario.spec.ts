@@ -1,37 +1,26 @@
-import { ScenarioBuilder } from '../../shared/builders/scenario.builder';
-import { SubscriptionBuilder } from '../../shared/builders/subscription.builder';
-import { TestAssertions } from '../../shared/harness/assertions';
-import { flushMicrotasks, waitForValue } from '../../shared/utils/async';
+import {ScenarioBuilder} from '../../shared/builders/scenario.builder';
+import {SubscriptionBuilder} from '../../shared/builders/subscription.builder';
+import {TestAssertions} from '../../shared/harness/assertions';
+import {flushMicrotasks, waitForValue} from '../../shared/utils/async';
+import {RegistryBuilder} from "../../shared/builders/registry.builder";
 
 describe('Integration.Scenarios.RegistryLifecycle', () => {
-  it('should register registry, deliver messages and dispose cleanly', async () => {
-    const scenario = new ScenarioBuilder()
-      .useMessage()
-      .subjectRegistry();
+  let scenario: ScenarioBuilder;
+  let registry: RegistryBuilder;
 
-    const world = scenario.getWorld();
-    const actions = scenario.actions();
-    const message = scenario.getMessage();
-    const received: unknown[] = [];
+  beforeEach(() => {
+    scenario = new ScenarioBuilder();
+    registry = new RegistryBuilder(scenario.getWorld().getPostboy());
+  })
 
-    const subscription = SubscriptionBuilder
-      .forType(world, message.type)
-      .collect(received)
-      .subscribe();
-
-    actions.fire(message);
-
-    const value = await waitForValue(() => received[0], {
-      timeoutMs: 100,
-      intervalMs: 5,
-    });
-
-    expect(value).toEqual(message);
-    TestAssertions.receivedOne(received, message);
-
-    await world.dispose();
-
-    TestAssertions.subscriptionClosed(subscription);
+  it('should dispose cleanly', async () => {
+    const scenario = new ScenarioBuilder().useMessage().subjectRegistry();
+    //
+    const sub = SubscriptionBuilder.forType(scenario.getWorld(), scenario.getMessage().type).subscribe();
+    //
+    scenario.getWorld().get('registry')?.down();
+    //
+    TestAssertions.subscriptionClosed(sub);
   });
 
   it('should preserve replay registry state until disposal', async () => {

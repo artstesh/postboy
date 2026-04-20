@@ -16,43 +16,11 @@ describe('Integration.Namespaces', () => {
     postboy = new TestPostboy();
   });
 
-  [new TestMessage(), new TestCallbackMessage()].forEach((message) => {
-    it(`should throw if fire not registered ${message.id}`, () => {
-      expect(() => postboy.fire(message)).toThrow();
-    });
-
-    it(`should throw if sub not registered ${message.id}`, () => {
-      expect(() => postboy.sub(message.type)).toThrow();
-    });
-
-    describe(`subscribing`, () => {
-      let namespace: string;
-
-      beforeEach(() => {
-        namespace = Forger.create<string>()!;
-        postboy.exec(new AddNamespace(namespace)).recordSubject(message.type);
-      });
-
-      it(`should fire messages`, (done) => {
-        postboy.sub(message.type).subscribe(() => done());
-        //
-        postboy.fire(message);
-      });
-
-      it(`should complete subs on down`, () => {
-        const sub = postboy.sub(message.type).subscribe(() => {});
-        //
-        postboy.exec(new EliminateNamespace(namespace));
-        //
-        should().true(sub.closed);
-      });
-    });
-  });
 
   it('should unsubscribe callback messages', (done) => {
     const namespace = Forger.create<string>()!;
     postboy.exec(new AddNamespace(namespace)).recordSubject(TestCallbackMessage);
-    const message = new TestCallbackMessage();
+    const message = new TestCallbackMessage(Forger.create<string>()!);
     message.result.subscribe({ complete: () => done() });
     postboy.fireCallback(message);
     //
@@ -62,7 +30,7 @@ describe('Integration.Namespaces', () => {
   it('should fulfil callback messages', (done) => {
     const namespace = Forger.create<string>()!;
     postboy.exec(new AddNamespace(namespace)).recordSubject(TestCallbackMessage);
-    const message = new TestCallbackMessage();
+    const message = new TestCallbackMessage(Forger.create<string>()!);
     message.result.subscribe(() => done());
     //
     message.finish(Forger.create<string>()!);

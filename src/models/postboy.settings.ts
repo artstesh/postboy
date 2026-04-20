@@ -2,7 +2,7 @@
  * Represents configurable settings for the Postboy system.
  */
 export class PostboySettings {
-  public metadata: boolean = false;
+  public metadata: boolean = true;
 
   /**
    * Constructs an instance of the class with optional settings.

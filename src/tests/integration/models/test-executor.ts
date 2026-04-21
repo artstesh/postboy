@@ -1,7 +1,7 @@
-import { PostboyGenericMessage } from '../../../models/postboy-generic-message';
+import { PostboyExecutor } from '../../../models/postboy-executor';
 
-export class TestExecutor extends PostboyGenericMessage {
-  static readonly ID = 'TestExecutor';
+export class TestExecutor<T> extends PostboyExecutor<T> {
+  static readonly ID = 'test-executor';
 
   constructor(public value: string) {
     super();

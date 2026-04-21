@@ -11,22 +11,26 @@ import { PostboyDependencyResolver } from '../../services/postboy-dependency.res
 import { PostboyMiddleware } from '../../models/postboy-middleware';
 import { PostboySubscription } from '../../models/postboy-subscription';
 import { should } from '@artstesh/it-should';
+import { PostboyContextService } from '../../services/postboy-context.service';
 
 describe('PostboyService', () => {
   let service: PostboyService;
   const middleware = mock(PostboyMiddlewareService);
   const store = mock(PostboyMessageStore);
+  const context = mock(PostboyContextService);
 
   beforeEach(() => {
     const resolver = mock(PostboyDependencyResolver);
     when(resolver.getMiddlewareService()).thenReturn(instance(middleware));
     when(resolver.getMessageStore()).thenReturn(instance(store));
+    when(context.run).thenReturn((c, f) => f());
     service = new PostboyService(instance(resolver));
   });
 
   afterEach(() => {
     reset(middleware);
     reset(store);
+    reset(context);
   });
 
   it('should addMiddleware', () => {
@@ -83,6 +87,15 @@ describe('PostboyService', () => {
       //
       verify(subscription.fire(message)).once();
     });
+
+    it('should not fire a locked message', () => {
+      const message = new TestMessage();
+      service.lock(TestMessage);
+      //
+      service.fire(message);
+      //
+      verify(subscription.fire(message)).never();
+    });
   });
 
   describe('fireCallback', () => {
@@ -121,7 +134,7 @@ describe('PostboyService', () => {
 
     it('should not fire a locked message', () => {
       const message = new TestMessage();
-      service.addLocker({ locking: [TestMessage.ID] });
+      service.lock(TestMessage);
       //
       service.fireCallback(message);
       //

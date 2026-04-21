@@ -23,10 +23,34 @@ export abstract class PostboyCallbackMessage<T> extends PostboyGenericMessage {
   protected result$ = new Subject<T>();
   public result: Observable<T> = this.result$.asObservable();
 
+  /**
+   * Emits the provided value.
+   *
+   * @template T - The type of the value to emit.
+   * @param {T} value - The value to emit through the `result$` observable.
+   * @returns {void}
+   */
   public next = (value: T): void => this.result$.next(value);
 
+  /**
+   * Marks the operation as complete by emitting the provided value and then completing the result stream.
+   *
+   * @param {T} value - The value to emit prior to completing the result stream.
+   * @return {void} This method does not return a value.
+   */
   public finish(value: T): void {
     this.result$.next(value);
+    this.result$.complete();
+  }
+
+  /**
+   * Completes the current observable result stream.
+   * This method marks the result observable as complete, ensuring no further values
+   * or events will be emitted from it.
+   *
+   * @return {void} No value is returned from this method.
+   */
+  public complete(): void {
     this.result$.complete();
   }
 }

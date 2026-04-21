@@ -2,9 +2,9 @@ import { TestPostboy } from './models/test-postboy';
 import { TestMessage } from './models/test-message';
 import { TestCallbackMessage } from './models/test-callback-message';
 import { TestReg } from './models/test-registry';
+import { combineLatest, share, shareReplay, skip, Subject, tap } from 'rxjs';
 import { should } from '@artstesh/it-should';
-import { Subject } from 'rxjs';
-import { skip, tap } from 'rxjs/operators';
+import { Forger } from '@artstesh/forger';
 
 describe('Integration.Messages', () => {
   let postboy: TestPostboy;
@@ -49,6 +49,12 @@ describe('Integration.Messages', () => {
           //
           should().true(sub.closed);
         });
+
+        it(`should fire sub on once`, (done) => {
+          postboy.once(message.type).subscribe(() => done());
+          //
+          postboy.fire(message);
+        });
       });
     });
 
@@ -70,6 +76,10 @@ describe('Integration.Messages', () => {
         postboy.fire(message);
       });
 
+      it(`should fire sub on once`, (done) => {
+        postboy.once(message.type).subscribe(() => done());
+      });
+
       it(`should complete subs on down`, () => {
         const sub = postboy.sub(message.type).subscribe();
         //
@@ -78,5 +88,38 @@ describe('Integration.Messages', () => {
         should().true(sub.closed);
       });
     });
+  });
+
+  it('should unsubscribe callback messages', (done) => {
+    const registry = new TestReg(postboy);
+    registry.recordSubject(TestCallbackMessage);
+    const message = new TestCallbackMessage();
+    message.result.subscribe({ complete: () => done() });
+    postboy.fireCallback(message);
+    //
+    registry.down();
+  });
+
+  it('should fulfil callback messages', (done) => {
+    new TestReg(postboy).recordSubject(TestCallbackMessage);
+    const message = new TestCallbackMessage();
+    message.result.subscribe(() => done());
+    //
+    message.finish(Forger.create<string>()!);
+  });
+
+  it('should be able to be cooled with pipe', () => {
+    let count = 0;
+    new TestReg(postboy).recordWithPipe(TestMessage, new Subject(), (s) =>
+      s.pipe(
+        tap(() => count++),
+        share(),
+      ),
+    );
+    //
+    combineLatest([postboy.sub(TestMessage), postboy.sub(TestMessage)]).subscribe();
+    postboy.fire(new TestMessage());
+    //
+    should().number(count).equals(1);
   });
 });

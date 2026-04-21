@@ -1,3 +1,4 @@
+import { firstValueFrom } from 'rxjs';
 import { PostboyCallbackMessage } from '../../models/postboy-callback.message';
 import { Forger } from '@artstesh/forger';
 import { should } from '@artstesh/it-should';
@@ -13,26 +14,26 @@ describe('PostboyCallbackMessage', () => {
     message = new TestPostboyCallbackMessage();
   });
 
-  it('should emit a value with next method', (done) => {
+  it('should emit a value with next method', async () => {
     const value = Forger.create<string>()!;
-    //
-    message.result.subscribe((r) => {
-      expect(r).toEqual(value);
-      done();
-    });
+    const resultPromise = firstValueFrom(message.result);
     //
     message.next(value);
+    //
+    should()
+      .string(await resultPromise)
+      .equals(value);
   });
 
-  it('should emit and complete with finish method', (done) => {
+  it('should emit and complete with finish method', async () => {
     const value = Forger.create<string>()!;
-    //
-    message.result.subscribe((r) => {
-      expect(r).toEqual(value);
-      done();
-    });
+    const resultPromise = firstValueFrom(message.result);
     //
     message.finish(value);
+    //
+    should()
+      .string(await resultPromise)
+      .equals(value);
   });
 
   it('should complete the result observable after calling finish', (done) => {

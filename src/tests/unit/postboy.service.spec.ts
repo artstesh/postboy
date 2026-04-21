@@ -22,9 +22,8 @@ describe('PostboyService', () => {
     const resolver = mock(PostboyDependencyResolver);
     when(resolver.getMiddlewareService()).thenReturn(instance(middleware));
     when(resolver.getMessageStore()).thenReturn(instance(store));
-    when(resolver.getPostboyContextService).thenReturn(() => instance(context));
     when(context.run).thenReturn((c, f) => f());
-    service = new PostboyService({}, instance(resolver));
+    service = new PostboyService(instance(resolver));
   });
 
   afterEach(() => {
@@ -53,7 +52,7 @@ describe('PostboyService', () => {
       //
       service.fire(message);
       //
-      verify(middleware.beforePublish(message, anything())).once();
+      verify(middleware.beforePublish(message)).once();
     });
 
     it('should apply middleware.afterPublish', () => {
@@ -61,7 +60,7 @@ describe('PostboyService', () => {
       //
       service.fire(message);
       //
-      verify(middleware.afterPublish(message, anything())).once();
+      verify(middleware.afterPublish(message)).once();
     });
 
     it('should fire the message', () => {
@@ -95,7 +94,7 @@ describe('PostboyService', () => {
       //
       service.fireCallback(message, action);
       //
-      verify(middleware.beforeCallback(message, anything())).once();
+      verify(middleware.beforeCallback(message)).once();
     });
 
     it('should apply middleware.afterCallback with subscribe', (done) => {
@@ -105,7 +104,7 @@ describe('PostboyService', () => {
       //
       const observable = service.fireCallback(message);
       observable.subscribe((value) => {
-        verify(middleware.afterCallback(message, anything())).once();
+        verify(middleware.afterCallback(message)).once();
         done();
       });
       message.finish(text);
@@ -147,7 +146,7 @@ describe('PostboyService', () => {
       //
       service.exec(executor);
       //
-      verify(middleware.beforeExecute(executor, anything())).once();
+      verify(middleware.beforeExecute(executor)).once();
     });
 
     it('should apply middleware.afterExecute', () => {
@@ -156,7 +155,7 @@ describe('PostboyService', () => {
       //
       service.exec(executor);
       //
-      verify(middleware.afterExecute(executor, anything(), anything())).once();
+      verify(middleware.afterExecute(executor, anything())).once();
     });
 
     it('should execute function', () => {

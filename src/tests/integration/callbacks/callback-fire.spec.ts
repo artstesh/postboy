@@ -19,10 +19,7 @@ describe('Integration.Callbacks.Fire', () => {
     actions.fireCallback(message);
     message.finish('ok');
 
-    const value = await waitForValue(() => received[0], {
-      timeoutMs: 100,
-      intervalMs: 5,
-    });
+    const value = await waitForValue(() => received[0]);
 
     expect(value).toBe('ok');
     TestAssertions.receivedOne(received, 'ok');
@@ -46,10 +43,7 @@ describe('Integration.Callbacks.Fire', () => {
     actions.fireCallback(message);
     message.finish('done');
 
-    await waitFor(() => completed, {
-      timeoutMs: 100,
-      intervalMs: 5,
-    });
+    await waitFor(() => completed);
 
     TestAssertions.completed(completed);
   });
@@ -92,10 +86,7 @@ describe('Integration.Callbacks.Fire', () => {
 
     actions.fireCallback(message);
 
-    await waitFor(() => !completed, {
-      timeoutMs: 50,
-      intervalMs: 5,
-    });
+    await waitFor(() => !completed);
 
     expect(completed).toBe(false);
   });

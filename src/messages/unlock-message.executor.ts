@@ -1,6 +1,6 @@
-import {PostboyGenericMessage} from "../models/postboy-generic-message";
-import {PostboyExecutor} from "../models/postboy-executor";
-import {MessageType} from "../postboy-abstract.registrator";
+import { PostboyGenericMessage } from '../models/postboy-generic-message';
+import { PostboyExecutor } from '../models/postboy-executor';
+import { MessageType } from '../postboy-abstract.registrator';
 
 /**
  * A specialized executor that handles the unlocking process for messages of a specified type.

@@ -20,10 +20,7 @@ describe('Integration.Namespaces.Dispose', () => {
 
     scenario.actions().fire(message);
 
-    const value = await waitForValue(() => received[0], {
-      timeoutMs: 100,
-      intervalMs: 5,
-    });
+    const value = await waitForValue(() => received[0]);
 
     expect(value).toEqual(message);
     TestAssertions.subscriptionOpen(subscription);
@@ -49,10 +46,7 @@ describe('Integration.Namespaces.Dispose', () => {
       .collect(received)
       .subscribe();
 
-    const value = await waitForValue(() => received[0], {
-      timeoutMs: 100,
-      intervalMs: 5,
-    });
+    const value = await waitForValue(() => received[0]);
 
     expect(value).toEqual(message);
 
@@ -83,14 +77,8 @@ describe('Integration.Namespaces.Dispose', () => {
 
     scenario.actions().fire(message);
 
-    const firstValue = await waitForValue(() => first[0], {
-      timeoutMs: 100,
-      intervalMs: 5,
-    });
-    const secondValue = await waitForValue(() => second[0], {
-      timeoutMs: 100,
-      intervalMs: 5,
-    });
+    const firstValue = await waitForValue(() => first[0]);
+    const secondValue = await waitForValue(() => second[0]);
 
     expect(firstValue).toEqual(message);
     expect(secondValue).toEqual(message);
@@ -117,10 +105,7 @@ describe('Integration.Namespaces.Dispose', () => {
 
     scenario.actions().fire(message);
 
-    const value = await waitForValue(() => received[0], {
-      timeoutMs: 100,
-      intervalMs: 5,
-    });
+    const value = await waitForValue(() => received[0]);
 
     expect(value).toEqual(message);
 

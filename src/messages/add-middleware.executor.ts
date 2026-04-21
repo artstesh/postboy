@@ -1,4 +1,4 @@
-import {PostboyExecutor} from "../models/postboy-executor";
+import { PostboyExecutor } from '../models/postboy-executor';
 import {PostboyMiddleware} from "../services/postboy-middleware";
 
 /**

@@ -43,10 +43,7 @@ describe('Integration.Middleware.Chain', () => {
 
     actions.fire(message);
 
-    const value = await waitForValue(() => received[0], {
-      timeoutMs: 100,
-      intervalMs: 5,
-    });
+    const value = await waitForValue(() => received[0]);
 
     expect(value).toEqual(message);
     expect(trace).toEqual([
@@ -84,10 +81,7 @@ describe('Integration.Middleware.Chain', () => {
 
     actions.fire(message);
 
-    const value = await waitForValue(() => received[0], {
-      timeoutMs: 100,
-      intervalMs: 5,
-    });
+    const value = await waitForValue(() => received[0]);
 
     expect(value).toEqual(message);
     expect(trace).toEqual([

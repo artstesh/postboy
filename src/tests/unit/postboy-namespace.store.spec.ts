@@ -17,7 +17,7 @@ describe('PostboyNamespaceStore', () => {
     it('should add a new namespace if it does not exist', () => {
       const spaceName = Forger.create<string>()!;
       //
-      const result = store.addSpace(spaceName,postboyService);
+      const result = store.addSpace(spaceName, postboyService);
       //
       expect(result).toBeInstanceOf(PostboyAbstractRegistrator);
     });
@@ -25,8 +25,8 @@ describe('PostboyNamespaceStore', () => {
     it('should return the same namespace registrator if it already exists', () => {
       const spaceName = Forger.create<string>()!;
       //
-      const firstInstance = store.addSpace(spaceName,postboyService);
-      const secondInstance = store.addSpace(spaceName,postboyService);
+      const firstInstance = store.addSpace(spaceName, postboyService);
+      const secondInstance = store.addSpace(spaceName, postboyService);
       //
       expect(secondInstance).toBe(firstInstance);
     });
@@ -36,9 +36,9 @@ describe('PostboyNamespaceStore', () => {
     it('should remove a space if it exists', () => {
       const spaceName = Forger.create<string>()!;
       //
-      const firstInstance = store.addSpace(spaceName,postboyService);
+      const firstInstance = store.addSpace(spaceName, postboyService);
       store.eliminateSpace(spaceName);
-      const secondInstance = store.addSpace(spaceName,postboyService);
+      const secondInstance = store.addSpace(spaceName, postboyService);
       //
       expect(secondInstance).not.toBe(firstInstance);
     });
@@ -54,9 +54,9 @@ describe('PostboyNamespaceStore', () => {
     it('should call down on all registrators and clear all spaces', () => {
       const spaceName = Forger.create<string>()!;
       //
-      const firstInstance = store.addSpace(spaceName,postboyService);
+      const firstInstance = store.addSpace(spaceName, postboyService);
       store.dispose();
-      const secondInstance = store.addSpace(spaceName,postboyService);
+      const secondInstance = store.addSpace(spaceName, postboyService);
       //
       expect(secondInstance).not.toBe(firstInstance);
     });

@@ -1,6 +1,10 @@
-export {AddMiddleware} from './add-middleware.executor';
-export {RemoveMiddleware} from './remove-middleware.executor';
-export {LockMessage} from './lock-message.executor';
-export {UnlockMessage} from './unlock-message.executor';
-export {AddNamespace} from './add-namespace.executor';
-export {EliminateNamespace} from './eliminate-namespace.executor';
+export { AddMiddleware } from './add-middleware.executor';
+export { RemoveMiddleware } from './remove-middleware.executor';
+export { LockMessage } from './lock-message.executor';
+export { UnlockMessage } from './unlock-message.executor';
+export { AddNamespace } from './add-namespace.executor';
+export { EliminateNamespace } from './eliminate-namespace.executor';
+export { ConnectHandler } from './connect-handler.executor';
+export { ConnectExecutor } from './connect-executor.executor';
+export { DisconnectMessage } from './disconnect-message.executor';
+export { ConnectMessage } from './connect-message.executor';

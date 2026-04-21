@@ -1,5 +1,5 @@
-import {PostboyExecutor} from "../models/postboy-executor";
-import {PostboyExecutionHandler} from "../models/postboy-execution.handler";
+import { PostboyExecutor } from '../models/postboy-executor';
+import { PostboyExecutionHandler } from '../models/postboy-execution.handler';
 
 /**
  * Represents a connection handler that extends the PostboyExecutor class.
@@ -21,8 +21,8 @@ export class ConnectHandler<E extends PostboyExecutor<R>, R> extends PostboyExec
    * @param {PostboyExecutionHandler<R, E>} handler - A handler that processes the execution logic.
    */
   constructor(
-   public executor: new (...args: any[]) => E,
-   public handler: PostboyExecutionHandler<R, E>
+    public executor: new (...args: any[]) => E,
+    public handler: PostboyExecutionHandler<R, E>,
   ) {
     super();
   }

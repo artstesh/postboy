@@ -30,11 +30,10 @@ export class PostboyMiddlewareService {
 
   public before<T extends PostboyMessage>(
     stage: MiddlewareStage,
-    message: T,
-    messageContext?: PostboyMessageContext,
+    message: T
   ): void {
     for (const middleware of this.middlewares) {
-      const context = this.buildContext(stage, message, messageContext);
+      const context = this.buildContext(stage, message);
       if (!middleware.canHandle(context)) continue;
       if (middleware.before(context) === MiddlewareDecision.Interrupt) this.throwIfCancelled(stage, middleware.name, message.id);
     }
@@ -43,66 +42,58 @@ export class PostboyMiddlewareService {
   public after<T extends PostboyMessage, R = unknown>(
     stage: MiddlewareStage,
     message: T,
-    messageContext?: PostboyMessageContext,
     result?: R,
   ): void {
     for (const middleware of this.middlewares) {
-      const context = this.buildContext(stage, message, messageContext);
+      const context = this.buildContext(stage, message);
       if (!middleware.canHandle(context)) continue;
       middleware.after(context, result);
     }
   }
 
   public beforePublish(
-    message: PostboyMessage,
-    messageContext?: PostboyMessageContext,
+    message: PostboyMessage
   ): void {
-    this.before(MiddlewareStage.Publish, message, messageContext);
+    this.before(MiddlewareStage.Publish, message);
   }
 
   public afterPublish(
-    message: PostboyMessage,
-    messageContext?: PostboyMessageContext,
+    message: PostboyMessage
   ): void {
-    this.after(MiddlewareStage.Publish, message, messageContext);
+    this.after(MiddlewareStage.Publish, message);
   }
 
   public beforeCallback(
-    message: PostboyMessage,
-    messageContext?: PostboyMessageContext,
+    message: PostboyMessage
   ): void {
-    this.before(MiddlewareStage.Callback, message, messageContext);
+    this.before(MiddlewareStage.Callback, message);
   }
 
   public afterCallback(
     message: PostboyMessage,
-    messageContext?: PostboyMessageContext,
     result?: unknown,
   ): void {
-    this.after(MiddlewareStage.Callback, message, messageContext, result);
+    this.after(MiddlewareStage.Callback, message, result);
   }
 
   public beforeExecute<T>(
-    message: PostboyExecutor<T>,
-    messageContext?: PostboyMessageContext,
+    message: PostboyExecutor<T>
   ): void {
-    this.before(MiddlewareStage.Execute, message, messageContext);
+    this.before(MiddlewareStage.Execute, message);
   }
 
   public afterExecute<T>(
     message: PostboyExecutor<T>,
-    result: T,
-    messageContext?: PostboyMessageContext,
+    result: T
   ): void {
-    this.after(MiddlewareStage.Execute, message, messageContext, result);
+    this.after(MiddlewareStage.Execute, message, result);
   }
 
   private buildContext<T extends PostboyMessage>(
     stage: MiddlewareStage,
-    message: T,
-    messageContext?: PostboyMessageContext,
+    message: T
   ): PipelineContext<T> {
-    return {stage, message, messageContext};
+    return {stage, message};
   }
 
   private throwIfCancelled(

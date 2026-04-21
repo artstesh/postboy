@@ -18,12 +18,12 @@ import {RemoveMiddleware} from "./messages/remove-middleware.executor";
 import {LockMessage} from "./messages/lock-message.executor";
 import {UnlockMessage} from "./messages/unlock-message.executor";
 import {DisconnectMessage} from "./messages/disconnect-message.executor";
-import {ConnectMessage} from "./messages/connect.message.executor";
 import {ConnectExecutor} from "./messages/connect-executor.executor";
 import {ConnectHandler} from "./messages/connect-handler.executor";
 import {MiddlewareStage} from "./models/middleware-stage.enum";
 import {CancelError} from "./models/cancel-error";
 import {PostboyMiddleware} from "./services/postboy-middleware";
+import {ConnectMessage} from "./messages";
 
 export class PostboyService {
   protected locked = new Set<string>();
@@ -31,16 +31,12 @@ export class PostboyService {
   private store: PostboyMessageStore;
   private namespaceStore: PostboyNamespaceStore;
   private dependencyResolver: PostboyDependencyResolver;
-  private context: PostboyContextService;
-  private settings: PostboySettings;
 
-  constructor(settings?: Partial<PostboySettings>, resolver?: PostboyDependencyResolver) {
-    this.settings = new PostboySettings(settings);
+  constructor(resolver?: PostboyDependencyResolver) {
     this.dependencyResolver = resolver || new PostboyDependencyResolver();
     this.middleware = this.dependencyResolver.getMiddlewareService();
     this.store = this.dependencyResolver.getMessageStore();
     this.namespaceStore = this.dependencyResolver.getNamespaceStore();
-    this.context = this.dependencyResolver.getPostboyContextService(this.settings.metadata);
     this.registerInfrastructureMessages();
   }
 
@@ -74,14 +70,11 @@ export class PostboyService {
    * @throws {Error} Throws an error if no registered event is found for the provided message ID.
    */
   public fire(message: PostboyGenericMessage): void {
-    const context = this.context.createChild(message);
-    return this.context.run(context, () => {
-      this.middleware.beforePublish(message, context);
+      this.middleware.beforePublish(message);
       if (!this.locked.has(message.id)) {
         this.store.getMessage(message.id, message.constructor.name).fire(message);
       }
-      this.middleware.afterPublish(message, context);
-    });
+      this.middleware.afterPublish(message);
   }
 
   /**
@@ -96,18 +89,14 @@ export class PostboyService {
     message: PostboyCallbackMessage<T>,
     action?: (e: T) => void,
   ): Observable<T> {
-    const context = this.context.createChild(message);
-
-    return this.context.run(context, () => {
-      this.middleware.beforeCallback(message, context);
-      const msg = this.store.getMessage(message.id, message.constructor.name);
-      if (action) message.result.subscribe(action);
-      this.store.callbackFired(message);
-      if (!this.locked.has(message.id)) {
-        queueMicrotask(() => msg.fire(message));
-      }
-      return message.result.pipe(tap(() => this.middleware.afterCallback(message, context)));
-    });
+    this.middleware.beforeCallback(message);
+    const msg = this.store.getMessage(message.id, message.constructor.name);
+    if (action) message.result.subscribe(action);
+    this.store.callbackFired(message);
+    if (!this.locked.has(message.id)) {
+      queueMicrotask(() => msg.fire(message));
+    }
+    return message.result.pipe(tap(() => this.middleware.afterCallback(message)));
   }
 
   /**
@@ -118,13 +107,10 @@ export class PostboyService {
    * @throws {Error} If the specified executor is not registered.
    */
   public exec<T>(executor: PostboyExecutor<T>): T {
-    const context = this.context.createChild(executor);
-    return this.context.run(context,  () => {
-      this.middleware.beforeExecute(executor, context);
-      const result = this.store.getExecutor<T>(executor.id)(executor);
-      this.middleware.afterExecute(executor, result, context);
-      return result;
-    });
+    this.middleware.beforeExecute(executor);
+    const result = this.store.getExecutor<T>(executor.id)(executor);
+    this.middleware.afterExecute(executor, result);
+    return result;
   }
 
   /**
@@ -213,6 +199,5 @@ export class PostboyService {
     this.namespaceStore?.dispose();
     this.store.dispose();
     this.middleware.dispose();
-    this.context.dispose();
   }
 }

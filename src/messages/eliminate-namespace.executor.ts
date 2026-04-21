@@ -1,4 +1,4 @@
-import {PostboyExecutor} from "../models/postboy-executor";
+import { PostboyExecutor } from '../models/postboy-executor';
 
 /**
  * Represents an executor that eliminates a specific namespace.

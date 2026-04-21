@@ -1,7 +1,7 @@
-import {PostboyExecutor} from "../models/postboy-executor";
-import {PostboyGenericMessage} from "../models/postboy-generic-message";
-import {MessageType} from "../postboy-abstract.registrator";
-import {Observable, Subject} from "rxjs";
+import { PostboyExecutor } from '../models/postboy-executor';
+import { PostboyGenericMessage } from '../models/postboy-generic-message';
+import { MessageType } from '../postboy-abstract.registrator';
+import { Observable, Subject } from 'rxjs';
 
 /**
  * Represents a message that facilitates connection functionality
@@ -25,7 +25,7 @@ export class ConnectMessage<T extends PostboyGenericMessage> extends PostboyExec
   constructor(
     public type: MessageType<T>,
     public sub: Subject<T>,
-    public pipe?: (s: Subject<T>) => Observable<T>
+    public pipe?: (s: Subject<T>) => Observable<T>,
   ) {
     super();
   }

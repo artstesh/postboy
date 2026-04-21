@@ -1,12 +1,11 @@
 import {ScenarioBuilder} from "../../shared/builders/scenario.builder";
-import {ConnectMessage} from "../../../messages/connect.message.executor";
 import {MessageFixture} from "../../shared/fixtures/message.fixture";
 import {Subject} from "rxjs";
 import {SubscriptionBuilder} from "../../shared/builders/subscription.builder";
 import {TestMessage} from "../../shared/models/test-message";
 import {waitFor} from "../../shared/utils/async";
 import {TestAssertions} from "../../shared/harness/assertions";
-import {AddNamespace} from "../../../messages";
+import {AddNamespace, ConnectMessage} from "../../../messages";
 import {Forger} from "@artstesh/forger";
 
 describe('#Integration.Scenarios.MessageRegistration', () => {

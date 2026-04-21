@@ -26,32 +26,30 @@ describe('PostboyMiddlewareService', () => {
   describe('before', () => {
     let stage: MiddlewareStage;
     let message: MockMessage;
-    let context: PostboyMessageContext;
 
     beforeEach(() => {
       stage = Forger.create<MiddlewareStage>()!;
       message = new MockMessage();
-      context = Forger.create<PostboyMessageContext>()!;
     })
 
     it('should pass over if cannot handle', () => {
       when(middleware.canHandle).thenReturn(() => false);
       //
-      expect(() => service.before(stage, message, context)).not.toThrow();
+      expect(() => service.before(stage, message)).not.toThrow();
     });
 
     it('should pass over if MiddlewareDecision.Continue', () => {
       when(middleware.canHandle).thenReturn(() => true);
       when(middleware.before).thenReturn(() => MiddlewareDecision.Continue);
       //
-      expect(() => service.before(stage, message, context)).not.toThrow();
+      expect(() => service.before(stage, message)).not.toThrow();
     });
 
     it('should throw if MiddlewareDecision.Interrupt', () => {
       when(middleware.canHandle).thenReturn(() => true);
       when(middleware.before).thenReturn(() => MiddlewareDecision.Interrupt);
       //
-      expect(() => service.before(stage, message, context)).toThrow(CancelError);
+      expect(() => service.before(stage, message)).toThrow(CancelError);
     });
   })
 
@@ -79,7 +77,7 @@ describe('PostboyMiddlewareService', () => {
     list.forEach(m => service.addMiddleware(instance(m)));
     list.forEach(m => when(m.canHandle).thenReturn(() => true));
     //
-    service.afterPublish(new MockMessage(), Forger.create<PostboyMessageContext>()!);
+    service.afterPublish(new MockMessage());
     //
     list.forEach(m => verify(m.after(anything(), anything())).once());
   });

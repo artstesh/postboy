@@ -60,10 +60,7 @@ describe('Integration.Namespaces.Register', () => {
       .collect(received)
       .subscribe();
 
-    const value = await waitForValue(() => received[0], {
-      timeoutMs: 100,
-      intervalMs: 5,
-    });
+    const value = await waitForValue(() => received[0]);
 
     expect(value).toEqual(message);
   });
@@ -113,10 +110,7 @@ describe('Integration.Namespaces.Register', () => {
 
     actions.fire(message);
 
-    const value = await waitForValue(() => received[0], {
-      timeoutMs: 100,
-      intervalMs: 5,
-    });
+    const value = await waitForValue(() => received[0]);
 
     expect(value).toEqual(message);
 

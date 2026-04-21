@@ -26,10 +26,7 @@ describe('Integration.Callbacks.Complete', () => {
     actions.fireCallback(message);
     message.finish('ok');
 
-    await waitFor(() => completed && result === 'ok', {
-      timeoutMs: 100,
-      intervalMs: 5,
-    });
+    await waitFor(() => completed && result === 'ok');
 
     TestAssertions.completed(completed);
     expect(result).toBe('ok');
@@ -54,10 +51,7 @@ describe('Integration.Callbacks.Complete', () => {
     actions.fireCallback(message);
     message.finish('ok');
 
-    await waitFor(() => completedCount === 1, {
-      timeoutMs: 100,
-      intervalMs: 5,
-    });
+    await waitFor(() => completedCount === 1);
 
     expect(completedCount).toBe(1);
   });
@@ -83,10 +77,7 @@ describe('Integration.Callbacks.Complete', () => {
     actions.fireCallback(message);
     message.finish('done');
 
-    await waitFor(() => completed, {
-      timeoutMs: 100,
-      intervalMs: 5,
-    });
+    await waitFor(() => completed);
 
     TestAssertions.receivedOne(received, 'done');
     TestAssertions.completed(completed);

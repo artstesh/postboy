@@ -29,10 +29,7 @@ describe('Integration.Middleware.Dispose', () => {
 
     scenario.actions().fire(message);
 
-    const value = await waitForValue(() => received[0], {
-      timeoutMs: 100,
-      intervalMs: 5,
-    });
+    const value = await waitForValue(() => received[0]);
 
     expect(value).toEqual(message);
   });

@@ -40,10 +40,7 @@ describe('Integration.Scenarios.RegistryLifecycle', () => {
       .collect(received)
       .subscribe();
 
-    const value = await waitForValue(() => received[0], {
-      timeoutMs: 100,
-      intervalMs: 5,
-    });
+    const value = await waitForValue(() => received[0]);
 
     expect(value).toEqual(message);
     TestAssertions.receivedOne(received, message);
@@ -113,15 +110,9 @@ describe('Integration.Scenarios.RegistryLifecycle', () => {
     left.actions().fire(leftMessage);
     right.actions().fire(rightMessage);
 
-    const leftValue = await waitForValue(() => leftReceived[0], {
-      timeoutMs: 100,
-      intervalMs: 5,
-    });
+    const leftValue = await waitForValue(() => leftReceived[0]);
 
-    const rightValue = await waitForValue(() => rightReceived[0], {
-      timeoutMs: 100,
-      intervalMs: 5,
-    });
+    const rightValue = await waitForValue(() => rightReceived[0]);
 
     expect(leftValue).toEqual(leftMessage);
     expect(rightValue).toEqual(rightMessage);

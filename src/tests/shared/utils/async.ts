@@ -21,8 +21,8 @@ export async function waitFor(
     intervalMs?: number;
   } = {},
 ): Promise<void> {
-  const timeoutMs = options.timeoutMs ?? 20;
-  const intervalMs = options.intervalMs ?? 5;
+  const timeoutMs = options.timeoutMs ?? 10;
+  const intervalMs = options.intervalMs ?? 2;
   const startedAt = Date.now();
 
   while (!predicate()) {

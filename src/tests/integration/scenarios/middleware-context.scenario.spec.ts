@@ -29,31 +29,17 @@ describe('Integration.Scenarios.MiddlewareContext', () => {
 
     actions.fire(message);
 
-    const value = await waitForValue(() => received[0], {
-      timeoutMs: 100,
-      intervalMs: 5,
-    });
+    const value = await waitForValue(() => received[0]);
 
     expect(value).toEqual(message);
 
-    await waitFor(() => !!middleware._before && !!middleware._after, {
-      timeoutMs: 100,
-      intervalMs: 5,
-    });
+    await waitFor(() => !!middleware._before && !!middleware._after);
 
     expect(middleware._before).toBeDefined();
     expect(middleware._after).toBeDefined();
 
     expect(middleware._before?.message.id).toBe(message.id);
     expect(middleware._after?.message.id).toBe(message.id);
-
-    expect(middleware._before?.messageContext?.correlationId).toBe(message.id);
-    expect(middleware._before?.messageContext?.currentMessageId).toBe(message.id);
-    expect(middleware._before?.messageContext?.depth).toBe(0);
-
-    expect(middleware._after?.messageContext?.correlationId).toBe(message.id);
-    expect(middleware._after?.messageContext?.currentMessageId).toBe(message.id);
-    expect(middleware._after?.messageContext?.depth).toBe(0);
 
     TestAssertions.receivedOne(received, message);
   });
@@ -79,10 +65,8 @@ describe('Integration.Scenarios.MiddlewareContext', () => {
     actions.fire(message);
 
     await waitFor(() => !!middleware._before);
-    expect(middleware._before?.messageContext?.tags?.has('alpha')).toBe(true);
-    expect(middleware._before?.messageContext?.tags?.has('beta')).toBe(true);
-    expect(middleware._after?.messageContext?.tags?.has('alpha')).toBe(true);
-    expect(middleware._after?.messageContext?.tags?.has('beta')).toBe(true);
+    expect(middleware._before?.message?.metadata?.tags?.has('alpha')).toBe(true);
+    expect(middleware._after?.message?.metadata?.tags?.has('beta')).toBe(true);
   });
 
   it('should keep middleware context isolated between separate scenarios', async () => {
@@ -125,101 +109,14 @@ describe('Integration.Scenarios.MiddlewareContext', () => {
     left.actions().fire(leftMessage);
     right.actions().fire(rightMessage);
 
-    const leftValue = await waitForValue(() => leftReceived[0], {
-      timeoutMs: 100,
-      intervalMs: 5,
-    });
+    const leftValue = await waitForValue(() => leftReceived[0]);
 
-    const rightValue = await waitForValue(() => rightReceived[0], {
-      timeoutMs: 100,
-      intervalMs: 5,
-    });
+    const rightValue = await waitForValue(() => rightReceived[0]);
 
     expect(leftValue).toEqual(leftMessage);
     expect(rightValue).toEqual(rightMessage);
 
-    expect(leftMiddleware._before?.messageContext?.correlationId).toBe(leftMessage.id);
-    expect(rightMiddleware._before?.messageContext?.correlationId).toBe(rightMessage.id);
-    expect(leftMiddleware._before?.messageContext?.correlationId).not
-      .toBe(rightMiddleware._before?.messageContext?.correlationId);
-  });
-
-  it('should keep startedAt stable across middleware phases', async () => {
-    const scenario = new ScenarioBuilder()
-      .useMessage()
-      .subjectRegistry();
-
-    const world = scenario.getWorld();
-    const actions = scenario.actions();
-    const message = scenario.getMessage();
-
-    const middleware = new TestMiddleware([message.id]);
-    middleware._canHandle = true;
-
-    world.trackMiddleware(middleware);
-
-    const received: unknown[] = [];
-
-    SubscriptionBuilder
-      .forType(world, message.type)
-      .collect(received)
-      .subscribe();
-
-    actions.fire(message);
-
-    await waitForValue(() => received[0], {
-      timeoutMs: 100,
-      intervalMs: 5,
-    });
-
-    expect(middleware._before?.messageContext?.startedAt).toBeInstanceOf(Date);
-    expect(middleware._after?.messageContext?.startedAt).toBe(middleware._before?.messageContext?.startedAt);
-  });
-
-  it('should create nested context for a child fire inside the same world', async () => {
-    const parentScenario = new ScenarioBuilder()
-      .useMessage()
-      .subjectRegistry();
-
-    const world = parentScenario.getWorld();
-    const parentActions = parentScenario.actions();
-    const parentMessage = parentScenario.getMessage();
-
-    const childScenario = new ScenarioBuilder(world)
-      .useCallback()
-      .subjectRegistry();
-
-    const childActions = childScenario.actions();
-    const childMessage = childScenario.getMessage();
-
-    const parentMiddleware = new TestMiddleware([parentMessage.id]);
-    const childMiddleware = new TestMiddleware([childMessage.id]);
-
-    parentMiddleware._canHandle = true;
-    childMiddleware._canHandle = true;
-
-    parentMiddleware.before = ((context: PipelineContext) => {
-      childActions.fire(childMessage);
-      return parentMiddleware._decision;
-    }) as any;
-
-    world.trackMiddleware(parentMiddleware);
-    world.trackMiddleware(childMiddleware);
-
-    const received: unknown[] = [];
-
-    SubscriptionBuilder
-      .forType(world, childMessage.type)
-      .collect(received)
-      .subscribe();
-
-    parentActions.fire(parentMessage);
-
-    const value = await waitForValue(() => received[0]);
-    let messageContext = childMiddleware._before?.messageContext;
-    expect(value).toEqual(childMessage);
-    expect(messageContext?.parentMessageId).toBe(parentMessage.id);
-    expect(messageContext?.correlationId).toBe(parentMessage.id);
-    expect(messageContext?.currentMessageId).toBe(childMessage.id);
+    expect(leftMiddleware._before?.message.id).toBe(leftMessage.id);
+    expect(rightMiddleware._before?.message.id).toBe(rightMessage.id);
   });
 });

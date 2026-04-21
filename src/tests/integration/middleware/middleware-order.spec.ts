@@ -43,10 +43,7 @@ describe('Integration.Middleware.Order', () => {
 
     scenario.actions().fire(message);
 
-    const value = await waitForValue(() => received[0], {
-      timeoutMs: 100,
-      intervalMs: 5,
-    });
+    const value = await waitForValue(() => received[0]);
 
     expect(value).toEqual(message);
     expect(trace).toEqual(['first:before', 'second:before', 'third:before']);
@@ -80,10 +77,7 @@ describe('Integration.Middleware.Order', () => {
 
     actions.fire(message);
 
-    const value = await waitForValue(() => received[0], {
-      timeoutMs: 100,
-      intervalMs: 5,
-    });
+    const value = await waitForValue(() => received[0]);
 
     expect(value).toEqual(message);
     expect(trace).toEqual(['first:after', 'second:after']);

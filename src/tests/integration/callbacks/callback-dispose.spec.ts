@@ -24,10 +24,7 @@ describe('Integration.Callbacks.Dispose', () => {
     actions.fireCallback(message);
     message.finish(Forger.create<string>());
 
-    await waitFor(() => completed, {
-      timeoutMs: 30,
-      intervalMs: 5,
-    });
+    await waitFor(() => completed);
 
     TestAssertions.should.true(completed);
     TestAssertions.subscriptionClosed(subscription);
@@ -51,10 +48,7 @@ describe('Integration.Callbacks.Dispose', () => {
     scenario.actions().fireCallback(message);
     message.finish('done');
 
-    await waitFor(() => completed, {
-      timeoutMs: 100,
-      intervalMs: 5,
-    });
+    await waitFor(() => completed);
 
     await world.dispose();
     await world.dispose();

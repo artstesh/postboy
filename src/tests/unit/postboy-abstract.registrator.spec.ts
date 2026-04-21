@@ -1,24 +1,24 @@
 // postboy-abstract.registrator.spec.ts
-import {BehaviorSubject, ReplaySubject, Subject} from 'rxjs';
-import {PostboyAbstractRegistrator} from '../../postboy-abstract.registrator';
-import {IPostboyDependingService} from '../../i-postboy-depending.service';
-import {PostboyGenericMessage} from '../../models/postboy-generic-message';
-import {PostboyExecutor} from '../../models/postboy-executor';
-import {Forger} from '@artstesh/forger';
-import {PostboyServiceMock} from "@artstesh/postboy-testing";
-import {instance, mock, verify} from "ts-mockito";
-import {should} from "@artstesh/it-should";
-import {DisconnectMessage} from "../../messages/disconnect-message.executor";
-import {ConnectMessage} from "../../messages/connect-message.executor";
-import {ConnectExecutor} from "../../messages/connect-executor.executor";
-import {ConnectHandler} from "../../messages/connect-handler.executor";
+import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
+import { PostboyAbstractRegistrator } from '../../postboy-abstract.registrator';
+import { IPostboyDependingService } from '../../i-postboy-depending.service';
+import { PostboyGenericMessage } from '../../models/postboy-generic-message';
+import { PostboyExecutor } from '../../models/postboy-executor';
+import { Forger } from '@artstesh/forger';
+import { PostboyServiceMock } from '@artstesh/postboy-testing';
+import { instance, mock, verify } from 'ts-mockito';
+import { should } from '@artstesh/it-should';
+import { DisconnectMessage } from '../../messages/disconnect-message.executor';
+import { ConnectMessage } from '../../messages/connect-message.executor';
+import { ConnectExecutor } from '../../messages/connect-executor.executor';
+import { ConnectHandler } from '../../messages/connect-handler.executor';
 
 class TestMessage extends PostboyGenericMessage {
   static ID = 'test-message';
 }
 
 class TestExec extends PostboyExecutor<string> {
-  static ID = Forger.create<string>({stringSpecial: false})!;
+  static ID = Forger.create<string>({ stringSpecial: false })!;
 }
 
 class TestPostboyRegistrator extends PostboyAbstractRegistrator {
@@ -70,7 +70,7 @@ describe('PostboyAbstractRegistrator', () => {
       //
       const history = postboy.history(ConnectMessage);
       should().array(history.all).length(1);
-      should().true(history.last.type === TestMessage)
+      should().true(history.last.type === TestMessage);
       should().true(result === registrator);
     });
   });
@@ -84,9 +84,9 @@ describe('PostboyAbstractRegistrator', () => {
       //
       const history = postboy.history(ConnectMessage);
       should().array(history.all).length(1);
-      should().true(history.last.type === TestMessage)
-      should().true(history.last.sub === subject)
-      should().true(history.last.pipe === pipeFn)
+      should().true(history.last.type === TestMessage);
+      should().true(history.last.sub === subject);
+      should().true(history.last.pipe === pipeFn);
       should().true(result === registrator);
     });
   });
@@ -107,7 +107,7 @@ describe('PostboyAbstractRegistrator', () => {
 
   describe('recordHandler', () => {
     it('should call postboy.recordHandler with provided executor and handler', () => {
-      const handler = {handle: jest.fn()};
+      const handler = { handle: jest.fn() };
       //
       const result = registrator.recordHandler(TestExec, handler);
       //
@@ -135,7 +135,7 @@ describe('PostboyAbstractRegistrator', () => {
 
   describe('recordBehavior', () => {
     it('should call record with BehaviorSubject and initial value', () => {
-      const result =  registrator.recordBehavior(TestMessage, new TestMessage());
+      const result = registrator.recordBehavior(TestMessage, new TestMessage());
       //
       const history = postboy.history(ConnectMessage);
       should().array(history.all).length(1);
@@ -147,7 +147,7 @@ describe('PostboyAbstractRegistrator', () => {
 
   describe('recordSubject', () => {
     it('should call record with a new Subject instance', () => {
-      const result =  registrator.recordSubject(TestMessage);
+      const result = registrator.recordSubject(TestMessage);
       //
 
       const history = postboy.history(ConnectMessage);

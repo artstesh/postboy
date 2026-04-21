@@ -1,5 +1,5 @@
-import {PostboyExecutor} from "../models/postboy-executor";
-import {MessageType} from "../postboy-abstract.registrator";
+import { PostboyExecutor } from '../models/postboy-executor';
+import { MessageType } from '../postboy-abstract.registrator';
 
 /**
  * Registers an executor that connects to a specific type of message handler.
@@ -21,8 +21,8 @@ export class ConnectExecutor<E extends PostboyExecutor<T>, T> extends PostboyExe
    * @param {(e: E) => T} exec - The function to be executed with the input of type E that returns a value of type T.
    */
   constructor(
-   public type: MessageType<E>,
-   public exec: (e: E) => T
+    public type: MessageType<E>,
+    public exec: (e: E) => T,
   ) {
     super();
   }

@@ -1,5 +1,5 @@
-import {PostboyMiddleware} from "../models/postboy-middleware";
-import {PostboyExecutor} from "../models/postboy-executor";
+import { PostboyMiddleware } from '../models/postboy-middleware';
+import { PostboyExecutor } from '../models/postboy-executor';
 
 /**
  * Represents a {@link PostboyMiddleware} addition operation for Postboy.

@@ -1,8 +1,8 @@
-import {PostboyAbstractRegistrator} from "../postboy-abstract.registrator";
-import {PostboyExecutor} from "../models/postboy-executor";
-import {PostboyExecutionHandler} from "../models/postboy-execution.handler";
-import {PostboyNamespaceStore} from "../services/postboy-namespace.store";
-import {PostboyService} from "../postboy.service";
+import { PostboyAbstractRegistrator } from '../postboy-abstract.registrator';
+import { PostboyExecutor } from '../models/postboy-executor';
+import { PostboyExecutionHandler } from '../models/postboy-execution.handler';
+import { PostboyNamespaceStore } from '../services/postboy-namespace.store';
+import { PostboyService } from '../postboy.service';
 
 /**
  * AddNamespace is a class that extends the PostboyExecutor with a specific implementation

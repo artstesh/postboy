@@ -1,5 +1,5 @@
-import {PostboyMiddleware} from "../models/postboy-middleware";
-import {PostboyExecutor} from "../models/postboy-executor";
+import { PostboyMiddleware } from '../models/postboy-middleware';
+import { PostboyExecutor } from '../models/postboy-executor';
 
 /**
  * Represents a class responsible for removing {@link PostboyMiddleware} in execution flow.

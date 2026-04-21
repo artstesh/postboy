@@ -1,4 +1,4 @@
-import {PostboyExecutor} from "../models/postboy-executor";
+import { PostboyExecutor } from '../models/postboy-executor';
 
 /**
  * Represents a message signaling a disconnection event. This class is used

@@ -6,8 +6,8 @@ import { skip, Subject, tap } from 'rxjs';
 import { should } from '@artstesh/it-should';
 import { Forger } from '@artstesh/forger';
 import { PostboyAbstractRegistrator } from '../../postboy-abstract.registrator';
-import {AddNamespace} from "../../messages/add-namespace.executor";
-import {EliminateNamespace} from "../../messages/eliminate-namespace.executor";
+import { AddNamespace } from '../../messages/add-namespace.executor';
+import { EliminateNamespace } from '../../messages/eliminate-namespace.executor';
 
 describe('Integration.Namespaces', () => {
   let postboy: TestPostboy;

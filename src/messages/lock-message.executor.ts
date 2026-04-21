@@ -1,6 +1,6 @@
-import {PostboyGenericMessage} from "../models/postboy-generic-message";
-import {MessageType} from "../postboy-abstract.registrator";
-import {PostboyExecutor} from "../models/postboy-executor";
+import { PostboyGenericMessage } from '../models/postboy-generic-message';
+import { MessageType } from '../postboy-abstract.registrator';
+import { PostboyExecutor } from '../models/postboy-executor';
 
 /**
  * Locks a specific message type to prevent firing of them.

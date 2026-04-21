@@ -6,7 +6,7 @@ import { TestExecutor } from './models/test-executor';
 import { Forger } from '@artstesh/forger';
 import { TestMiddleware } from './models/test-middleware';
 import { TestReg } from './models/test-registry';
-import {AddMiddleware} from "../../messages/add-middleware.executor";
+import { AddMiddleware } from '../../messages/add-middleware.executor';
 
 describe('Integration.Middleware', () => {
   let postboy: TestPostboy;

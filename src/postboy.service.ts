@@ -10,8 +10,6 @@ import {PostboyDependencyResolver} from './services/postboy-dependency.resolver'
 import {PostboyMiddlewareService} from './services/postboy-middleware.service';
 import {PostboyMessageStore} from './services/postboy-message.store';
 import {PostboyNamespaceStore} from './services/postboy-namespace.store';
-import {PostboyContextService} from './services/postboy-context.service';
-import {PostboySettings} from './models/postboy.settings';
 import {AddNamespace} from "./messages/add-namespace.executor";
 import {EliminateNamespace} from "./messages/eliminate-namespace.executor";
 import {AddMiddleware} from "./messages/add-middleware.executor";
@@ -19,7 +17,7 @@ import {RemoveMiddleware} from "./messages/remove-middleware.executor";
 import {LockMessage} from "./messages/lock-message.executor";
 import {UnlockMessage} from "./messages/unlock-message.executor";
 import {DisconnectMessage} from "./messages/disconnect-message.executor";
-import {ConnectMessage} from "./messages/connect.message.executor";
+import {ConnectMessage} from "./messages/connect-message.executor";
 import {ConnectExecutor} from "./messages/connect-executor.executor";
 import {ConnectHandler} from "./messages/connect-handler.executor";
 
@@ -29,16 +27,12 @@ export class PostboyService {
   private store: PostboyMessageStore;
   private namespaceStore: PostboyNamespaceStore;
   private dependencyResolver: PostboyDependencyResolver;
-  private context: PostboyContextService;
-  private settings: PostboySettings;
 
-  constructor(settings?: Partial<PostboySettings>, resolver?: PostboyDependencyResolver) {
-    this.settings = new PostboySettings(settings);
+  constructor(resolver?: PostboyDependencyResolver) {
     this.dependencyResolver = resolver || new PostboyDependencyResolver();
     this.middleware = this.dependencyResolver.getMiddlewareService();
     this.store = this.dependencyResolver.getMessageStore();
     this.namespaceStore = this.dependencyResolver.getNamespaceStore();
-    this.context = this.dependencyResolver.getPostboyContextService(this.settings.metadata);
     this.registerInfrastructureMessages();
   }
 
@@ -127,11 +121,8 @@ export class PostboyService {
    * @throws {Error} Throws an error if no registered event is found for the provided message ID.
    */
   public fire(message: PostboyGenericMessage): void {
-    const context = this.context.createChild(message);
-    this.context.run(context, () => {
-      this.middleware.manage(message);
-      if (!this.locked.has(message.id)) this.store.getMessage(message.id, message.constructor.name).fire(message);
-    });
+    this.middleware.manage(message);
+    if (!this.locked.has(message.id)) this.store.getMessage(message.id, message.constructor.name).fire(message);
   }
 
   /**
@@ -143,15 +134,12 @@ export class PostboyService {
    * @return {void} This method does not return any value.
    */
   public fireCallback<T>(message: PostboyCallbackMessage<T>, action?: (e: T) => void): Observable<T> {
-    const context = this.context.createChild(message);
-    return this.context.run(context, () => {
-      this.middleware.manage(message);
-      this.store.callbackFired(message);
-      message.result.subscribe(action);
-      if (!this.locked.has(message.id))
-        setTimeout(() => this.store.getMessage(message.id, message.constructor.name).fire(message));
-      return message.result;
-    });
+    this.middleware.manage(message);
+    this.store.callbackFired(message);
+    message.result.subscribe(action);
+    if (!this.locked.has(message.id))
+      setTimeout(() => this.store.getMessage(message.id, message.constructor.name).fire(message));
+    return message.result;
   }
 
   /**
@@ -162,11 +150,8 @@ export class PostboyService {
    * @throws {Error} If the specified executor is not registered.
    */
   public exec<T>(executor: PostboyExecutor<T>): T {
-    const context = this.context.createChild(executor);
-    return this.context.run(context, () => {
-      this.middleware.manage(executor);
-      return this.store.getExecutor<T>(executor.id)(executor);
-    });
+    this.middleware.manage(executor);
+    return this.store.getExecutor<T>(executor.id)(executor);
   }
 
   /**
@@ -277,6 +262,5 @@ export class PostboyService {
     this.namespaceStore?.dispose();
     this.store.dispose();
     this.middleware.dispose();
-    this.context.dispose();
   }
 }

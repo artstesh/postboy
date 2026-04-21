@@ -1,8 +1,6 @@
 import { PostboyMiddlewareService } from './postboy-middleware.service';
 import { PostboyMessageStore } from './postboy-message.store';
 import { PostboyNamespaceStore } from './postboy-namespace.store';
-import { PostboyService } from '../postboy.service';
-import { PostboyContextService } from './postboy-context.service';
 
 export class PostboyDependencyResolver {
   /**
@@ -31,11 +29,4 @@ export class PostboyDependencyResolver {
    * @returns {PostboyNamespaceStore} A new instance of PostboyNamespaceStore associated with the given PostboyService.
    */
   getNamespaceStore = () => new PostboyNamespaceStore();
-  /**
-   * A factory function that creates an instance of PostboyContextService.
-   *
-   * @param {boolean} active - Determines whether the created PostboyContextService instance is active.
-   * @returns {PostboyContextService} A new instance of PostboyContextService with the specified active state.
-   */
-  getPostboyContextService = (active: boolean) => new PostboyContextService(active);
 }

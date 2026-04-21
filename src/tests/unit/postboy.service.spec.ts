@@ -23,9 +23,8 @@ describe('PostboyService', () => {
     const resolver = mock(PostboyDependencyResolver);
     when(resolver.getMiddlewareService()).thenReturn(instance(middleware));
     when(resolver.getMessageStore()).thenReturn(instance(store));
-    when(resolver.getPostboyContextService).thenReturn(() => instance(context));
     when(context.run).thenReturn((c, f) => f());
-    service = new PostboyService({}, instance(resolver));
+    service = new PostboyService(instance(resolver));
   });
 
   afterEach(() => {

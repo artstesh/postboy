@@ -9,7 +9,7 @@ import {PostboyServiceMock} from "@artstesh/postboy-testing";
 import {instance, mock, verify} from "ts-mockito";
 import {should} from "@artstesh/it-should";
 import {DisconnectMessage} from "../../messages/disconnect-message.executor";
-import {ConnectMessage} from "../../messages/connect.message.executor";
+import {ConnectMessage} from "../../messages/connect-message.executor";
 import {ConnectExecutor} from "../../messages/connect-executor.executor";
 import {ConnectHandler} from "../../messages/connect-handler.executor";
 

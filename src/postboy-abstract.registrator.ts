@@ -5,7 +5,7 @@ import { PostboyExecutor } from './models/postboy-executor';
 import { checkId, PostboyGenericMessage } from './models/postboy-generic-message';
 import { PostboyExecutionHandler } from './models/postboy-execution.handler';
 import { IdGenerator } from './utils/id.generator';
-import {ConnectMessage} from "./messages/connect.message.executor";
+import {ConnectMessage} from "./messages/connect-message.executor";
 import {DisconnectMessage} from "./messages/disconnect-message.executor";
 import {ConnectExecutor} from "./messages/connect-executor.executor";
 import {ConnectHandler} from "./messages/connect-handler.executor";

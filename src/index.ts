@@ -9,7 +9,7 @@ export * from './models/postboy-generic-message';
 export * from './models/postboy-callback.message';
 export * from './models/postboy-execution.handler';
 export * from './models/postboy-executor';
-export * from './models/postboy-middleware';
+export * from './services/postboy-middleware';
 export * from './models/postboy.message';
 export * from './services/postboy-middleware.service';
 export * from './services/postboy-message.store';

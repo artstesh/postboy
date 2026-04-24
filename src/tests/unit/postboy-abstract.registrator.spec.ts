@@ -1,17 +1,17 @@
 // postboy-abstract.registrator.spec.ts
-import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
-import { PostboyAbstractRegistrator } from '../../postboy-abstract.registrator';
-import { IPostboyDependingService } from '../../i-postboy-depending.service';
-import { PostboyGenericMessage } from '../../models/postboy-generic-message';
-import { PostboyExecutor } from '../../models/postboy-executor';
-import { Forger } from '@artstesh/forger';
-import { PostboyServiceMock } from '@artstesh/postboy-testing';
-import { instance, mock, verify } from 'ts-mockito';
-import { should } from '@artstesh/it-should';
-import { DisconnectMessage } from '../../messages/disconnect-message.executor';
-import { ConnectMessage } from '../../messages/connect-message.executor';
-import { ConnectExecutor } from '../../messages/connect-executor.executor';
-import { ConnectHandler } from '../../messages/connect-handler.executor';
+import {BehaviorSubject, ReplaySubject, Subject} from 'rxjs';
+import {PostboyAbstractRegistrator} from '../../postboy-abstract.registrator';
+import {IPostboyDependingService} from '../../i-postboy-depending.service';
+import {PostboyGenericMessage} from '../../models/postboy-generic-message';
+import {PostboyExecutor} from '../../models/postboy-executor';
+import {Forger} from '@artstesh/forger';
+import {instance, mock, verify} from 'ts-mockito';
+import {should} from '@artstesh/it-should';
+import {DisconnectMessage} from '../../messages/disconnect-message.executor';
+import {ConnectMessage} from '../../messages/connect-message.executor';
+import {ConnectExecutor} from '../../messages/connect-executor.executor';
+import {ConnectHandler} from '../../messages/connect-handler.executor';
+import {PostboyService} from "../../postboy.service";
 
 class TestMessage extends PostboyGenericMessage {
   static ID = 'test-message';
@@ -28,11 +28,11 @@ class TestPostboyRegistrator extends PostboyAbstractRegistrator {
 }
 
 describe('PostboyAbstractRegistrator', () => {
-  let postboy: PostboyServiceMock;
+  let postboy: PostboyService;
   let registrator: TestPostboyRegistrator;
 
   beforeEach(() => {
-    postboy = new PostboyServiceMock();
+    postboy = new PostboyService();
     registrator = new TestPostboyRegistrator(postboy as any);
   });
 
@@ -62,12 +62,16 @@ describe('PostboyAbstractRegistrator', () => {
     });
   });
 
-  describe('record', () => {
+  describe('record', async () => {
     it('should add id and call postboy.record', () => {
       const subject = new Subject<TestMessage>();
+      let regMessage: ConnectMessage<any> | null = null;
       //
+      postboy.sub(ConnectMessage).subscribe((msg) => (regMessage = msg));
       const result = registrator.record(TestMessage, subject);
+      waitFor(() => regMessage !== null);
       //
+
       const history = postboy.history(ConnectMessage);
       should().array(history.all).length(1);
       should().true(history.last.type === TestMessage);

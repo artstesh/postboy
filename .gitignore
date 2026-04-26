@@ -173,3 +173,4 @@ bower_components/
 /src/**/*.d.ts.map
 /coverage
 /.npmrc
+package-lock.json

@@ -28,12 +28,8 @@
     "url": "git+https://github.com/artstesh/postboy.git"
   },
   "peerDependencies": {
-    "rxjs": ">6.0.0",
+    "rxjs": "^7.0.0",
     "typescript": "^4.0.0"
-  },
-  "dependencies": {
-    "rxjs": "^6.0.0",
-    "tslib": "^2.3.0"
   },
   "devDependencies": {
     "@artstesh/forger": "^1.2.1",

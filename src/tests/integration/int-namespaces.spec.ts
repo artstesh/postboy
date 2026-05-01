@@ -1,10 +1,10 @@
-import {TestPostboy} from './models/test-postboy';
-import {TestMessage} from './models/test-message';
-import {TestCallbackMessage} from './models/test-callback-message';
-import {should} from '@artstesh/it-should';
-import {Forger} from '@artstesh/forger';
-import {AddNamespace} from '../../messages/add-namespace.executor';
-import {EliminateNamespace} from '../../messages/eliminate-namespace.executor';
+import { TestPostboy } from './models/test-postboy';
+import { TestMessage } from './models/test-message';
+import { TestCallbackMessage } from './models/test-callback-message';
+import { should } from '@artstesh/it-should';
+import { Forger } from '@artstesh/forger';
+import { AddNamespace } from '../../messages/add-namespace.executor';
+import { EliminateNamespace } from '../../messages/eliminate-namespace.executor';
 
 describe('Integration.Namespaces', () => {
   let postboy: TestPostboy;

@@ -1,4 +1,3 @@
-
 import { PostboyCallbackMessage } from '../../models/postboy-callback.message';
 import { Forger } from '@artstesh/forger';
 import { should } from '@artstesh/it-should';
@@ -20,17 +19,17 @@ describe('PostboyCallbackMessage', () => {
     message.result.subscribe((v) => {
       should().string(v).equals(value);
       done();
-    })
+    });
     message.next(value);
   });
 
-  it('should emit and complete with finish method',  (done) => {
+  it('should emit and complete with finish method', (done) => {
     const value = Forger.create<string>()!;
     //
-    message.result.subscribe(v => {
+    message.result.subscribe((v) => {
       should().string(v).equals(value);
       done();
-    })
+    });
     message.finish(value);
   });
 

@@ -1,4 +1,4 @@
-import { first, Observable, Subject } from 'rxjs';
+import {first, Observable, Subject, tap} from 'rxjs';
 import { checkId, PostboyGenericMessage } from './models/postboy-generic-message';
 import { PostboySubscription } from './models/postboy-subscription';
 import { PostboyExecutor } from './models/postboy-executor';
@@ -142,10 +142,19 @@ export class PostboyService {
   public fireCallback<T>(message: PostboyCallbackMessage<T>, action?: (e: T) => void): Observable<T> {
     this.middleware.manage(message);
     this.store.callbackFired(message);
-    message.result.subscribe(action);
-    if (!this.locked.has(message.id))
-      setTimeout(() => this.store.getMessage(message.id, message.constructor.name).fire(message));
-    return message.result;
+    const result$ = action ? message.result.pipe(tap(action)) : message.result;
+    const observable = new Observable<T>((subscriber) => {
+      const subscription = result$.subscribe(subscriber);
+
+      if (!this.locked.has(message.id)) {
+        this.store.getMessage(message.id, message.constructor.name).fire(message);
+      }
+
+      return () => subscription.unsubscribe();
+    });
+    if (!!action)
+      observable.subscribe();
+    return observable;
   }
 
   /**

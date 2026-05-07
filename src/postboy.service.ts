@@ -20,7 +20,7 @@ import { DisconnectMessage } from './messages/disconnect-message.executor';
 import { ConnectMessage } from './messages/connect-message.executor';
 import { ConnectExecutor } from './messages/connect-executor.executor';
 import { ConnectHandler } from './messages/connect-handler.executor';
-import { first } from 'rxjs/internal/operators';
+import { first, tap } from 'rxjs/internal/operators';
 
 export class PostboyService {
   protected locked = new Set<string>();
@@ -143,10 +143,18 @@ export class PostboyService {
   public fireCallback<T>(message: PostboyCallbackMessage<T>, action?: (e: T) => void): Observable<T> {
     this.middleware.manage(message);
     this.store.callbackFired(message);
-    message.result.subscribe(action);
-    if (!this.locked.has(message.id))
-      setTimeout(() => this.store.getMessage(message.id, message.constructor.name).fire(message));
-    return message.result;
+    const result$ = action ? message.result.pipe(tap(action)) : message.result;
+    const observable = new Observable<T>((subscriber) => {
+      const subscription = result$.subscribe(subscriber);
+
+      if (!this.locked.has(message.id)) {
+        this.store.getMessage(message.id, message.constructor.name).fire(message);
+      }
+
+      return () => subscription.unsubscribe();
+    });
+    if (!!action) observable.subscribe();
+    return observable;
   }
 
   /**

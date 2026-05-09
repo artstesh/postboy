@@ -1,36 +1,24 @@
-import { defineConfig } from 'eslint';
-import tseslint from 'typescript-eslint';
+import tseslint from '@typescript-eslint/eslint-plugin';
+import parser from '@typescript-eslint/parser';
 
-export default defineConfig(
-  tseslint.configs.recommended,
+export default [
   {
+    files: ['**/*.ts'],
+    ignores: ['lib/**', 'node_modules/**'],
     languageOptions: {
-      parser: '@typescript-eslint/parser',
+      parser: parser,
       parserOptions: {
         project: ['./tsconfig.json', './tsconfig.test.json'],
-        tsconfigRootDir: import.meta.url,
+        tsconfigRootDir: import.meta.dir,
         sourceType: 'module',
       },
       ecmaVersion: 'latest',
       sourceType: 'module',
+      globals: {
+        node: 'readonly',
+        jest: 'readonly'
+      }
     },
-    plugins: {
-      '@typescript-eslint': tseslint.plugin,
-    },
-    rules: {
-      // Здесь можно добавить кастомные правила
-    },
-  },
-  {
-    files: ['**/*.test.{ts,tsx}'],
-    languageOptions: {
-      env: {
-        jest: true,
-      },
-    },
-  },
-  {
-    files: ['**/*.{ts,tsx}'],
-    ignores: ['lib/**', 'node_modules/**'],
+    rules: {}
   }
-);
+];

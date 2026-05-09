@@ -21,22 +21,26 @@
     "lifecycle-management"
   ],
   "scripts": {
+    "pack:check": "npm pack --dry-run",
     "prepack": "npm run clean && npm run build",
-    "prepublishOnly": "npm run lint && npm test",
-    "preversion": "npm run lint && npm test",
+    "prepublishOnly": "npm run lint && npm run typecheck && npm test && npm run build && npm run pack:check",
+    "preversion": "npm run lint && npm run typecheck && npm test",
+    "analyze": "ng build --stats-json && webpack-bundle-analyzer lib/stats.json",
     "version": "npm run format && git add -A src",
     "postversion": "git push && git push --tags",
     "format": "prettier --write \"src/**/*.ts\"",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint \"src/**/*.ts\" --fix",
     "test": "jest --config jest.config.js",
-    "build": "tsc -p tsconfig.json",
-    "clean": "rimraf lib src/**/*.js src/**/*.js.map src/**/*.d.ts src/**/*.d.ts.map"
+    "build": "tsup",
+    "clean": "rimraf --glob lib/ src/**/*.js src/**/*.js.map src/**/*.d.ts src/**/*.d.ts.map"
   },
   "exports": {
     ".": {
       "types": "./lib/index.d.ts",
-      "require": "./lib/index.js",
-      "default": "./lib/index.js"
+      "import": "./lib/index.mjs",
+      "require": "./lib/index.cjs",
+      "default": "./lib/index.mjs"
     }
   },
   "files": [
@@ -72,6 +76,7 @@
     "rxjs": "^7.0.0",
     "ts-jest": "29.1.2",
     "ts-mockito": "^2.6.1",
+    "tsup": "^8.5.1",
     "typescript": "^5.0.2",
     "typescript-eslint": "^8.59.2"
   }

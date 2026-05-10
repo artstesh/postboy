@@ -10,6 +10,8 @@
     "noEmitOnError": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "pretty": true,
     "declarationMap": true,
     "sourceMap": true,

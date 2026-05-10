@@ -1,4 +1,4 @@
-import { defineConfig } from 'tsup';
+import {defineConfig} from 'tsup';
 
 export default defineConfig({
   entry: ['src/index.ts'],
@@ -10,11 +10,15 @@ export default defineConfig({
   bundle: true,
   splitting: false,
   treeshake: true,
-  minify: false,
+  minify: true,
   outDir: 'lib',
-  external: ['rxjs'],
+  external: [
+    'rxjs',
+    'rxjs/*',
+    'rxjs/operators'
+  ],
   skipNodeModulesBundle: true,
-  outExtension({ format }) {
+  outExtension({format}) {
     return {
       js: format === 'esm' ? '.mjs' : '.cjs',
     };

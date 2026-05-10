@@ -1,24 +1,25 @@
 // postboy-abstract.registrator.spec.ts
-import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
-import { PostboyAbstractRegistrator } from '../../postboy-abstract.registrator';
-import { IPostboyDependingService } from '../../i-postboy-depending.service';
-import { PostboyGenericMessage } from '../../models/postboy-generic-message';
-import { PostboyExecutor } from '../../models/postboy-executor';
-import { Forger } from '@artstesh/forger';
-import { PostboyServiceMock } from '@artstesh/postboy-testing';
-import { instance, mock, verify } from 'ts-mockito';
-import { should } from '@artstesh/it-should';
-import { DisconnectMessage } from '../../messages/disconnect-message.executor';
-import { ConnectMessage } from '../../messages/connect-message.executor';
-import { ConnectExecutor } from '../../messages/connect-executor.executor';
-import { ConnectHandler } from '../../messages/connect-handler.executor';
+import {BehaviorSubject, ReplaySubject, Subject} from 'rxjs';
+import {PostboyAbstractRegistrator} from '../../postboy-abstract.registrator';
+import {IPostboyDependingService} from '../../i-postboy-depending.service';
+import {PostboyGenericMessage} from '../../models/postboy-generic-message';
+import {PostboyExecutor} from '../../models/postboy-executor';
+import {Forger} from '@artstesh/forger';
+import {capture, instance, mock, reset, verify} from 'ts-mockito';
+import {should} from '@artstesh/it-should';
+import {ConnectMessage} from '../../messages/connect-message.executor';
+import {ConnectExecutor} from '../../messages/connect-executor.executor';
+import {ConnectHandler} from '../../messages/connect-handler.executor';
+import {PostboyService} from "../../postboy.service";
+import {DisconnectMessage} from "../../messages";
+import fn = jest.fn;
 
 class TestMessage extends PostboyGenericMessage {
   static ID = 'test-message';
 }
 
 class TestExec extends PostboyExecutor<string> {
-  static ID = Forger.create<string>({ stringSpecial: false })!;
+  static ID = Forger.create<string>({stringSpecial: false})!;
 }
 
 class TestPostboyRegistrator extends PostboyAbstractRegistrator {
@@ -28,13 +29,16 @@ class TestPostboyRegistrator extends PostboyAbstractRegistrator {
 }
 
 describe('PostboyAbstractRegistrator', () => {
-  let postboy: PostboyServiceMock;
+  let postboy = mock(PostboyService);
   let registrator: TestPostboyRegistrator;
 
   beforeEach(() => {
-    postboy = new PostboyServiceMock();
-    registrator = new TestPostboyRegistrator(postboy as any);
+    registrator = new TestPostboyRegistrator(instance(postboy));
   });
+
+  afterEach(() => {
+    reset(postboy);
+  })
 
   describe('up', () => {
     it('should call _up and up on registered services', () => {
@@ -48,17 +52,20 @@ describe('PostboyAbstractRegistrator', () => {
   });
 
   describe('down', () => {
-    it('should unregister all id entries and clear services', () => {
+    it('should unregister all id entries and clear services', async () => {
       const service = mock<IPostboyDependingService>();
       registrator.record(TestMessage, new Subject());
-      registrator.recordExecutor(TestExec, () => '');
+      registrator.recordExecutor(TestExec, fn());
       registrator.registerServices([instance(service)]);
       registrator.up();
       //
       registrator.down();
       //
       verify(service.down?.()).once();
-      should().array(postboy.history(DisconnectMessage).all).length(2);
+      const [msg2] = capture(postboy.exec<any>).last();
+      const [msg1] = capture(postboy.exec<any>).beforeLast();
+      should().array([(msg1 as DisconnectMessage).messageId, (msg2 as DisconnectMessage).messageId])
+        .equalUnordered([TestMessage.ID, TestExec.ID]);
     });
   });
 
@@ -68,9 +75,8 @@ describe('PostboyAbstractRegistrator', () => {
       //
       const result = registrator.record(TestMessage, subject);
       //
-      const history = postboy.history(ConnectMessage);
-      should().array(history.all).length(1);
-      should().true(history.last.type === TestMessage);
+      const [msg1] = capture(postboy.exec<any>).last();
+      should().true((msg1 as ConnectMessage<any>).type === TestMessage);
       should().true(result === registrator);
     });
   });
@@ -82,11 +88,10 @@ describe('PostboyAbstractRegistrator', () => {
       //
       const result = registrator.recordWithPipe(TestMessage, subject, pipeFn);
       //
-      const history = postboy.history(ConnectMessage);
-      should().array(history.all).length(1);
-      should().true(history.last.type === TestMessage);
-      should().true(history.last.sub === subject);
-      should().true(history.last.pipe === pipeFn);
+      const [msg1] = capture(postboy.exec<any>).last();
+      should().true(msg1.id === ConnectMessage.ID);
+      should().true((msg1 as ConnectMessage<any>).sub === subject);
+      should().true((msg1 as ConnectMessage<any>).pipe === pipeFn);
       should().true(result === registrator);
     });
   });
@@ -97,24 +102,24 @@ describe('PostboyAbstractRegistrator', () => {
       //
       const result = registrator.recordExecutor(TestExec, executorLogic);
       //
-      const history = postboy.history(ConnectExecutor);
-      should().array(history.all).length(1);
-      should().true(history.last.type === TestExec);
-      should().true(history.last.exec === executorLogic);
+      const [msg1] = capture(postboy.exec<any>).last();
+      should().true(msg1.id === ConnectExecutor.ID);
+      should().true((msg1 as ConnectExecutor<any, any>).type === TestExec);
+      should().true((msg1 as ConnectExecutor<any, any>).exec === executorLogic);
       should().true(result === registrator);
     });
   });
 
   describe('recordHandler', () => {
     it('should call postboy.recordHandler with provided executor and handler', () => {
-      const handler = { handle: jest.fn() };
+      const handler = {handle: jest.fn()};
       //
       const result = registrator.recordHandler(TestExec, handler);
       //
-      const history = postboy.history(ConnectHandler);
-      should().array(history.all).length(1);
-      should().true(history.last.handler === handler);
-      should().true(history.last.executor === TestExec);
+      const [msg1] = capture(postboy.exec<any>).last();
+      should().true(msg1.id === ConnectHandler.ID);
+      should().true((msg1 as ConnectHandler<any, any>).handler === handler);
+      should().true((msg1 as ConnectHandler<any, any>).executor === TestExec);
       should().true(result === registrator);
     });
   });
@@ -125,10 +130,10 @@ describe('PostboyAbstractRegistrator', () => {
       //
       const result = registrator.recordReplay(TestMessage, bufferSize);
       //
-      const history = postboy.history(ConnectMessage);
-      should().array(history.all).length(1);
-      should().true(history.last.sub instanceof ReplaySubject);
-      should().true(history.last.type === TestMessage);
+      const [msg1] = capture(postboy.exec<any>).last();
+      should().true(msg1.id === ConnectMessage.ID);
+      should().true((msg1 as ConnectMessage<any>).sub instanceof ReplaySubject);
+      should().true((msg1 as ConnectMessage<any>).type === TestMessage);
       should().true(result === registrator);
     });
   });
@@ -137,10 +142,10 @@ describe('PostboyAbstractRegistrator', () => {
     it('should call record with BehaviorSubject and initial value', () => {
       const result = registrator.recordBehavior(TestMessage, new TestMessage());
       //
-      const history = postboy.history(ConnectMessage);
-      should().array(history.all).length(1);
-      should().true(history.last.sub instanceof BehaviorSubject);
-      should().true(history.last.type === TestMessage);
+      const [msg1] = capture(postboy.exec<any>).last();
+      should().true(msg1.id === ConnectMessage.ID);
+      should().true((msg1 as ConnectMessage<any>).sub instanceof BehaviorSubject);
+      should().true((msg1 as ConnectMessage<any>).type === TestMessage);
       should().true(result === registrator);
     });
   });
@@ -149,10 +154,9 @@ describe('PostboyAbstractRegistrator', () => {
     it('should call record with a new Subject instance', () => {
       const result = registrator.recordSubject(TestMessage);
       //
-
-      const history = postboy.history(ConnectMessage);
-      should().array(history.all).length(1);
-      should().true(history.last.type === TestMessage);
+      const [msg1] = capture(postboy.exec<any>).last();
+      should().true(msg1.id === ConnectMessage.ID);
+      should().true((msg1 as ConnectMessage<any>).type === TestMessage);
       should().true(result === registrator);
     });
   });

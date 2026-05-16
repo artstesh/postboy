@@ -1,17 +1,17 @@
 // postboy-abstract.registrator.spec.ts
-import {BehaviorSubject, ReplaySubject, Subject} from 'rxjs';
-import {PostboyAbstractRegistrator} from '../../postboy-abstract.registrator';
-import {IPostboyDependingService} from '../../i-postboy-depending.service';
-import {PostboyGenericMessage} from '../../models/postboy-generic-message';
-import {PostboyExecutor} from '../../models/postboy-executor';
-import {Forger} from '@artstesh/forger';
-import {capture, instance, mock, reset, verify} from 'ts-mockito';
-import {should} from '@artstesh/it-should';
-import {ConnectMessage} from '../../messages/connect-message.executor';
-import {ConnectExecutor} from '../../messages/connect-executor.executor';
-import {ConnectHandler} from '../../messages/connect-handler.executor';
-import {PostboyService} from "../../postboy.service";
-import {DisconnectMessage} from "../../messages";
+import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
+import { PostboyAbstractRegistrator } from '../../postboy-abstract.registrator';
+import { IPostboyDependingService } from '../../i-postboy-depending.service';
+import { PostboyGenericMessage } from '../../models/postboy-generic-message';
+import { PostboyExecutor } from '../../models/postboy-executor';
+import { Forger } from '@artstesh/forger';
+import { capture, instance, mock, reset, verify } from 'ts-mockito';
+import { should } from '@artstesh/it-should';
+import { ConnectMessage } from '../../messages/connect-message.executor';
+import { ConnectExecutor } from '../../messages/connect-executor.executor';
+import { ConnectHandler } from '../../messages/connect-handler.executor';
+import { PostboyService } from '../../postboy.service';
+import { DisconnectMessage } from '../../messages';
 import fn = jest.fn;
 
 class TestMessage extends PostboyGenericMessage {
@@ -19,7 +19,7 @@ class TestMessage extends PostboyGenericMessage {
 }
 
 class TestExec extends PostboyExecutor<string> {
-  static ID = Forger.create<string>({stringSpecial: false})!;
+  static ID = Forger.create<string>({ stringSpecial: false })!;
 }
 
 class TestPostboyRegistrator extends PostboyAbstractRegistrator {
@@ -38,7 +38,7 @@ describe('PostboyAbstractRegistrator', () => {
 
   afterEach(() => {
     reset(postboy);
-  })
+  });
 
   describe('up', () => {
     it('should call _up and up on registered services', () => {
@@ -64,7 +64,8 @@ describe('PostboyAbstractRegistrator', () => {
       verify(service.down?.()).once();
       const [msg2] = capture(postboy.exec<any>).last();
       const [msg1] = capture(postboy.exec<any>).beforeLast();
-      should().array([(msg1 as DisconnectMessage).messageId, (msg2 as DisconnectMessage).messageId])
+      should()
+        .array([(msg1 as DisconnectMessage).messageId, (msg2 as DisconnectMessage).messageId])
         .equalUnordered([TestMessage.ID, TestExec.ID]);
     });
   });
@@ -112,7 +113,7 @@ describe('PostboyAbstractRegistrator', () => {
 
   describe('recordHandler', () => {
     it('should call postboy.recordHandler with provided executor and handler', () => {
-      const handler = {handle: jest.fn()};
+      const handler = { handle: jest.fn() };
       //
       const result = registrator.recordHandler(TestExec, handler);
       //

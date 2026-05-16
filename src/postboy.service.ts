@@ -1,4 +1,4 @@
-import {first, Observable, Subject, tap} from 'rxjs';
+import { first, Observable, Subject, tap } from 'rxjs';
 import { checkId, PostboyGenericMessage } from './models/postboy-generic-message';
 import { PostboySubscription } from './models/postboy-subscription';
 import { PostboyExecutor } from './models/postboy-executor';

@@ -5,7 +5,7 @@ import { TestReg } from './models/test-registry';
 import { combineLatest, Subject } from 'rxjs';
 import { should } from '@artstesh/it-should';
 import { Forger } from '@artstesh/forger';
-import { share, skip, tap } from 'rxjs/internal/operators';
+import { share, skip, tap } from 'rxjs';
 
 describe('Integration.Messages', () => {
   let postboy: TestPostboy;

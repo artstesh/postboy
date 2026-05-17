@@ -1,6 +1,11 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outDir": "src"
-  }
+    "noEmit": true,
+  },
+  "include": [
+    "**/*.spec.ts"
+  ],
+  "exclude": [
+  ]
 }

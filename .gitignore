@@ -173,4 +173,4 @@ bower_components/
 /src/**/*.d.ts.map
 /coverage
 /.npmrc
-/stats
+/stats/**/*.*

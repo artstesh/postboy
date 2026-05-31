@@ -83,7 +83,7 @@ A few practical rules:
 - use `ConnectMessage` instead of `record()` and `recordWithPipe()`;
 - use `DisconnectMessage` instead of `unregister()`;
 - use `AddMiddleware/RemoveMiddleware` instead of `addMiddleware()/removeMiddleware()`;
-- use `AddNamespace/EliminateNamespace` instead of `registerNamespace()/unregisterNamespace()`
+- use `AddNamespace/EliminateNamespace` instead of `addNamespace()/eliminateNamespace()`
 - use `ConnectExecutor` instead of `recordExecutor()`;
 - use `ConnectHandler` instead of `recordHandler();
 

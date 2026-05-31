@@ -1,9 +1,9 @@
-import { TestPostboy } from './models/test-postboy';
-import { TestReg } from './models/test-registry';
+import { TestPostboy } from '../shared/models/test-postboy';
+import { TestReg } from '../shared/models/test-registry';
 import { should } from '@artstesh/it-should';
-import { TestExecutor } from './models/test-executor';
+import { TestExecutor } from '../shared/models/test-executor';
 import { Forger } from '@artstesh/forger';
-import { TestHandler } from './models/test-handler';
+import { TestHandler } from '../shared/models/test-handler';
 
 describe('Integration.Executors', () => {
   let postboy: TestPostboy;

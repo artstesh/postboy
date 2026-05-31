@@ -1,3 +1,4 @@
 import { PostboyService } from '../../../postboy.service';
 
-export class TestPostboy extends PostboyService {}
+export class TestPostboy extends PostboyService {
+}

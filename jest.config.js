@@ -14,4 +14,9 @@ module.exports = {
     ],
   },
   moduleFileExtensions: ['ts', 'js', 'json'],
+  coverageDirectory: '../coverage',
+  rootDir: 'src',
+  collectCoverage: false,
+  coveragePathIgnorePatterns: [
+    'src/tests/'],
 };

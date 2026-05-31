@@ -1,5 +1,5 @@
-import {CancelDetails} from "./cancel-details";
-import {MiddlewareStage} from "./middleware-stage.enum";
+import { CancelDetails } from './cancel-details';
+import { MiddlewareStage } from './middleware-stage.enum';
 
 export class CancelError extends Error {
   public readonly details: CancelDetails;

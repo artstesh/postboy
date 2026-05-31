@@ -1,12 +1,11 @@
-import {PostboyMessage} from '../models/postboy.message';
-import {PostboyMessageContext} from '../models/postboy-message.context';
-import {PostboyExecutor} from '../models/postboy-executor';
-import {PipelineContext} from "../models/pipeline-context";
-import {PostboyMiddleware} from "./postboy-middleware";
-import {MiddlewareStage} from "../models/middleware-stage.enum";
-import {MiddlewareDecisionType} from "../models/middleware-decision.enum";
-import {CancelError} from "../models/cancel-error";
-
+import { PostboyMessage } from '../models/postboy.message';
+import { PostboyMessageContext } from '../models/postboy-message.context';
+import { PostboyExecutor } from '../models/postboy-executor';
+import { PipelineContext } from '../models/pipeline-context';
+import { PostboyMiddleware } from './postboy-middleware';
+import { MiddlewareStage } from '../models/middleware-stage.enum';
+import { MiddlewareDecisionType } from '../models/middleware-decision.enum';
+import { CancelError } from '../models/cancel-error';
 
 export class PostboyMiddlewareService {
   protected middlewares: PostboyMiddleware[] = [];
@@ -17,9 +16,9 @@ export class PostboyMiddlewareService {
 
   public removeMiddleware(middleware: PostboyMiddleware): void {
     this.middlewares = this.middlewares.filter((m) => {
-      if (m !== middleware) return true
+      if (m !== middleware) return true;
       m.dispose();
-      return false
+      return false;
     });
   }
 
@@ -28,22 +27,16 @@ export class PostboyMiddlewareService {
     this.middlewares = [];
   }
 
-  public before<T extends PostboyMessage>(
-    stage: MiddlewareStage,
-    message: T
-  ): void {
+  public before<T extends PostboyMessage>(stage: MiddlewareStage, message: T): void {
     for (const middleware of this.middlewares) {
       const context = this.buildContext(stage, message);
       if (!middleware.canHandle(context)) continue;
-      if (middleware.before(context).type === MiddlewareDecisionType.Interrupt) this.throwIfCancelled(stage, middleware.name, message.id);
+      if (middleware.before(context).type === MiddlewareDecisionType.Interrupt)
+        this.throwIfCancelled(stage, middleware.name, message.id);
     }
   }
 
-  public after<T extends PostboyMessage, R = unknown>(
-    stage: MiddlewareStage,
-    message: T,
-    result?: R,
-  ): void {
+  public after<T extends PostboyMessage, R = unknown>(stage: MiddlewareStage, message: T, result?: R): void {
     for (const middleware of this.middlewares) {
       const context = this.buildContext(stage, message);
       if (!middleware.canHandle(context)) continue;
@@ -51,49 +44,32 @@ export class PostboyMiddlewareService {
     }
   }
 
-  public beforePublish(
-    message: PostboyMessage
-  ): void {
+  public beforePublish(message: PostboyMessage): void {
     this.before(MiddlewareStage.Publish, message);
   }
 
-  public afterPublish(
-    message: PostboyMessage
-  ): void {
+  public afterPublish(message: PostboyMessage): void {
     this.after(MiddlewareStage.Publish, message);
   }
 
-  public beforeCallback(
-    message: PostboyMessage
-  ): void {
+  public beforeCallback(message: PostboyMessage): void {
     this.before(MiddlewareStage.Callback, message);
   }
 
-  public afterCallback(
-    message: PostboyMessage,
-    result?: unknown,
-  ): void {
+  public afterCallback(message: PostboyMessage, result?: unknown): void {
     this.after(MiddlewareStage.Callback, message, result);
   }
 
-  public beforeExecute<T>(
-    message: PostboyExecutor<T>
-  ): void {
+  public beforeExecute<T>(message: PostboyExecutor<T>): void {
     this.before(MiddlewareStage.Execute, message);
   }
 
-  public afterExecute<T>(
-    message: PostboyExecutor<T>,
-    result: T
-  ): void {
+  public afterExecute<T>(message: PostboyExecutor<T>, result: T): void {
     this.after(MiddlewareStage.Execute, message, result);
   }
 
-  private buildContext<T extends PostboyMessage>(
-    stage: MiddlewareStage,
-    message: T
-  ): PipelineContext<T> {
-    return {stage, message};
+  private buildContext<T extends PostboyMessage>(stage: MiddlewareStage, message: T): PipelineContext<T> {
+    return { stage, message };
   }
 
   private throwIfCancelled(

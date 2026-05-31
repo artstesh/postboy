@@ -1,29 +1,39 @@
-import {BehaviorSubject, ReplaySubject, Subject} from 'rxjs';
-import {TestReg} from "../models/test-registry";
-import {TestPostboy} from "../models/test-postboy";
-import {TestMessage} from "../models/test-message";
-import {TestCallbackMessage} from "../models/test-callback-message";
-import {MessageType} from "../../../postboy-abstract.registrator";
-import {PostboyMessage} from "../../../models/postboy.message";
+import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
+import { TestReg } from '../models/test-registry';
+import { TestPostboy } from '../models/test-postboy';
+import { TestMessage } from '../models/test-message';
+import { TestCallbackMessage } from '../models/test-callback-message';
+import { MessageType } from '../../../postboy-abstract.registrator';
+import { PostboyMessage } from '../../../models/postboy.message';
 
 export class RegistryFixture {
   static create(postboy: TestPostboy = new TestPostboy()): TestReg {
     return new TestReg(postboy);
   }
 
-  static subject<T extends PostboyMessage = PostboyMessage>(type: MessageType<T>, postboy: TestPostboy = new TestPostboy()): TestReg {
+  static subject<T extends PostboyMessage = PostboyMessage>(
+    type: MessageType<T>,
+    postboy: TestPostboy = new TestPostboy(),
+  ): TestReg {
     const reg = new TestReg(postboy);
     reg.recordSubject(type);
     return reg;
   }
 
-  static replay<T extends PostboyMessage = PostboyMessage>(type: MessageType<T>, postboy: TestPostboy = new TestPostboy()): TestReg {
+  static replay<T extends PostboyMessage = PostboyMessage>(
+    type: MessageType<T>,
+    postboy: TestPostboy = new TestPostboy(),
+  ): TestReg {
     const reg = new TestReg(postboy);
     reg.recordReplay(type);
     return reg;
   }
 
-  static behavior<T extends PostboyMessage = PostboyMessage>(type: MessageType<T>, initialValue: T, postboy: TestPostboy = new TestPostboy()): TestReg {
+  static behavior<T extends PostboyMessage = PostboyMessage>(
+    type: MessageType<T>,
+    initialValue: T,
+    postboy: TestPostboy = new TestPostboy(),
+  ): TestReg {
     const reg = new TestReg(postboy);
     reg.recordBehavior(type, initialValue as any);
     return reg;

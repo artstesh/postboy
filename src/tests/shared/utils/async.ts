@@ -51,9 +51,7 @@ export async function waitForValue<T>(
   return value as T;
 }
 
-export async function expectRejected<T = unknown>(
-  promise: Promise<T>,
-): Promise<unknown> {
+export async function expectRejected<T = unknown>(promise: Promise<T>): Promise<unknown> {
   try {
     await promise;
     throw new Error('Expected promise to be rejected');

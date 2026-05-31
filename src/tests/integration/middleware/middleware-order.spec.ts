@@ -1,9 +1,9 @@
-import {ScenarioBuilder} from '../../shared/builders/scenario.builder';
-import {SubscriptionBuilder} from '../../shared/builders/subscription.builder';
-import {MiddlewareFixture} from '../../shared/fixtures/middleware.fixture';
-import {TestAssertions} from '../../shared/harness/assertions';
-import {waitForValue} from '../../shared/utils/async';
-import {TestMessage} from "../../shared/models/test-message";
+import { ScenarioBuilder } from '../../shared/builders/scenario.builder';
+import { SubscriptionBuilder } from '../../shared/builders/subscription.builder';
+import { MiddlewareFixture } from '../../shared/fixtures/middleware.fixture';
+import { TestAssertions } from '../../shared/harness/assertions';
+import { waitForValue } from '../../shared/utils/async';
+import { TestMessage } from '../../shared/models/test-message';
 
 describe('Integration.Middleware.Order', () => {
   let scenario: ScenarioBuilder;
@@ -12,18 +12,19 @@ describe('Integration.Middleware.Order', () => {
   beforeEach(() => {
     scenario = new ScenarioBuilder().useMessage().subjectRegistry();
     message = scenario.getMessage();
-  })
+  });
 
   afterEach(() => {
     scenario.getWorld().dispose();
-  })
+  });
 
   it('should call middleware in registration order before publish', async () => {
     const world = scenario.getWorld();
 
     const trace: string[] = [];
 
-    scenario.useMiddleware()
+    scenario
+      .useMiddleware()
       .active({
         onBefore: () => trace.push('first:before'),
       })
@@ -36,10 +37,7 @@ describe('Integration.Middleware.Order', () => {
 
     const received: unknown[] = [];
 
-    SubscriptionBuilder
-      .forType(world, message.type)
-      .collect(received)
-      .subscribe();
+    SubscriptionBuilder.forType(world, message.type).collect(received).subscribe();
 
     scenario.actions().fire(message);
 
@@ -50,9 +48,7 @@ describe('Integration.Middleware.Order', () => {
   });
 
   it('should call middleware after publish in registration order', async () => {
-    const scenario = new ScenarioBuilder()
-      .useMessage()
-      .subjectRegistry();
+    const scenario = new ScenarioBuilder().useMessage().subjectRegistry();
 
     const world = scenario.getWorld();
     const actions = scenario.actions();
@@ -60,7 +56,8 @@ describe('Integration.Middleware.Order', () => {
 
     const trace: string[] = [];
 
-    scenario.useMiddleware()
+    scenario
+      .useMiddleware()
       .active({
         onAfter: () => trace.push('first:after'),
       })
@@ -70,10 +67,7 @@ describe('Integration.Middleware.Order', () => {
 
     const received: unknown[] = [];
 
-    SubscriptionBuilder
-      .forType(world, message.type)
-      .collect(received)
-      .subscribe();
+    SubscriptionBuilder.forType(world, message.type).collect(received).subscribe();
 
     actions.fire(message);
 
@@ -87,7 +81,8 @@ describe('Integration.Middleware.Order', () => {
     const world = scenario.getWorld();
     const trace: string[] = [];
 
-    scenario.useMiddleware()
+    scenario
+      .useMiddleware()
       .interrupting({
         onBefore: () => trace.push('first:before'),
       })
@@ -97,10 +92,7 @@ describe('Integration.Middleware.Order', () => {
 
     const received: unknown[] = [];
 
-    SubscriptionBuilder
-      .forType(world, message.type)
-      .collect(received)
-      .subscribe();
+    SubscriptionBuilder.forType(world, message.type).collect(received).subscribe();
 
     TestAssertions.throws(() => scenario.actions().fire(message));
 

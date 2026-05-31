@@ -5,13 +5,9 @@ import { flushMicrotasks, waitForValue } from '../../shared/utils/async';
 
 describe('Integration.Namespaces.Isolation', () => {
   it('should isolate message delivery between two independent worlds', async () => {
-    const left = new ScenarioBuilder()
-      .useMessage()
-      .subjectRegistry();
+    const left = new ScenarioBuilder().useMessage().subjectRegistry();
 
-    const right = new ScenarioBuilder()
-      .useMessage()
-      .subjectRegistry();
+    const right = new ScenarioBuilder().useMessage().subjectRegistry();
 
     const leftWorld = left.getWorld();
     const rightWorld = right.getWorld();
@@ -22,15 +18,9 @@ describe('Integration.Namespaces.Isolation', () => {
     const leftReceived: unknown[] = [];
     const rightReceived: unknown[] = [];
 
-    SubscriptionBuilder
-      .forType(leftWorld, leftMessage.type)
-      .collect(leftReceived)
-      .subscribe();
+    SubscriptionBuilder.forType(leftWorld, leftMessage.type).collect(leftReceived).subscribe();
 
-    SubscriptionBuilder
-      .forType(rightWorld, rightMessage.type)
-      .collect(rightReceived)
-      .subscribe();
+    SubscriptionBuilder.forType(rightWorld, rightMessage.type).collect(rightReceived).subscribe();
 
     left.actions().fire(leftMessage);
     right.actions().fire(rightMessage);
@@ -47,13 +37,9 @@ describe('Integration.Namespaces.Isolation', () => {
   });
 
   it('should not leak subscriptions from one world into another', async () => {
-    const left = new ScenarioBuilder()
-      .useMessage()
-      .subjectRegistry();
+    const left = new ScenarioBuilder().useMessage().subjectRegistry();
 
-    const right = new ScenarioBuilder()
-      .useMessage()
-      .subjectRegistry();
+    const right = new ScenarioBuilder().useMessage().subjectRegistry();
 
     const leftWorld = left.getWorld();
     const rightWorld = right.getWorld();
@@ -64,15 +50,9 @@ describe('Integration.Namespaces.Isolation', () => {
     const leftReceived: unknown[] = [];
     const rightReceived: unknown[] = [];
 
-    SubscriptionBuilder
-      .forType(leftWorld, leftMessage.type)
-      .collect(leftReceived)
-      .subscribe();
+    SubscriptionBuilder.forType(leftWorld, leftMessage.type).collect(leftReceived).subscribe();
 
-    SubscriptionBuilder
-      .forType(rightWorld, rightMessage.type)
-      .collect(rightReceived)
-      .subscribe();
+    SubscriptionBuilder.forType(rightWorld, rightMessage.type).collect(rightReceived).subscribe();
 
     left.actions().fire(leftMessage);
     await flushMicrotasks();
@@ -87,13 +67,9 @@ describe('Integration.Namespaces.Isolation', () => {
   });
 
   it('should keep replay state isolated between independent worlds', async () => {
-    const left = new ScenarioBuilder()
-      .useMessage()
-      .replayRegistry();
+    const left = new ScenarioBuilder().useMessage().replayRegistry();
 
-    const right = new ScenarioBuilder()
-      .useMessage()
-      .replayRegistry();
+    const right = new ScenarioBuilder().useMessage().replayRegistry();
 
     const leftWorld = left.getWorld();
     const rightWorld = right.getWorld();
@@ -107,15 +83,9 @@ describe('Integration.Namespaces.Isolation', () => {
     const leftReceived: unknown[] = [];
     const rightReceived: unknown[] = [];
 
-    SubscriptionBuilder
-      .forType(leftWorld, leftMessage.type)
-      .collect(leftReceived)
-      .subscribe();
+    SubscriptionBuilder.forType(leftWorld, leftMessage.type).collect(leftReceived).subscribe();
 
-    SubscriptionBuilder
-      .forType(rightWorld, rightMessage.type)
-      .collect(rightReceived)
-      .subscribe();
+    SubscriptionBuilder.forType(rightWorld, rightMessage.type).collect(rightReceived).subscribe();
 
     const leftValue = await waitForValue(() => leftReceived[0]);
 
@@ -126,13 +96,9 @@ describe('Integration.Namespaces.Isolation', () => {
   });
 
   it('should dispose one world without affecting another', async () => {
-    const left = new ScenarioBuilder()
-      .useMessage()
-      .subjectRegistry();
+    const left = new ScenarioBuilder().useMessage().subjectRegistry();
 
-    const right = new ScenarioBuilder()
-      .useMessage()
-      .subjectRegistry();
+    const right = new ScenarioBuilder().useMessage().subjectRegistry();
 
     const leftWorld = left.getWorld();
     const rightWorld = right.getWorld();
@@ -143,15 +109,9 @@ describe('Integration.Namespaces.Isolation', () => {
     const leftReceived: unknown[] = [];
     const rightReceived: unknown[] = [];
 
-    SubscriptionBuilder
-      .forType(leftWorld, leftMessage.type)
-      .collect(leftReceived)
-      .subscribe();
+    SubscriptionBuilder.forType(leftWorld, leftMessage.type).collect(leftReceived).subscribe();
 
-    SubscriptionBuilder
-      .forType(rightWorld, rightMessage.type)
-      .collect(rightReceived)
-      .subscribe();
+    SubscriptionBuilder.forType(rightWorld, rightMessage.type).collect(rightReceived).subscribe();
 
     await leftWorld.dispose();
 

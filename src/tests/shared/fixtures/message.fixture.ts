@@ -1,8 +1,8 @@
 import { Forger } from '@artstesh/forger';
-import {TestCallbackMessage} from "../models/test-callback-message";
-import {TestMessage} from "../models/test-message";
-import {TestExecutor} from "../models/test-executor";
-import {TestHandler} from "../models/test-handler";
+import { TestCallbackMessage } from '../models/test-callback-message';
+import { TestMessage } from '../models/test-message';
+import { TestExecutor } from '../models/test-executor';
+import { TestHandler } from '../models/test-handler';
 
 export class MessageFixture {
   static message(): TestMessage {

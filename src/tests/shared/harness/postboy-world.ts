@@ -1,14 +1,14 @@
 import { TestWorld } from './test-world';
-import {TestPostboy} from "../models/test-postboy";
-import {TestReg} from "../models/test-registry";
-import {PostboyMessage} from "../../../models/postboy.message";
-import {PostboyCallbackMessage} from "../../../models/postboy-callback.message";
-import {PostboyMiddleware} from "../../../services/postboy-middleware";
-import {PostboyExecutionHandler} from "../../../models/postboy-execution.handler";
-import {PostboyExecutor} from "../../../models/postboy-executor";
-import {TestHandler} from "../models/test-handler";
-import {Forger} from "@artstesh/forger";
-import {AddMiddleware} from "../../../messages";
+import { TestPostboy } from '../models/test-postboy';
+import { TestReg } from '../models/test-registry';
+import { PostboyMessage } from '../../../models/postboy.message';
+import { PostboyCallbackMessage } from '../../../models/postboy-callback.message';
+import { PostboyMiddleware } from '../../../services/postboy-middleware';
+import { PostboyExecutionHandler } from '../../../models/postboy-execution.handler';
+import { PostboyExecutor } from '../../../models/postboy-executor';
+import { TestHandler } from '../models/test-handler';
+import { Forger } from '@artstesh/forger';
+import { AddMiddleware } from '../../../messages';
 
 export type PostboyWorldState = {
   postboy?: TestPostboy;
@@ -37,17 +37,22 @@ export class PostboyWorld extends TestWorld<PostboyWorldState> {
     return message;
   }
 
-  createCallbackMessage<R,TMessage extends PostboyCallbackMessage<R> = PostboyCallbackMessage<R>>(message: TMessage): TMessage {
+  createCallbackMessage<R, TMessage extends PostboyCallbackMessage<R> = PostboyCallbackMessage<R>>(
+    message: TMessage,
+  ): TMessage {
     this.set('callbackMessage', message);
     return message;
   }
 
-  createExecutor<R,TMessage extends PostboyExecutor<any> = PostboyExecutor<any>>(executor: TMessage): TMessage {
+  createExecutor<R, TMessage extends PostboyExecutor<any> = PostboyExecutor<any>>(executor: TMessage): TMessage {
     this.set('executor', executor);
     return executor;
   }
 
-  createHandler<R,TMessage extends PostboyExecutor<any> = PostboyExecutor<any>>(executor: TMessage, handler: TestHandler): TMessage {
+  createHandler<R, TMessage extends PostboyExecutor<any> = PostboyExecutor<any>>(
+    executor: TMessage,
+    handler: TestHandler,
+  ): TMessage {
     this.set('executor', executor);
     this.set('handler', handler);
     return executor;

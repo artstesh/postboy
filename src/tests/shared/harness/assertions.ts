@@ -1,8 +1,7 @@
 import { Subscription } from 'rxjs';
-import {should, VerifierFactory} from '@artstesh/it-should';
+import { should, VerifierFactory } from '@artstesh/it-should';
 
 export class TestAssertions {
-
   static should = should();
 
   static subscriptionOpen(sub: Subscription): void {

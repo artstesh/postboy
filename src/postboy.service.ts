@@ -1,29 +1,28 @@
-import {first, Observable, Subject, tap} from 'rxjs';
-import {checkId, PostboyGenericMessage} from './models/postboy-generic-message';
-import {PostboySubscription} from './models/postboy-subscription';
-import {PostboyExecutor} from './models/postboy-executor';
-import {PostboyCallbackMessage} from './models/postboy-callback.message';
-import {MessageType, PostboyAbstractRegistrator} from './postboy-abstract.registrator';
-import {PostboyExecutionHandler} from './models/postboy-execution.handler';
-import {PostboyDependencyResolver} from './services/postboy-dependency.resolver';
-import {PostboyMiddlewareService} from './services/postboy-middleware.service';
-import {PostboyMessageStore} from './services/postboy-message.store';
-import {PostboyNamespaceStore} from './services/postboy-namespace.store';
-import {PostboyContextService} from './services/postboy-context.service';
-import {PostboySettings} from './models/postboy.settings';
-import {AddNamespace} from "./messages/add-namespace.executor";
-import {EliminateNamespace} from "./messages/eliminate-namespace.executor";
-import {AddMiddleware} from "./messages/add-middleware.executor";
-import {RemoveMiddleware} from "./messages/remove-middleware.executor";
-import {LockMessage} from "./messages/lock-message.executor";
-import {UnlockMessage} from "./messages/unlock-message.executor";
-import {DisconnectMessage} from "./messages/disconnect-message.executor";
-import {MiddlewareStage} from "./models/middleware-stage.enum";
-import {CancelError} from "./models/cancel-error";
+import { first, Observable, Subject, tap } from 'rxjs';
+import { checkId, PostboyGenericMessage } from './models/postboy-generic-message';
+import { PostboySubscription } from './models/postboy-subscription';
+import { PostboyExecutor } from './models/postboy-executor';
+import { PostboyCallbackMessage } from './models/postboy-callback.message';
+import { MessageType, PostboyAbstractRegistrator } from './postboy-abstract.registrator';
+import { PostboyExecutionHandler } from './models/postboy-execution.handler';
+import { PostboyDependencyResolver } from './services/postboy-dependency.resolver';
+import { PostboyMiddlewareService } from './services/postboy-middleware.service';
+import { PostboyMessageStore } from './services/postboy-message.store';
+import { PostboyNamespaceStore } from './services/postboy-namespace.store';
+import { PostboyContextService } from './services/postboy-context.service';
+import { PostboySettings } from './models/postboy.settings';
+import { AddNamespace } from './messages/add-namespace.executor';
+import { EliminateNamespace } from './messages/eliminate-namespace.executor';
+import { AddMiddleware } from './messages/add-middleware.executor';
+import { RemoveMiddleware } from './messages/remove-middleware.executor';
+import { LockMessage } from './messages/lock-message.executor';
+import { UnlockMessage } from './messages/unlock-message.executor';
+import { DisconnectMessage } from './messages/disconnect-message.executor';
+import { MiddlewareStage } from './models/middleware-stage.enum';
+import { CancelError } from './models/cancel-error';
 import { ConnectMessage } from './messages/connect-message.executor';
 import { ConnectExecutor } from './messages/connect-executor.executor';
 import { ConnectHandler } from './messages/connect-handler.executor';
-
 
 export class PostboyService {
   protected locked = new Set<string>();
@@ -44,20 +43,26 @@ export class PostboyService {
     this.store.registerExecutor(DisconnectMessage.ID, (e) => this.store.unregister((e as DisconnectMessage).messageId));
     this.store.registerExecutor(UnlockMessage.ID, (e) => this.locked.delete(checkId((e as UnlockMessage<any>).type)));
     this.store.registerExecutor(LockMessage.ID, (e) => this.locked.add(checkId((e as LockMessage<any>).type)));
-    this.store.registerExecutor(AddMiddleware.ID, (e) => this.middleware.addMiddleware((e as AddMiddleware).middleware));
-    this.store.registerExecutor(RemoveMiddleware.ID, (e) => this.middleware.removeMiddleware((e as RemoveMiddleware).middleware));
+    this.store.registerExecutor(AddMiddleware.ID, (e) =>
+      this.middleware.addMiddleware((e as AddMiddleware).middleware),
+    );
+    this.store.registerExecutor(RemoveMiddleware.ID, (e) =>
+      this.middleware.removeMiddleware((e as RemoveMiddleware).middleware),
+    );
     this.store.registerExecutor(AddNamespace.ID, (e) => this.namespaceStore.addSpace((e as AddNamespace).space, this));
-    this.store.registerExecutor(EliminateNamespace.ID, (e) => this.namespaceStore.eliminateSpace((e as EliminateNamespace).space));
-    this.store.registerExecutor(ConnectMessage.ID, e => {
-      const {type, sub, pipe} = e as ConnectMessage<any>;
+    this.store.registerExecutor(EliminateNamespace.ID, (e) =>
+      this.namespaceStore.eliminateSpace((e as EliminateNamespace).space),
+    );
+    this.store.registerExecutor(ConnectMessage.ID, (e) => {
+      const { type, sub, pipe } = e as ConnectMessage<any>;
       this.store.registerMessage(checkId(type), new PostboySubscription<any>(sub, pipe));
     });
-    this.store.registerExecutor(ConnectExecutor.ID, e => {
-      const {type, exec} = e as ConnectExecutor<any, any>;
+    this.store.registerExecutor(ConnectExecutor.ID, (e) => {
+      const { type, exec } = e as ConnectExecutor<any, any>;
       this.store.registerExecutor(checkId(type), exec);
     });
-    this.store.registerExecutor(ConnectHandler.ID, e => {
-      const {executor, handler} = e as ConnectHandler<any, any>;
+    this.store.registerExecutor(ConnectHandler.ID, (e) => {
+      const { executor, handler } = e as ConnectHandler<any, any>;
       this.store.registerExecutor(checkId(executor), (e) => handler.handle(e));
     });
   }
@@ -70,11 +75,11 @@ export class PostboyService {
    * @throws {Error} Throws an error if no registered event is found for the provided message ID.
    */
   public fire(message: PostboyGenericMessage): void {
-      this.middleware.beforePublish(message);
-      if (!this.locked.has(message.id)) {
-        this.store.getMessage(message.id, message.constructor.name).fire(message);
-      }
-      this.middleware.afterPublish(message);
+    this.middleware.beforePublish(message);
+    if (!this.locked.has(message.id)) {
+      this.store.getMessage(message.id, message.constructor.name).fire(message);
+    }
+    this.middleware.afterPublish(message);
   }
 
   /**
@@ -85,10 +90,7 @@ export class PostboyService {
    * @param {(e: T) => void} [action] - Optional callback function to execute when the result of the message is emitted.
    * @return {void} This method does not return any value.
    */
-  public fireCallback<T>(
-    message: PostboyCallbackMessage<T>,
-    action?: (e: T) => void,
-  ): Observable<T> {
+  public fireCallback<T>(message: PostboyCallbackMessage<T>, action?: (e: T) => void): Observable<T> {
     this.middleware.beforeCallback(message);
     if (action) message.result.subscribe(action);
     this.store.callbackFired(message);

@@ -3,15 +3,10 @@ import { TestAssertions } from '../../shared/harness/assertions';
 import { waitFor } from '../../shared/utils/async';
 
 describe('Integration.Scenarios.ContextIsolation', () => {
-
   it('should not share tags between independent scenarios', async () => {
-    const left = new ScenarioBuilder()
-      .useMessage()
-      .subjectRegistry();
+    const left = new ScenarioBuilder().useMessage().subjectRegistry();
 
-    const right = new ScenarioBuilder()
-      .useMessage()
-      .subjectRegistry();
+    const right = new ScenarioBuilder().useMessage().subjectRegistry();
 
     const leftMessage = left.getMessage();
     const rightMessage = right.getMessage();
@@ -29,8 +24,7 @@ describe('Integration.Scenarios.ContextIsolation', () => {
 
     await waitFor(() => {
       return (
-        leftMessage.metadata?.tags?.has('left-tag') === true &&
-        rightMessage.metadata?.tags?.has('right-tag') === true
+        leftMessage.metadata?.tags?.has('left-tag') === true && rightMessage.metadata?.tags?.has('right-tag') === true
       );
     });
 

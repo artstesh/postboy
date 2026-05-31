@@ -1,7 +1,7 @@
 import { Subscription } from 'rxjs';
 import { PostboyWorld } from '../harness/postboy-world';
-import {PostboyMessage} from "../../../models/postboy.message";
-import {MessageType} from "../../../postboy-abstract.registrator";
+import { PostboyMessage } from '../../../models/postboy.message';
+import { MessageType } from '../../../postboy-abstract.registrator';
 
 type SubscriptionMode = 'sub' | 'once';
 
@@ -17,7 +17,10 @@ export class SubscriptionBuilder<TValue extends PostboyMessage = PostboyMessage>
     this.type = type;
   }
 
-  static forType<T extends PostboyMessage = PostboyMessage>(world: PostboyWorld, type: MessageType<T>): SubscriptionBuilder<T> {
+  static forType<T extends PostboyMessage = PostboyMessage>(
+    world: PostboyWorld,
+    type: MessageType<T>,
+  ): SubscriptionBuilder<T> {
     return new SubscriptionBuilder(world, type);
   }
 

@@ -1,8 +1,8 @@
-import {ScenarioBuilder} from '../../shared/builders/scenario.builder';
-import {SubscriptionBuilder} from '../../shared/builders/subscription.builder';
-import {TestAssertions} from '../../shared/harness/assertions';
-import {waitFor, waitForValue} from '../../shared/utils/async';
-import {TestMessage} from "../../shared/models/test-message";
+import { ScenarioBuilder } from '../../shared/builders/scenario.builder';
+import { SubscriptionBuilder } from '../../shared/builders/subscription.builder';
+import { TestAssertions } from '../../shared/harness/assertions';
+import { waitFor, waitForValue } from '../../shared/utils/async';
+import { TestMessage } from '../../shared/models/test-message';
 
 describe('Integration.Scenarios.GenericMessageLifecycle', () => {
   it('should register, fire and deliver message through the full lifecycle', async () => {

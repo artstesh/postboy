@@ -1,14 +1,11 @@
 import { ScenarioBuilder } from '../../shared/builders/scenario.builder';
 import { TestAssertions } from '../../shared/harness/assertions';
 import { waitFor } from '../../shared/utils/async';
-import {Forger} from "@artstesh/forger";
+import { Forger } from '@artstesh/forger';
 
 describe('Integration.Scenarios.CallbackContext', () => {
-
   it('should keep callback tags intact during flow', async () => {
-    const scenario = new ScenarioBuilder()
-      .useCallback()
-      .subjectRegistry();
+    const scenario = new ScenarioBuilder().useCallback().subjectRegistry();
 
     const actions = scenario.actions();
     const message = scenario.getMessage();

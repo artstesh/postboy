@@ -13,7 +13,6 @@ describe('Integration.Messages', () => {
     postboy = new TestPostboy();
   });
 
-
   it('should unsubscribe callback messages', (done) => {
     const registry = new TestReg(postboy);
     registry.recordSubject(TestCallbackMessage);

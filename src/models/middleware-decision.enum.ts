@@ -1,5 +1,4 @@
-
 export enum MiddlewareDecisionType {
-  Continue= 1,
-  Interrupt
+  Continue = 1,
+  Interrupt,
 }

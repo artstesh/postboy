@@ -1,10 +1,10 @@
 import { Subject } from 'rxjs';
 import { RegistryFixture } from '../fixtures/registry.fixture';
-import {TestPostboy} from "../models/test-postboy";
-import {TestReg} from "../models/test-registry";
-import {PostboyMessage} from "../../../models/postboy.message";
-import {MessageType} from "../../../postboy-abstract.registrator";
-import {PostboyExecutionHandler} from "../../../models/postboy-execution.handler";
+import { TestPostboy } from '../models/test-postboy';
+import { TestReg } from '../models/test-registry';
+import { PostboyMessage } from '../../../models/postboy.message';
+import { MessageType } from '../../../postboy-abstract.registrator';
+import { PostboyExecutionHandler } from '../../../models/postboy-execution.handler';
 
 export class RegistryBuilder {
   private readonly postboy: TestPostboy;
@@ -30,17 +30,24 @@ export class RegistryBuilder {
     return this;
   }
 
-  withPipe<T extends PostboyMessage = PostboyMessage>(type: MessageType<T>, source: Subject<T>, pipeFactory: (source$: Subject<T>) => any): this {
+  withPipe<T extends PostboyMessage = PostboyMessage>(
+    type: MessageType<T>,
+    source: Subject<T>,
+    pipeFactory: (source$: Subject<T>) => any,
+  ): this {
     this.registry.recordWithPipe(type, source, pipeFactory);
     return this;
   }
 
-  executor<R,T extends PostboyMessage = PostboyMessage>(type: MessageType<T>, executor: (message: T) => R): this {
+  executor<R, T extends PostboyMessage = PostboyMessage>(type: MessageType<T>, executor: (message: T) => R): this {
     this.registry.recordExecutor(type, executor);
     return this;
   }
 
-  handler<R,T extends PostboyMessage = PostboyMessage>(type: MessageType<T>, handler: PostboyExecutionHandler<R, T>): this {
+  handler<R, T extends PostboyMessage = PostboyMessage>(
+    type: MessageType<T>,
+    handler: PostboyExecutionHandler<R, T>,
+  ): this {
     this.registry.recordHandler(type, handler);
     return this;
   }

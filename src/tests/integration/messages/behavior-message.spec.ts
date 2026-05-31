@@ -1,4 +1,4 @@
-import {should} from "@artstesh/it-should";
+import { should } from '@artstesh/it-should';
 
 describe('Integration.Messages.Behavior', () => {
   it('should true', () => {

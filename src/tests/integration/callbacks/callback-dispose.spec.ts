@@ -45,7 +45,7 @@ describe('Integration.Callbacks.Dispose', () => {
       },
     });
 
-    await scenario.actions().fireCallback(message);
+    scenario.actions().fireCallback(message);
     message.finish('done');
 
     await waitFor(() => completed);

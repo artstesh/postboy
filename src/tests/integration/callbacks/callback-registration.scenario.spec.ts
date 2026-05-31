@@ -26,7 +26,7 @@ describe('#Integration.Scenarios.CallbackRegistration', () => {
     const list: TestCallbackMessage[] = [];
     SubscriptionBuilder.forType(scenario.getWorld(), message.type).asSub().collect(list).subscribe();
     //
-    await scenario.actions().fireCallback(message, ev => list.push(ev as TestCallbackMessage));
+    scenario.actions().fireCallback(message, ev => list.push(ev as TestCallbackMessage));
     //
     TestAssertions.should.array(list).equal([message]);
   });
@@ -38,7 +38,7 @@ describe('#Integration.Scenarios.CallbackRegistration', () => {
     const list: TestCallbackMessage[] = [];
     SubscriptionBuilder.forType(scenario.getWorld(), message.type).asSub().collect(list).subscribe();
     //
-    await scenario.actions().fireCallback(message);
+    scenario.actions().fireCallback(message);
     await waitFor(() => list.length > 0, {timeoutMs: 20, intervalMs: 2});
     //
     TestAssertions.should.array(list).equal([message]);
@@ -50,7 +50,7 @@ describe('#Integration.Scenarios.CallbackRegistration', () => {
     const list: TestCallbackMessage[] = [];
     SubscriptionBuilder.forType(scenario.getWorld(), message.type).asSub().collect(list).subscribe();
     //
-    await scenario.actions().fireCallback(message);
+    scenario.actions().fireCallback(message);
     await waitFor(() => list.length > 0, {timeoutMs: 20, intervalMs: 2});
     //
     TestAssertions.should.array(list).equal([message]);

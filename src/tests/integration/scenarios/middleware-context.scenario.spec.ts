@@ -3,13 +3,11 @@ import { SubscriptionBuilder } from '../../shared/builders/subscription.builder'
 import { TestAssertions } from '../../shared/harness/assertions';
 import { waitFor, waitForValue } from '../../shared/utils/async';
 import { TestMiddleware } from '../../shared/models/test-middleware';
-import {PipelineContext} from "../../../models/pipeline-context";
+import { PipelineContext } from '../../../models/pipeline-context';
 
 describe('Integration.Scenarios.MiddlewareContext', () => {
   it('should pass filled context to middleware before and after publish', async () => {
-    const scenario = new ScenarioBuilder()
-      .useMessage()
-      .subjectRegistry();
+    const scenario = new ScenarioBuilder().useMessage().subjectRegistry();
 
     const world = scenario.getWorld();
     const actions = scenario.actions();
@@ -22,10 +20,7 @@ describe('Integration.Scenarios.MiddlewareContext', () => {
 
     const received: unknown[] = [];
 
-    SubscriptionBuilder
-      .forType(world, message.type)
-      .collect(received)
-      .subscribe();
+    SubscriptionBuilder.forType(world, message.type).collect(received).subscribe();
 
     actions.fire(message);
 
@@ -45,9 +40,7 @@ describe('Integration.Scenarios.MiddlewareContext', () => {
   });
 
   it('should preserve tags in middleware context', async () => {
-    const scenario = new ScenarioBuilder()
-      .useMessage()
-      .subjectRegistry();
+    const scenario = new ScenarioBuilder().useMessage().subjectRegistry();
 
     const world = scenario.getWorld();
     const actions = scenario.actions();
@@ -70,13 +63,9 @@ describe('Integration.Scenarios.MiddlewareContext', () => {
   });
 
   it('should keep middleware context isolated between separate scenarios', async () => {
-    const left = new ScenarioBuilder()
-      .useMessage()
-      .subjectRegistry();
+    const left = new ScenarioBuilder().useMessage().subjectRegistry();
 
-    const right = new ScenarioBuilder()
-      .useCallback()
-      .subjectRegistry();
+    const right = new ScenarioBuilder().useCallback().subjectRegistry();
 
     const leftWorld = left.getWorld();
     const rightWorld = right.getWorld();
@@ -96,15 +85,9 @@ describe('Integration.Scenarios.MiddlewareContext', () => {
     const leftReceived: unknown[] = [];
     const rightReceived: unknown[] = [];
 
-    SubscriptionBuilder
-      .forType(leftWorld, leftMessage.type)
-      .collect(leftReceived)
-      .subscribe();
+    SubscriptionBuilder.forType(leftWorld, leftMessage.type).collect(leftReceived).subscribe();
 
-    SubscriptionBuilder
-      .forType(rightWorld, rightMessage.type)
-      .collect(rightReceived)
-      .subscribe();
+    SubscriptionBuilder.forType(rightWorld, rightMessage.type).collect(rightReceived).subscribe();
 
     left.actions().fire(leftMessage);
     right.actions().fire(rightMessage);

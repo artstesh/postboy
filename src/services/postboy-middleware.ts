@@ -1,7 +1,6 @@
-import {PipelineContext} from "../models/pipeline-context";
-import {MiddlewareDecisionType} from "../models/middleware-decision.enum";
-import {MiddlewareDecision} from "../models";
-
+import { PipelineContext } from '../models/pipeline-context';
+import { MiddlewareDecisionType } from '../models/middleware-decision.enum';
+import { MiddlewareDecision } from '../models';
 
 /**
  * Abstract base class for defining middleware in a pipeline.
@@ -32,7 +31,7 @@ export abstract class PostboyMiddleware {
    * Return Interrupt to cancel the operation.
    */
   public before(_context: PipelineContext): MiddlewareDecision {
-    return {type: MiddlewareDecisionType.Continue};
+    return { type: MiddlewareDecisionType.Continue };
   }
 
   /**

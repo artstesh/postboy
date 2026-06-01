@@ -1,4 +1,4 @@
-# Library 3.4 — Middleware Pipeline Overhaul
+# Library 3.5 — Middleware Pipeline Overhaul
 
 Version 3.4 introduces a new middleware pipeline model that replaces the previous single-step middleware handling with a stage-based lifecycle. This change makes middleware more expressive, enables cancellation at specific stages, and provides better control over post-processing and error handling.
 

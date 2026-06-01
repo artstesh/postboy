@@ -4,11 +4,8 @@ import { TestAssertions } from '../../shared/harness/assertions';
 import { waitForValue } from '../../shared/utils/async';
 
 describe('Integration.Scenarios.ContextPropagation', () => {
-
   it('should keep tags and metadata intact during scenario flow', async () => {
-    const scenario = new ScenarioBuilder()
-      .useMessage()
-      .subjectRegistry();
+    const scenario = new ScenarioBuilder().useMessage().subjectRegistry();
 
     const message = scenario.getMessage();
     message.setMetadata({

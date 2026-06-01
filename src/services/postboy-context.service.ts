@@ -1,12 +1,11 @@
-import {AsyncLocalStorage} from 'node:async_hooks';
-import {PostboyMessageContext} from '../models/postboy-message.context';
-import {PostboyMessage} from '../models/postboy.message';
+import { AsyncLocalStorage } from 'node:async_hooks';
+import { PostboyMessageContext } from '../models/postboy-message.context';
+import { PostboyMessage } from '../models/postboy.message';
 
 export class PostboyContextService {
   private readonly storage = new AsyncLocalStorage<PostboyMessageContext>();
 
-  constructor(public active: boolean = true) {
-  }
+  constructor(public active: boolean = true) {}
 
   private get current(): PostboyMessageContext | undefined {
     return this.storage.getStore();
@@ -37,13 +36,13 @@ export class PostboyContextService {
     const data = !parent
       ? this.createRoot(message)
       : {
-        correlationId: parent.correlationId,
-        currentMessageId: message.id,
-        parentMessageId: parent.currentMessageId,
-        depth: parent.depth + 1,
-        startedAt: parent.startedAt,
-        tags,
-      };
+          correlationId: parent.correlationId,
+          currentMessageId: message.id,
+          parentMessageId: parent.currentMessageId,
+          depth: parent.depth + 1,
+          startedAt: parent.startedAt,
+          tags,
+        };
     this.updateMessage(message, data);
     return data;
   }
@@ -52,7 +51,7 @@ export class PostboyContextService {
     message.setMetadata({
       correlationId: context.correlationId,
       causationId: context.parentMessageId,
-      tags: context.tags
+      tags: context.tags,
     });
   }
 

@@ -9,22 +9,21 @@ describe('Integration.Executors.Lifecycle', () => {
   let executor: TestExecutor<any>;
 
   beforeEach(() => {
-    scenario= new ScenarioBuilder().useExecutor().handlerRegistry();
+    scenario = new ScenarioBuilder().useExecutor().handlerRegistry();
     executor = scenario.getMessage() as TestExecutor<any>;
-  })
+  });
 
   afterEach(() => {
     scenario.getWorld().dispose();
-  })
+  });
 
   it('should execute executor through the full lifecycle', async () => {
     const trace: string[] = [];
 
-    scenario.useMiddleware()
-      .active({
-        onBefore: () => trace.push('before'),
-        onAfter: () => trace.push('after'),
-      });
+    scenario.useMiddleware().active({
+      onBefore: () => trace.push('before'),
+      onAfter: () => trace.push('after'),
+    });
 
     const result = scenario.actions().exec(executor);
 
@@ -35,10 +34,9 @@ describe('Integration.Executors.Lifecycle', () => {
   it('should allow executor lifecycle to be interrupted before completion', async () => {
     const trace: string[] = [];
 
-    scenario.useMiddleware()
-      .interrupting({
-        onBefore: () => trace.push('before'),
-      });
+    scenario.useMiddleware().interrupting({
+      onBefore: () => trace.push('before'),
+    });
 
     TestAssertions.throws(() => scenario.actions().exec(executor));
     expect(trace).toEqual(['before']);

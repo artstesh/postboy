@@ -1,11 +1,5 @@
-import {
-  TestScheduler,
-  RunHelpers,
-} from 'rxjs/testing';
-import {
-  Observable,
-  Subscription,
-} from 'rxjs';
+import { TestScheduler, RunHelpers } from 'rxjs/testing';
+import { Observable, Subscription } from 'rxjs';
 
 export type MarbleRunCallback<T = void> = (helpers: RunHelpers) => T;
 

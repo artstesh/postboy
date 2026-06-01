@@ -1,11 +1,11 @@
-import {ScenarioBuilder} from '../../shared/builders/scenario.builder';
-import {SubscriptionBuilder} from '../../shared/builders/subscription.builder';
-import {TestAssertions} from '../../shared/harness/assertions';
-import {delay, flushMicrotasks, waitForValue} from '../../shared/utils/async';
-import {Forger} from "@artstesh/forger";
-import {AddNamespace, EliminateNamespace} from "../../../messages";
-import {TestMessage} from "../../shared/models/test-message";
-import {PostboyAbstractRegistrator} from "../../../postboy-abstract.registrator";
+import { ScenarioBuilder } from '../../shared/builders/scenario.builder';
+import { SubscriptionBuilder } from '../../shared/builders/subscription.builder';
+import { TestAssertions } from '../../shared/harness/assertions';
+import { delay, flushMicrotasks, waitForValue } from '../../shared/utils/async';
+import { Forger } from '@artstesh/forger';
+import { AddNamespace, EliminateNamespace } from '../../../messages';
+import { TestMessage } from '../../shared/models/test-message';
+import { PostboyAbstractRegistrator } from '../../../postboy-abstract.registrator';
 
 describe('Integration.Namespaces.Register', () => {
   let scenario: ScenarioBuilder;
@@ -16,11 +16,11 @@ describe('Integration.Namespaces.Register', () => {
     scenario = new ScenarioBuilder().useMessage();
     namespace = Forger.create<string>()!;
     registrator = scenario.getWorld().getPostboy().exec(new AddNamespace(namespace));
-  })
+  });
 
   afterEach(() => {
     scenario.getWorld().dispose();
-  })
+  });
 
   it('should register namespace and deliver messages', async () => {
     registrator.recordSubject(scenario.getMessage().type);
@@ -45,9 +45,7 @@ describe('Integration.Namespaces.Register', () => {
   });
 
   it('should allow replay registry to deliver last value to late subscriber', async () => {
-    const scenario = new ScenarioBuilder()
-      .useMessage()
-      .replayRegistry();
+    const scenario = new ScenarioBuilder().useMessage().replayRegistry();
 
     const actions = scenario.actions();
     const message = scenario.getMessage();
@@ -55,10 +53,7 @@ describe('Integration.Namespaces.Register', () => {
 
     actions.fire(message);
 
-    SubscriptionBuilder
-      .forType(scenario.getWorld(), message.type)
-      .collect(received)
-      .subscribe();
+    SubscriptionBuilder.forType(scenario.getWorld(), message.type).collect(received).subscribe();
 
     const value = await waitForValue(() => received[0]);
 
@@ -66,9 +61,7 @@ describe('Integration.Namespaces.Register', () => {
   });
 
   it('should support multiple subscriptions for the same registered namespace', async () => {
-    const scenario = new ScenarioBuilder()
-      .useMessage()
-      .subjectRegistry();
+    const scenario = new ScenarioBuilder().useMessage().subjectRegistry();
 
     const actions = scenario.actions();
     const message = scenario.getMessage();
@@ -76,15 +69,9 @@ describe('Integration.Namespaces.Register', () => {
     const first: unknown[] = [];
     const second: unknown[] = [];
 
-    SubscriptionBuilder
-      .forType(scenario.getWorld(), message.type)
-      .collect(first)
-      .subscribe();
+    SubscriptionBuilder.forType(scenario.getWorld(), message.type).collect(first).subscribe();
 
-    SubscriptionBuilder
-      .forType(scenario.getWorld(), message.type)
-      .collect(second)
-      .subscribe();
+    SubscriptionBuilder.forType(scenario.getWorld(), message.type).collect(second).subscribe();
 
     actions.fire(message);
     await flushMicrotasks();
@@ -94,19 +81,14 @@ describe('Integration.Namespaces.Register', () => {
   });
 
   it('should keep registration active until dispose', async () => {
-    const scenario = new ScenarioBuilder()
-      .useMessage()
-      .subjectRegistry();
+    const scenario = new ScenarioBuilder().useMessage().subjectRegistry();
 
     const world = scenario.getWorld();
     const actions = scenario.actions();
     const message = scenario.getMessage();
     const received: unknown[] = [];
 
-    const subscription = SubscriptionBuilder
-      .forType(world, message.type)
-      .collect(received)
-      .subscribe();
+    const subscription = SubscriptionBuilder.forType(world, message.type).collect(received).subscribe();
 
     actions.fire(message);
 

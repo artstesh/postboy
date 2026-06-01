@@ -1,9 +1,9 @@
-import {ScenarioBuilder} from "../../shared/builders/scenario.builder";
-import {SubscriptionBuilder} from "../../shared/builders/subscription.builder";
-import {flushMicrotasks} from "../../shared/utils/async";
-import {TestAssertions} from "../../shared/harness/assertions";
-import {toArray} from "../../shared/utils/observables";
-import {take} from "rxjs";
+import { ScenarioBuilder } from '../../shared/builders/scenario.builder';
+import { SubscriptionBuilder } from '../../shared/builders/subscription.builder';
+import { flushMicrotasks } from '../../shared/utils/async';
+import { TestAssertions } from '../../shared/harness/assertions';
+import { toArray } from '../../shared/utils/observables';
+import { take } from 'rxjs';
 
 describe('#Integration.Scenarios.MessageReplay', () => {
   let scenario: ScenarioBuilder;
@@ -23,10 +23,7 @@ describe('#Integration.Scenarios.MessageReplay', () => {
     scenario.actions().fire(message);
     scenario.actions().fire(message);
 
-    SubscriptionBuilder
-      .forType(scenario.getWorld(), message.type)
-      .collect(received)
-      .subscribe();
+    SubscriptionBuilder.forType(scenario.getWorld(), message.type).collect(received).subscribe();
 
     await flushMicrotasks();
 
@@ -51,15 +48,9 @@ describe('#Integration.Scenarios.MessageReplay', () => {
     const first: unknown[] = [];
     const second: unknown[] = [];
 
-    SubscriptionBuilder
-      .forType(scenario.getWorld(), message.type)
-      .collect(first)
-      .subscribe();
+    SubscriptionBuilder.forType(scenario.getWorld(), message.type).collect(first).subscribe();
 
-    SubscriptionBuilder
-      .forType(scenario.getWorld(), message.type)
-      .collect(second)
-      .subscribe();
+    SubscriptionBuilder.forType(scenario.getWorld(), message.type).collect(second).subscribe();
 
     await flushMicrotasks();
 

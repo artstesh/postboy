@@ -1,14 +1,14 @@
-import {PostboyWorld} from '../harness/postboy-world';
-import {RegistryBuilder} from './registry.builder';
-import {TestMessage} from "../models/test-message";
-import {TestCallbackMessage} from "../models/test-callback-message";
-import {ScenarioActions} from "../actions/scenario.actions";
-import {PostboyMessage} from "../../../models/postboy.message";
-import {MessageFixture} from "../fixtures/message.fixture";
-import {Observable, Subject} from "rxjs";
-import {TestExecutor} from "../models/test-executor";
-import {PostboyExecutor} from "../../../models/postboy-executor";
-import {MiddlewareBuilder} from "./middleware.builder";
+import { PostboyWorld } from '../harness/postboy-world';
+import { RegistryBuilder } from './registry.builder';
+import { TestMessage } from '../models/test-message';
+import { TestCallbackMessage } from '../models/test-callback-message';
+import { ScenarioActions } from '../actions/scenario.actions';
+import { PostboyMessage } from '../../../models/postboy.message';
+import { MessageFixture } from '../fixtures/message.fixture';
+import { Observable, Subject } from 'rxjs';
+import { TestExecutor } from '../models/test-executor';
+import { PostboyExecutor } from '../../../models/postboy-executor';
+import { MiddlewareBuilder } from './middleware.builder';
 
 export class ScenarioBuilder {
   private readonly world: PostboyWorld;
@@ -32,13 +32,19 @@ export class ScenarioBuilder {
   }
 
   useExecutor(): this {
-    this._message = this.world.createHandler<string, TestExecutor<any>>(MessageFixture.executor(), MessageFixture.handler());
+    this._message = this.world.createHandler<string, TestExecutor<any>>(
+      MessageFixture.executor(),
+      MessageFixture.handler(),
+    );
     return this;
   }
 
   executeRegistry<R>(func: (message: PostboyExecutor<any>) => R): this {
     this.ensureMessage();
-    this.registryBuilder = new RegistryBuilder(this.world.getPostboy()).executor((this._message as TestExecutor<any>).type, e => func(e));
+    this.registryBuilder = new RegistryBuilder(this.world.getPostboy()).executor(
+      (this._message as TestExecutor<any>).type,
+      (e) => func(e),
+    );
     this.world.createRegistry(this.registryBuilder.build());
     return this;
   }
@@ -51,35 +57,49 @@ export class ScenarioBuilder {
 
   handlerRegistry<T>(toReturn?: T): this {
     this.ensureMessage();
-    this.registryBuilder = new RegistryBuilder(this.world.getPostboy()).handler((this._message as TestExecutor<any>).type, MessageFixture.handler(toReturn));
+    this.registryBuilder = new RegistryBuilder(this.world.getPostboy()).handler(
+      (this._message as TestExecutor<any>).type,
+      MessageFixture.handler(toReturn),
+    );
     this.world.createRegistry(this.registryBuilder.build());
     return this;
   }
 
   subjectRegistry(): this {
     this.ensureMessage();
-    this.registryBuilder = new RegistryBuilder(this.world.getPostboy()).subject((this._message as TestMessage | TestCallbackMessage).type);
+    this.registryBuilder = new RegistryBuilder(this.world.getPostboy()).subject(
+      (this._message as TestMessage | TestCallbackMessage).type,
+    );
     this.world.createRegistry(this.registryBuilder.build());
     return this;
   }
 
   replayRegistry(): this {
     this.ensureMessage();
-    this.registryBuilder = new RegistryBuilder(this.world.getPostboy()).replay((this._message as TestMessage | TestCallbackMessage).type);
+    this.registryBuilder = new RegistryBuilder(this.world.getPostboy()).replay(
+      (this._message as TestMessage | TestCallbackMessage).type,
+    );
     this.world.createRegistry(this.registryBuilder.build());
     return this;
   }
 
   behaviorRegistry(initialValue: any): this {
     this.ensureMessage();
-    this.registryBuilder = new RegistryBuilder(this.world.getPostboy()).behavior((this._message as TestMessage | TestCallbackMessage).type, initialValue);
+    this.registryBuilder = new RegistryBuilder(this.world.getPostboy()).behavior(
+      (this._message as TestMessage | TestCallbackMessage).type,
+      initialValue,
+    );
     this.world.createRegistry(this.registryBuilder.build());
     return this;
   }
 
   withPipeRegistry<T extends PostboyMessage = PostboyMessage>(func: (s: Subject<T>) => Observable<T>): this {
     this.ensureMessage();
-    this.registryBuilder = new RegistryBuilder(this.world.getPostboy()).withPipe(this._message!.type, new Subject<any>(), (s) => func(s));
+    this.registryBuilder = new RegistryBuilder(this.world.getPostboy()).withPipe(
+      this._message!.type,
+      new Subject<any>(),
+      (s) => func(s),
+    );
     this.world.createRegistry(this.registryBuilder.build());
     return this;
   }

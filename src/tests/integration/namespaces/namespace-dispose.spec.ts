@@ -5,18 +5,13 @@ import { flushMicrotasks, waitForValue } from '../../shared/utils/async';
 
 describe('Integration.Namespaces.Dispose', () => {
   it('should close subscription when world is disposed', async () => {
-    const scenario = new ScenarioBuilder()
-      .useMessage()
-      .subjectRegistry();
+    const scenario = new ScenarioBuilder().useMessage().subjectRegistry();
 
     const world = scenario.getWorld();
     const message = scenario.getMessage();
     const received: unknown[] = [];
 
-    const subscription = SubscriptionBuilder
-      .forType(world, message.type)
-      .collect(received)
-      .subscribe();
+    const subscription = SubscriptionBuilder.forType(world, message.type).collect(received).subscribe();
 
     scenario.actions().fire(message);
 
@@ -31,9 +26,7 @@ describe('Integration.Namespaces.Dispose', () => {
   });
 
   it('should close replay subscription on dispose and not leak between scenarios', async () => {
-    const scenario = new ScenarioBuilder()
-      .useMessage()
-      .replayRegistry();
+    const scenario = new ScenarioBuilder().useMessage().replayRegistry();
 
     const world = scenario.getWorld();
     const message = scenario.getMessage();
@@ -41,10 +34,7 @@ describe('Integration.Namespaces.Dispose', () => {
 
     scenario.actions().fire(message);
 
-    const subscription = SubscriptionBuilder
-      .forType(world, message.type)
-      .collect(received)
-      .subscribe();
+    const subscription = SubscriptionBuilder.forType(world, message.type).collect(received).subscribe();
 
     const value = await waitForValue(() => received[0]);
 
@@ -56,24 +46,16 @@ describe('Integration.Namespaces.Dispose', () => {
   });
 
   it('should dispose multiple subscriptions in the same namespace', async () => {
-    const scenario = new ScenarioBuilder()
-      .useMessage()
-      .subjectRegistry();
+    const scenario = new ScenarioBuilder().useMessage().subjectRegistry();
 
     const world = scenario.getWorld();
     const message = scenario.getMessage();
     const first: unknown[] = [];
     const second: unknown[] = [];
 
-    const sub1 = SubscriptionBuilder
-      .forType(world, message.type)
-      .collect(first)
-      .subscribe();
+    const sub1 = SubscriptionBuilder.forType(world, message.type).collect(first).subscribe();
 
-    const sub2 = SubscriptionBuilder
-      .forType(world, message.type)
-      .collect(second)
-      .subscribe();
+    const sub2 = SubscriptionBuilder.forType(world, message.type).collect(second).subscribe();
 
     scenario.actions().fire(message);
 
@@ -90,18 +72,13 @@ describe('Integration.Namespaces.Dispose', () => {
   });
 
   it('should allow dispose to be called more than once safely', async () => {
-    const scenario = new ScenarioBuilder()
-      .useMessage()
-      .subjectRegistry();
+    const scenario = new ScenarioBuilder().useMessage().subjectRegistry();
 
     const world = scenario.getWorld();
     const message = scenario.getMessage();
     const received: unknown[] = [];
 
-    SubscriptionBuilder
-      .forType(world, message.type)
-      .collect(received)
-      .subscribe();
+    SubscriptionBuilder.forType(world, message.type).collect(received).subscribe();
 
     scenario.actions().fire(message);
 

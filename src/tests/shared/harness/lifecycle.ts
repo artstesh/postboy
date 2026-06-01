@@ -1,7 +1,6 @@
 import { TestWorld } from './test-world';
 
-export type ScenarioHandler<TWorld extends TestWorld<any>> =
-  (world: TWorld) => void | Promise<void>;
+export type ScenarioHandler<TWorld extends TestWorld<any>> = (world: TWorld) => void | Promise<void>;
 
 export interface ScenarioOptions<TWorld extends TestWorld<any>> {
   worldFactory?: () => TWorld;

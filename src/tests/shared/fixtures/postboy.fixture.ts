@@ -1,6 +1,6 @@
 import { PostboyWorld } from '../harness/postboy-world';
-import {TestPostboy} from "../models/test-postboy";
-import {PostboySettings} from "../../../models/postboy.settings";
+import { TestPostboy } from '../models/test-postboy';
+import { PostboySettings } from '../../../models/postboy.settings';
 
 export type PostboyFixtureOptions = {
   settings?: Partial<PostboySettings>;
@@ -19,10 +19,7 @@ export class PostboyFixture {
     return postboy;
   }
 
-  static createWithWorld(
-    world: PostboyWorld,
-    options: Omit<PostboyFixtureOptions, 'world'> = {},
-  ): TestPostboy {
+  static createWithWorld(world: PostboyWorld, options: Omit<PostboyFixtureOptions, 'world'> = {}): TestPostboy {
     return this.create({
       ...options,
       world,

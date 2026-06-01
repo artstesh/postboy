@@ -1,4 +1,4 @@
-import {MiddlewareStage} from "./middleware-stage.enum";
+import { MiddlewareStage } from './middleware-stage.enum';
 
 export interface CancelDetails {
   stage: MiddlewareStage;

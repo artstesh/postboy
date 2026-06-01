@@ -16,7 +16,6 @@ describe('Integration.Namespaces', () => {
     postboy = new TestPostboy();
   });
 
-
   it('should unsubscribe callback messages', (done) => {
     const namespace = Forger.create<string>()!;
     postboy.exec(new AddNamespace(namespace)).recordSubject(TestCallbackMessage);

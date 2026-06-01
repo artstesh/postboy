@@ -2,7 +2,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "noEmit": true,
-    "outDir": "''"
+    "noEmitOnError": false
   },
   "include": [
     "**/*.spec.ts"

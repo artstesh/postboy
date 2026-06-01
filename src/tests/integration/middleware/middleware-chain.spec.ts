@@ -3,28 +3,29 @@ import { SubscriptionBuilder } from '../../shared/builders/subscription.builder'
 import { MiddlewareFixture } from '../../shared/fixtures/middleware.fixture';
 import { TestAssertions } from '../../shared/harness/assertions';
 import { waitFor, waitForValue } from '../../shared/utils/async';
-import {TestExecutor} from "../../shared/models/test-executor";
-import {TestMessage} from "../../shared/models/test-message";
+import { TestExecutor } from '../../shared/models/test-executor';
+import { TestMessage } from '../../shared/models/test-message';
 
 describe('Integration.Middleware.Chain', () => {
   let scenario: ScenarioBuilder;
   let message: TestMessage;
 
   beforeEach(() => {
-    scenario= new ScenarioBuilder().useMessage().subjectRegistry();
+    scenario = new ScenarioBuilder().useMessage().subjectRegistry();
     message = scenario.getMessage();
-  })
+  });
 
   afterEach(() => {
     scenario.getWorld().dispose();
-  })
+  });
 
   it('should pass message through all active middleware and deliver to subscriber', async () => {
     const actions = scenario.actions();
 
     const trace: string[] = [];
 
-    scenario.useMiddleware()
+    scenario
+      .useMiddleware()
       .active({
         onBefore: () => trace.push('first:before'),
         onAfter: () => trace.push('first:after'),
@@ -36,22 +37,14 @@ describe('Integration.Middleware.Chain', () => {
 
     const received: unknown[] = [];
 
-    SubscriptionBuilder
-      .forType(scenario.getWorld(), message.type)
-      .collect(received)
-      .subscribe();
+    SubscriptionBuilder.forType(scenario.getWorld(), message.type).collect(received).subscribe();
 
     actions.fire(message);
 
     const value = await waitForValue(() => received[0]);
 
     expect(value).toEqual(message);
-    expect(trace).toEqual([
-      'first:before',
-      'second:before',
-      'first:after',
-      'second:after',
-    ]);
+    expect(trace).toEqual(['first:before', 'second:before', 'first:after', 'second:after']);
     TestAssertions.receivedOne(received, message);
   });
 
@@ -62,7 +55,8 @@ describe('Integration.Middleware.Chain', () => {
 
     const trace: string[] = [];
 
-    scenario.useMiddleware()
+    scenario
+      .useMiddleware()
       .active({
         onBefore: () => trace.push('first:before'),
         onAfter: () => trace.push('first:after'),
@@ -74,32 +68,26 @@ describe('Integration.Middleware.Chain', () => {
 
     const received: unknown[] = [];
 
-    SubscriptionBuilder
-      .forType(world, message.type)
-      .collect(received)
-      .subscribe();
+    SubscriptionBuilder.forType(world, message.type).collect(received).subscribe();
 
     actions.fire(message);
 
     const value = await waitForValue(() => received[0]);
 
     expect(value).toEqual(message);
-    expect(trace).toEqual([
-      'first:before',
-      'first:after',
-    ]);
+    expect(trace).toEqual(['first:before', 'first:after']);
     TestAssertions.receivedOne(received, message);
   });
 
   it('should stop pipeline when middleware interrupts before publish', () => {
-
     const world = scenario.getWorld();
     const actions = scenario.actions();
     const message = scenario.getMessage();
 
     const trace: string[] = [];
 
-    scenario.useMiddleware()
+    scenario
+      .useMiddleware()
       .interrupting({
         onBefore: () => trace.push('first:before'),
       })
@@ -109,10 +97,7 @@ describe('Integration.Middleware.Chain', () => {
 
     const received: unknown[] = [];
 
-    SubscriptionBuilder
-      .forType(world, message.type)
-      .collect(received)
-      .subscribe();
+    SubscriptionBuilder.forType(world, message.type).collect(received).subscribe();
 
     TestAssertions.throws(() => actions.fire(message));
     expect(trace).toEqual(['first:before']);

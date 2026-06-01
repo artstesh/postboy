@@ -5,19 +5,14 @@ import { flushMicrotasks, waitForValue } from '../../shared/utils/async';
 
 describe('Integration.Scenarios.SubscriptionLifecycle', () => {
   it('should create subscription, receive value and close on dispose', async () => {
-    const scenario = new ScenarioBuilder()
-      .useMessage()
-      .subjectRegistry();
+    const scenario = new ScenarioBuilder().useMessage().subjectRegistry();
 
     const world = scenario.getWorld();
     const actions = scenario.actions();
     const message = scenario.getMessage();
     const received: unknown[] = [];
 
-    const subscription = SubscriptionBuilder
-      .forType(world, message.type)
-      .collect(received)
-      .subscribe();
+    const subscription = SubscriptionBuilder.forType(world, message.type).collect(received).subscribe();
 
     TestAssertions.subscriptionOpen(subscription);
 
@@ -34,20 +29,14 @@ describe('Integration.Scenarios.SubscriptionLifecycle', () => {
   });
 
   it('should support once subscription lifecycle', async () => {
-    const scenario = new ScenarioBuilder()
-      .useMessage()
-      .subjectRegistry();
+    const scenario = new ScenarioBuilder().useMessage().subjectRegistry();
 
     const world = scenario.getWorld();
     const actions = scenario.actions();
     const message = scenario.getMessage();
     const received: unknown[] = [];
 
-    const subscription = SubscriptionBuilder
-      .forType(world, message.type)
-      .asOnce()
-      .collect(received)
-      .subscribe();
+    const subscription = SubscriptionBuilder.forType(world, message.type).asOnce().collect(received).subscribe();
 
     TestAssertions.subscriptionOpen(subscription);
 
@@ -64,19 +53,14 @@ describe('Integration.Scenarios.SubscriptionLifecycle', () => {
   });
 
   it('should keep subscription open until explicit unsubscribe', async () => {
-    const scenario = new ScenarioBuilder()
-      .useMessage()
-      .subjectRegistry();
+    const scenario = new ScenarioBuilder().useMessage().subjectRegistry();
 
     const world = scenario.getWorld();
     const actions = scenario.actions();
     const message = scenario.getMessage();
     const received: unknown[] = [];
 
-    const subscription = SubscriptionBuilder
-      .forType(world, message.type)
-      .collect(received)
-      .subscribe();
+    const subscription = SubscriptionBuilder.forType(world, message.type).collect(received).subscribe();
 
     TestAssertions.subscriptionOpen(subscription);
 
@@ -92,19 +76,14 @@ describe('Integration.Scenarios.SubscriptionLifecycle', () => {
   });
 
   it('should not receive values after unsubscribe', async () => {
-    const scenario = new ScenarioBuilder()
-      .useMessage()
-      .subjectRegistry();
+    const scenario = new ScenarioBuilder().useMessage().subjectRegistry();
 
     const world = scenario.getWorld();
     const actions = scenario.actions();
     const message = scenario.getMessage();
     const received: unknown[] = [];
 
-    const subscription = SubscriptionBuilder
-      .forType(world, message.type)
-      .collect(received)
-      .subscribe();
+    const subscription = SubscriptionBuilder.forType(world, message.type).collect(received).subscribe();
 
     subscription.unsubscribe();
 
@@ -116,9 +95,7 @@ describe('Integration.Scenarios.SubscriptionLifecycle', () => {
   });
 
   it('should close all subscriptions on world dispose', async () => {
-    const scenario = new ScenarioBuilder()
-      .useMessage()
-      .subjectRegistry();
+    const scenario = new ScenarioBuilder().useMessage().subjectRegistry();
 
     const world = scenario.getWorld();
     const actions = scenario.actions();
@@ -127,15 +104,9 @@ describe('Integration.Scenarios.SubscriptionLifecycle', () => {
     const first: unknown[] = [];
     const second: unknown[] = [];
 
-    const sub1 = SubscriptionBuilder
-      .forType(world, message.type)
-      .collect(first)
-      .subscribe();
+    const sub1 = SubscriptionBuilder.forType(world, message.type).collect(first).subscribe();
 
-    const sub2 = SubscriptionBuilder
-      .forType(world, message.type)
-      .collect(second)
-      .subscribe();
+    const sub2 = SubscriptionBuilder.forType(world, message.type).collect(second).subscribe();
 
     actions.fire(message);
 

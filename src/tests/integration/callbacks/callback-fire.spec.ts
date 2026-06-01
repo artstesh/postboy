@@ -1,14 +1,12 @@
-import {ScenarioBuilder} from '../../shared/builders/scenario.builder';
-import {TestAssertions} from '../../shared/harness/assertions';
-import {waitFor, waitForValue} from '../../shared/utils/async';
-import {toArray} from '../../shared/utils/observables';
-import {MessageFixture} from "../../shared/fixtures/message.fixture";
+import { ScenarioBuilder } from '../../shared/builders/scenario.builder';
+import { TestAssertions } from '../../shared/harness/assertions';
+import { waitFor, waitForValue } from '../../shared/utils/async';
+import { toArray } from '../../shared/utils/observables';
+import { MessageFixture } from '../../shared/fixtures/message.fixture';
 
 describe('Integration.Callbacks.Fire', () => {
   it('should fire callback message and emit result value', async () => {
-    const scenario = new ScenarioBuilder()
-      .useCallback()
-      .subjectRegistry();
+    const scenario = new ScenarioBuilder().useCallback().subjectRegistry();
 
     const actions = scenario.actions();
     const message = scenario.getMessage();
@@ -26,9 +24,7 @@ describe('Integration.Callbacks.Fire', () => {
   });
 
   it('should complete callback message after finish', async () => {
-    const scenario = new ScenarioBuilder()
-      .useCallback()
-      .subjectRegistry();
+    const scenario = new ScenarioBuilder().useCallback().subjectRegistry();
 
     const actions = scenario.actions();
     const message = scenario.getMessage();
@@ -49,9 +45,7 @@ describe('Integration.Callbacks.Fire', () => {
   });
 
   it('should support observable collection for callback result', async () => {
-    const scenario = new ScenarioBuilder()
-      .useCallback()
-      .subjectRegistry();
+    const scenario = new ScenarioBuilder().useCallback().subjectRegistry();
 
     const actions = scenario.actions();
     const message = scenario.getMessage();
@@ -66,13 +60,12 @@ describe('Integration.Callbacks.Fire', () => {
 
   it('should throw when callback message is not registered', () => {
     TestAssertions.throws(() =>
-      new ScenarioBuilder().getWorld().getPostboy().fireCallback(MessageFixture.callbackMessage()));
+      new ScenarioBuilder().getWorld().getPostboy().fireCallback(MessageFixture.callbackMessage()),
+    );
   });
 
   it('should not complete before finish is called', async () => {
-    const scenario = new ScenarioBuilder()
-      .useCallback()
-      .subjectRegistry();
+    const scenario = new ScenarioBuilder().useCallback().subjectRegistry();
 
     const actions = scenario.actions();
     const message = scenario.getMessage();

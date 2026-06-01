@@ -19,7 +19,7 @@ class TestMessage extends PostboyGenericMessage {
 }
 
 class TestExec extends PostboyExecutor<string> {
-  static ID = Forger.create<string>({stringSpecial: false})!;
+  static ID = Forger.create<string>({ stringSpecial: false })!;
 }
 
 class TestPostboyRegistrator extends PostboyAbstractRegistrator {
@@ -113,7 +113,7 @@ describe('PostboyAbstractRegistrator', () => {
 
   describe('recordHandler', () => {
     it('should call postboy.recordHandler with provided executor and handler', () => {
-      const handler = {handle: jest.fn()};
+      const handler = { handle: jest.fn() };
       //
       const result = registrator.recordHandler(TestExec, handler);
       //

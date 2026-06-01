@@ -1,13 +1,13 @@
-import {ScenarioBuilder} from "../../shared/builders/scenario.builder";
-import {MessageFixture} from "../../shared/fixtures/message.fixture";
-import {Subject} from "rxjs";
-import {SubscriptionBuilder} from "../../shared/builders/subscription.builder";
-import {TestMessage} from "../../shared/models/test-message";
-import {waitFor} from "../../shared/utils/async";
-import {TestAssertions} from "../../shared/harness/assertions";
-import {AddNamespace, ConnectMessage} from "../../../messages";
-import {Forger} from "@artstesh/forger";
-import {TestCallbackMessage} from "../../shared/models/test-callback-message";
+import { ScenarioBuilder } from '../../shared/builders/scenario.builder';
+import { MessageFixture } from '../../shared/fixtures/message.fixture';
+import { Subject } from 'rxjs';
+import { SubscriptionBuilder } from '../../shared/builders/subscription.builder';
+import { TestMessage } from '../../shared/models/test-message';
+import { waitFor } from '../../shared/utils/async';
+import { TestAssertions } from '../../shared/harness/assertions';
+import { AddNamespace, ConnectMessage } from '../../../messages';
+import { Forger } from '@artstesh/forger';
+import { TestCallbackMessage } from '../../shared/models/test-callback-message';
 
 describe('#Integration.Scenarios.CallbackRegistration', () => {
   let scenario: ScenarioBuilder;
@@ -26,20 +26,19 @@ describe('#Integration.Scenarios.CallbackRegistration', () => {
     const list: TestCallbackMessage[] = [];
     SubscriptionBuilder.forType(scenario.getWorld(), message.type).asSub().collect(list).subscribe();
     //
-    scenario.actions().fireCallback(message, ev => list.push(ev as TestCallbackMessage));
+    await scenario.actions().fireCallback(message, (ev) => list.push(ev as TestCallbackMessage));
     //
     TestAssertions.should.array(list).equal([message]);
   });
 
   it('registration of message with namespace success', async () => {
     const message = MessageFixture.callbackMessage();
-    scenario.getWorld().getPostboy().exec(new AddNamespace(Forger.create<string>()!))
-      .recordSubject(message.type);
+    scenario.getWorld().getPostboy().exec(new AddNamespace(Forger.create<string>()!)).recordSubject(message.type);
     const list: TestCallbackMessage[] = [];
     SubscriptionBuilder.forType(scenario.getWorld(), message.type).asSub().collect(list).subscribe();
     //
-    scenario.actions().fireCallback(message);
-    await waitFor(() => list.length > 0, {timeoutMs: 20, intervalMs: 2});
+    await scenario.actions().fireCallback(message);
+    await waitFor(() => list.length > 0, { timeoutMs: 20, intervalMs: 2 });
     //
     TestAssertions.should.array(list).equal([message]);
   });
@@ -50,8 +49,8 @@ describe('#Integration.Scenarios.CallbackRegistration', () => {
     const list: TestCallbackMessage[] = [];
     SubscriptionBuilder.forType(scenario.getWorld(), message.type).asSub().collect(list).subscribe();
     //
-    scenario.actions().fireCallback(message);
-    await waitFor(() => list.length > 0, {timeoutMs: 20, intervalMs: 2});
+    await scenario.actions().fireCallback(message);
+    await waitFor(() => list.length > 0, { timeoutMs: 20, intervalMs: 2 });
     //
     TestAssertions.should.array(list).equal([message]);
   });

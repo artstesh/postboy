@@ -1,9 +1,7 @@
-import { PostboyWorld } from '../harness/postboy-world';
-import { TestPostboy } from '../models/test-postboy';
-import { PostboySettings } from '../../../models/postboy.settings';
+import {PostboyWorld} from '../harness/postboy-world';
+import {TestPostboy} from '../models/test-postboy';
 
 export type PostboyFixtureOptions = {
-  settings?: Partial<PostboySettings>;
   world?: PostboyWorld;
   postboy?: TestPostboy;
 };

@@ -1,5 +1,5 @@
-import {PostboyWorld} from '../harness/postboy-world';
-import {TestPostboy} from '../models/test-postboy';
+import { PostboyWorld } from '../harness/postboy-world';
+import { TestPostboy } from '../models/test-postboy';
 
 export type PostboyFixtureOptions = {
   world?: PostboyWorld;

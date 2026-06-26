@@ -1,6 +1,6 @@
 {
   "name": "@artstesh/postboy",
-  "version": "3.6.0",
+  "version": "3.4.2",
   "author": "artstesh",
   "main": "lib/index.cjs",
   "module": "lib/index.mjs",

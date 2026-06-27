@@ -3,7 +3,7 @@ import { SubscriptionBuilder } from '../../shared/builders/subscription.builder'
 import { flushMicrotasks } from '../../shared/utils/async';
 import { TestAssertions } from '../../shared/harness/assertions';
 import { toArray } from '../../shared/utils/observables';
-import { take } from "rxjs/operators";
+import { take } from 'rxjs/operators';
 
 describe('#Integration.Scenarios.MessageReplay', () => {
   let scenario: ScenarioBuilder;

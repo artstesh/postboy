@@ -5,7 +5,7 @@ import { TestAssertions } from '../../shared/harness/assertions';
 import { PostboyMessage } from '../../../models/postboy.message';
 import { SubscriptionBuilder } from '../../shared/builders/subscription.builder';
 import { TestMessage } from '../../shared/models/test-message';
-import {tap} from "rxjs/operators";
+import { tap } from 'rxjs/operators';
 
 describe('Integration.Messages.FireMessage', () => {
   it('should deliver fired message to subscriber', () => {

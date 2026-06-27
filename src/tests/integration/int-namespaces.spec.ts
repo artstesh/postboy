@@ -1,8 +1,8 @@
-import {TestPostboy} from '../shared/models/test-postboy';
-import {TestCallbackMessage} from '../shared/models/test-callback-message';
-import {Forger} from '@artstesh/forger';
-import {AddNamespace} from '../../messages/add-namespace.executor';
-import {EliminateNamespace} from '../../messages/eliminate-namespace.executor';
+import { TestPostboy } from '../shared/models/test-postboy';
+import { TestCallbackMessage } from '../shared/models/test-callback-message';
+import { Forger } from '@artstesh/forger';
+import { AddNamespace } from '../../messages/add-namespace.executor';
+import { EliminateNamespace } from '../../messages/eliminate-namespace.executor';
 
 describe('Integration.Namespaces', () => {
   let postboy: TestPostboy;

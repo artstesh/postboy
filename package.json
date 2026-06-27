@@ -59,8 +59,8 @@
     "rxjs": "^6.0.0"
   },
   "devDependencies": {
-    "@artstesh/forger": "^1.2.1",
-    "@artstesh/it-should": "^1.2.0",
+    "@artstesh/forger": "^2.0.0",
+    "@artstesh/it-should": "^2.0.1",
     "@eslint/js": "^10.0.1",
     "@types/jest": "29.5.12",
     "@typescript-eslint/eslint-plugin": "^8.59.2",

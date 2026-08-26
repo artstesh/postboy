@@ -220,4 +220,33 @@ describe('PostboyService', () => {
       verify(store.registerExecutor(TestExec.ID, execFunc)).once();
     });
   });
+
+  describe('recordWithPipe', () => {
+    it('should register a message type with a subject and pipe', () => {
+      class TestMessage extends PostboyCallbackMessage<string> {
+        static ID = Forger.create<string>()!;
+      }
+
+      const subject = new Subject<TestMessage>();
+      const pipe = (s: Subject<TestMessage>) => s.asObservable();
+      //
+      service.recordWithPipe(TestMessage, subject, pipe);
+      //
+      verify(store.registerMessage(TestMessage.ID, anything())).once();
+    });
+  });
+
+  describe('recordHandler', () => {
+    it('should register a handler that delegates to handle', () => {
+      class TestExec extends PostboyExecutor<string> {
+        static ID = Forger.create<string>()!;
+      }
+
+      const handler = { handle: jest.fn() };
+      //
+      service.recordHandler(TestExec, handler as any);
+      //
+      verify(store.registerExecutor(TestExec.ID, anything())).once();
+    });
+  });
 });

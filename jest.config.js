@@ -42,6 +42,6 @@ module.exports = {
   projects: [
     project('unit'),
     project('integration'),
-    project('stress', { testTimeout: 60000 }),
+    project('stress'),
   ],
 };

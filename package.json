@@ -39,6 +39,7 @@
     "test:integration": "jest --config jest.config.js --selectProjects integration",
     "test:stress": "jest --config jest.config.js --selectProjects stress",
     "test:coverage": "jest --config jest.config.js --coverage",
+    "bench": "tsx src/tests/bench/postboy.bench.ts",
     "build": "tsup",
     "clean": "rimraf --glob lib/ src/**/*.js src/**/*.js.map src/**/*.d.ts src/**/*.d.ts.map"
   },
@@ -83,9 +84,11 @@
     "rimraf": "^6.1.3",
     "rxjs": "^7.0.0",
     "source-map-explorer": "^2.5.3",
+    "tinybench": "^6.1.3",
     "ts-jest": "29.1.2",
     "ts-mockito": "^2.6.1",
     "tsup": "^8.5.1",
+    "tsx": "^4.23.12",
     "typescript": "^5.0.2",
     "typescript-eslint": "^8.59.2"
   }

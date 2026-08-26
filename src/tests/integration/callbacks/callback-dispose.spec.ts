@@ -28,6 +28,26 @@ describe('Integration.Callbacks.Dispose', () => {
     TestAssertions.subscriptionClosed(subscription);
   });
 
+  it('should complete in-flight callback result when registry goes down', async () => {
+    const scenario = new ScenarioBuilder().useCallback().subjectRegistry();
+
+    const message = scenario.getMessage();
+
+    let completed = false;
+    message.result.subscribe({
+      complete: () => {
+        completed = true;
+      },
+    });
+
+    scenario.actions().fireCallback(message);
+    scenario.getWorld().get('registry')?.down();
+
+    await waitFor(() => completed);
+
+    TestAssertions.completed(completed);
+  });
+
   it('should keep callback disposal idempotent', async () => {
     const scenario = new ScenarioBuilder().useCallback().subjectRegistry();
 

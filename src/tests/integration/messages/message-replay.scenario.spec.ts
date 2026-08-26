@@ -5,7 +5,7 @@ import { TestAssertions } from '../../shared/harness/assertions';
 import { toArray } from '../../shared/utils/observables';
 import { take } from 'rxjs';
 
-describe('#Integration.Scenarios.MessageReplay', () => {
+describe('Integration.Scenarios.MessageReplay', () => {
   let scenario: ScenarioBuilder;
 
   beforeEach(() => {

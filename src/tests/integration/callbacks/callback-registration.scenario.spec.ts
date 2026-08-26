@@ -9,7 +9,7 @@ import { AddNamespace, ConnectMessage } from '../../../messages';
 import { Forger } from '@artstesh/forger';
 import { TestCallbackMessage } from '../../shared/models/test-callback-message';
 
-describe('#Integration.Scenarios.CallbackRegistration', () => {
+describe('Integration.Scenarios.CallbackRegistration', () => {
   let scenario: ScenarioBuilder;
 
   beforeEach(() => {

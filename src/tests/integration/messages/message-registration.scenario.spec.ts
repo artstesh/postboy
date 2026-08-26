@@ -8,7 +8,7 @@ import { TestAssertions } from '../../shared/harness/assertions';
 import { AddNamespace, ConnectMessage } from '../../../messages';
 import { Forger } from '@artstesh/forger';
 
-describe('#Integration.Scenarios.MessageRegistration', () => {
+describe('Integration.Scenarios.MessageRegistration', () => {
   let scenario: ScenarioBuilder;
 
   beforeEach(() => {

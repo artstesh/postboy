@@ -1,7 +1,10 @@
 import { ScenarioBuilder } from '../../shared/builders/scenario.builder';
 import { SubscriptionBuilder } from '../../shared/builders/subscription.builder';
 import { TestAssertions } from '../../shared/harness/assertions';
-import { flushMicrotasks, waitForValue } from '../../shared/utils/async';
+import { flushMicrotasks, waitFor, waitForValue } from '../../shared/utils/async';
+import { Forger } from '@artstesh/forger';
+import { AddNamespace } from '../../../messages/add-namespace.executor';
+import { EliminateNamespace } from '../../../messages/eliminate-namespace.executor';
 
 describe('Integration.Namespaces.Dispose', () => {
   it('should close subscription when world is disposed', async () => {
@@ -43,6 +46,29 @@ describe('Integration.Namespaces.Dispose', () => {
     await world.dispose();
 
     TestAssertions.subscriptionClosed(subscription);
+  });
+
+  it('should complete in-flight callback result when namespace is eliminated', async () => {
+    const scenario = new ScenarioBuilder().useCallback();
+    const postboy = scenario.getWorld().getPostboy();
+    const namespace = Forger.create<string>()!;
+    postboy.exec(new AddNamespace(namespace)).recordSubject(scenario.getMessage().type);
+
+    const message = scenario.getMessage();
+
+    let completed = false;
+    message.result.subscribe({
+      complete: () => {
+        completed = true;
+      },
+    });
+
+    scenario.actions().fireCallback(message);
+    postboy.exec(new EliminateNamespace(namespace));
+
+    await waitFor(() => completed);
+
+    TestAssertions.completed(completed);
   });
 
   it('should dispose multiple subscriptions in the same namespace', async () => {

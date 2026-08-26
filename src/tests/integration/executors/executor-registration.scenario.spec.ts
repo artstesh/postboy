@@ -6,7 +6,7 @@ import { Forger } from '@artstesh/forger';
 import { ConnectExecutor } from '../../../messages/connect-executor.executor';
 import { ConnectHandler } from '../../../messages/connect-handler.executor';
 
-describe('#Integration.Scenarios.ExecutorRegistration', () => {
+describe('Integration.Scenarios.ExecutorRegistration', () => {
   let scenario: ScenarioBuilder;
 
   beforeEach(() => {

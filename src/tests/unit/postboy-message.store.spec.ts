@@ -62,4 +62,86 @@ describe('PostboyMessageStore', () => {
       expect(() => store.unregister(Forger.create<string>()!)).not.toThrow();
     });
   });
+
+  describe('callbackFired', () => {
+    it('should complete fired callbacks on unregister', () => {
+      const id = Forger.create<string>()!;
+      const callbackMessage = { id } as any;
+      let completed = false;
+      callbackMessage.complete = () => (completed = true);
+      store.callbackFired(callbackMessage);
+      //
+      store.unregister(id);
+      //
+      expect(completed).toBe(true);
+    });
+
+    it('should complete all fired callbacks for the same message id on unregister', () => {
+      const id = Forger.create<string>()!;
+      let completedCount = 0;
+      const callbackMessage = { id, complete: () => completedCount++ } as any;
+      store.callbackFired(callbackMessage);
+      store.callbackFired(callbackMessage);
+      //
+      store.unregister(id);
+      //
+      expect(completedCount).toBe(2);
+    });
+  });
+
+  describe('dispose', () => {
+    it('should finish all registered messages and clear the store', () => {
+      const id = Forger.create<string>()!;
+      let finished = false;
+      subscription.sub().subscribe({ complete: () => (finished = true) });
+      store.registerMessage(id, subscription);
+      //
+      store.dispose();
+      //
+      expect(finished).toBe(true);
+      expect(() => store.getMessage(id, 'TestMessage')).toThrow();
+    });
+
+    it('should complete fired callbacks on dispose', () => {
+      const id = Forger.create<string>()!;
+      let completed = false;
+      const callbackMessage = { id, complete: () => (completed = true) } as any;
+      store.callbackFired(callbackMessage);
+      //
+      store.dispose();
+      //
+      expect(completed).toBe(true);
+    });
+
+    it('should be idempotent', () => {
+      expect(() => {
+        store.dispose();
+        store.dispose();
+      }).not.toThrow();
+    });
+  });
+
+  describe('duplicate registration', () => {
+    it('should warn when a message id is registered twice', () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const id = Forger.create<string>()!;
+      //
+      store.registerMessage(id, subscription);
+      store.registerMessage(id, subscription);
+      //
+      expect(warnSpy).toHaveBeenCalled();
+      warnSpy.mockRestore();
+    });
+
+    it('should warn when an executor id is registered twice', () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const id = Forger.create<string>()!;
+      //
+      store.registerExecutor(id, jest.fn());
+      store.registerExecutor(id, jest.fn());
+      //
+      expect(warnSpy).toHaveBeenCalled();
+      warnSpy.mockRestore();
+    });
+  });
 });

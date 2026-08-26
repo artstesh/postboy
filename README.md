@@ -14,6 +14,8 @@ Modern web development often feels like a survival race: components are scattere
 
 Postboy doesn’t aim to replace NgRx or Akita—it solves a narrower set of problems but does so with minimal entry barriers.
 
+> **Note for AI-assisted development:** the package ships with an `AI_SKILL.md` file (also available in the repository root) — a compact, up-to-date reference of the library's API, idiomatic usage patterns, and common pitfalls, written specifically for AI coding agents. If you use an AI assistant to work with `@artstesh/postboy`, feed it this file as context.
+
 ---
 
 ## 1.2. Core Concepts

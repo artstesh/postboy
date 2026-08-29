@@ -10,9 +10,44 @@ import { DisconnectMessage } from './messages/disconnect-message.executor';
 import { ConnectExecutor } from './messages/connect-executor.executor';
 import { ConnectHandler } from './messages/connect-handler.executor';
 
+/**
+ * Constructor signature of a message class.
+ *
+ * The bus identifies message types by the static `ID` such a constructor carries (see
+ * {@link PostboyGenericMessage}), not by class identity — two different classes sharing
+ * an `ID` collide on the same registration (the later one overrides the earlier one
+ * with a warning).
+ */
 export type MessageType<T extends PostboyGenericMessage> = new (...args: any[]) => T;
 
+/**
+ * Base class for feature registrators: registers messages and executors for one feature
+ * and remembers every recorded `ID`, so that a single {@link down} disconnects them all.
+ *
+ * Subclasses make their `record*` calls inside the abstract {@link _up} hook; services
+ * attached via {@link registerServices} share the same lifecycle. Create one registrator
+ * per feature (or per namespace, via `AddNamespace`) and keep the instance to tear the
+ * feature down later.
+ *
+ * @example
+ * ```ts
+ * class FeatureRegistrator extends PostboyAbstractRegistrator {
+ *   protected _up(): void {
+ *     this.recordSubject(PingMessage).recordExecutor(GetDataExecutor, (e) => e.payload);
+ *   }
+ * }
+ *
+ * const reg = new FeatureRegistrator(postboy, 'feature-a');
+ * reg.up(); // registrations are live
+ * reg.down(); // everything recorded above is disconnected
+ * ```
+ */
 export abstract class PostboyAbstractRegistrator {
+  /**
+   * Identifier of this registrator: the name passed to the constructor, or a generated
+   * unique id when none was given. It identifies the registrator only — message routing
+   * is not affected by it.
+   */
   get namespace(): string {
     return this._namespace;
   }
@@ -20,6 +55,10 @@ export abstract class PostboyAbstractRegistrator {
   private services: IPostboyDependingService[] = [];
   private readonly _namespace: string;
 
+  /**
+   * @param postboy - The bus every `record*` call is executed on.
+   * @param namespace - Optional name exposed by {@link namespace}; a random unique id is generated when omitted.
+   */
   constructor(
     protected postboy: PostboyService,
     namespace: string | null = null,
@@ -28,27 +67,36 @@ export abstract class PostboyAbstractRegistrator {
   }
 
   /**
-   * Registers a list of services to be used by the application.
+   * Sets the services that share this registrator's lifecycle: their `up()` runs on
+   * {@link up} (after the registrations), their `down()` on {@link down} (before the
+   * disconnection). Replaces any previously registered list.
    *
-   * @param {IPostboyDependingService[]} services - An array of services to register.
-   * @return {void} This method does not return a value.
+   * @param services - Services to attach to the lifecycle.
    */
   public registerServices(services: IPostboyDependingService[]): void {
     this.services = services;
   }
 
   /**
-   * Initiates the 'up' process for the current instance and all associated services.
-   *
-   * @return {void} Does not return a value.
+   * Activates the registrator: runs the {@link _up} registration hook, then calls `up()`
+   * on every attached service.
    */
   public up(): void {
     this._up?.();
     this.services.forEach((s) => s.up());
   }
 
+  /**
+   * Registration hook executed by {@link up}. Subclasses make all their `record*` calls
+   * here so that {@link down} can disconnect them.
+   */
   protected abstract _up(): void;
 
+  /**
+   * Tears the registrator down, in order: calls `down()` on every attached service (then
+   * clears the service list), then executes a `DisconnectMessage` for each recorded `ID`,
+   * completing subscriber streams and removing handlers registered by this registrator.
+   */
   public down(): void {
     this.services.forEach((s) => !!s.down && s.down());
     this.services = [];
@@ -56,11 +104,11 @@ export abstract class PostboyAbstractRegistrator {
   }
 
   /**
-   * Records a type and its corresponding Subject<T> into the Postboy system and updates the internal identifiers.
+   * Registers a message type with the given subject and remembers its `ID` for {@link down}.
    *
-   * @param {MessageType<T>} type - A constructor for the generic message type T.
-   * @param {Subject<T>} sub - The subject associated with the generic message type.
-   * @return {this} Returns the current instance for method chaining.
+   * @param type - The constructor of the message type; must declare its own static `ID`.
+   * @param sub - The subject subscribers will observe.
+   * @return This registrator, for chaining.
    */
   public record<T extends PostboyGenericMessage>(type: MessageType<T>, sub: Subject<T>): PostboyAbstractRegistrator {
     this.ids.push(checkId(type));
@@ -69,12 +117,13 @@ export abstract class PostboyAbstractRegistrator {
   }
 
   /**
-   * Records a message type with a specific subject and applies a transformation pipe to the subject.
+   * Registers a message type whose stream is transformed by a pipe before reaching
+   * subscribers, and remembers its `ID` for {@link down}.
    *
-   * @param {MessageType<T>} type - The constructor of the message type to record, which extends PostboyGenericMessage.
-   * @param {Subject<T>} sub - The Subject instance to associate with the message type.
-   * @param {(s: Subject<T>) => Observable<T>} pipe - A function that takes the subject as input and returns an Observable with transformations applied.
-   * @return {this} The current instance of the class for chaining.
+   * @param type - The constructor of the message type; must declare its own static `ID`.
+   * @param sub - The subject subscribers will observe.
+   * @param pipe - Wraps the subject into the observable handed out by `PostboyService.sub`, e.g. to apply operators.
+   * @return This registrator, for chaining.
    */
   public recordWithPipe<T extends PostboyGenericMessage>(
     type: MessageType<T>,
@@ -87,11 +136,11 @@ export abstract class PostboyAbstractRegistrator {
   }
 
   /**
-   * Records an executor associated with a specific type and execution logic.
+   * Registers a synchronous handler for an executor type and remembers its `ID` for {@link down}.
    *
-   * @param type The class constructor of the executor type to be recorded, which extends PostboyExecutor.
-   * @param exec A callback function that executes the logic using an instance of the specified executor type.
-   * @return void
+   * @param type - The constructor of the executor class; must declare its own static `ID`.
+   * @param exec - Called with the executor instance on every `PostboyService.exec` of this type.
+   * @return This registrator, for chaining.
    */
   public recordExecutor<E extends PostboyExecutor<T>, T>(
     type: new (...args: any[]) => E,
@@ -103,11 +152,13 @@ export abstract class PostboyAbstractRegistrator {
   }
 
   /**
-   * Records a handler for a specific executor type.
+   * Registers a {@link PostboyExecutionHandler} for an executor type and remembers its
+   * `ID` for {@link down}. The handler's `handle` method is invoked on every
+   * `PostboyService.exec` of this type.
    *
-   * @param executor The constructor of the executor type, which extends `PostboyExecutor`.
-   * @param handler The execution handler associated with the given executor type.
-   * @return void
+   * @param executor - The constructor of the executor class; must declare its own static `ID`.
+   * @param handler - The handler instance receiving the executor.
+   * @return This registrator, for chaining.
    */
   public recordHandler<E extends PostboyExecutor<R>, R>(
     executor: new (...args: any[]) => E,
@@ -119,17 +170,13 @@ export abstract class PostboyAbstractRegistrator {
   }
 
   /**
-   * A utility function that facilitates the recording and replaying of messages
-   * using a ReplaySubject. This function is designed to handle messages of a
-   * specific type and allows specifying a buffer size to determine how many
-   * of the most recent messages should be replayed.
+   * Registers the type with a `ReplaySubject`: new subscribers first receive up to
+   * `bufferSize` most recently fired messages, then live ones. Suited for
+   * "latest events" streams where late subscribers need recent history.
    *
-   * @template T Extends the PostboyGenericMessage type, representing the type of message
-   * to be recorded and replayed.
-   * @param {MessageType<T>} type The constructor of the message type to be recorded and replayed.
-   * @param {number} [bufferSize=1] The number of recent messages to retain in the ReplaySubject's buffer.
-   * Defaults to 1 if not specified.
-   * @returns The result of invoking the `record` method with the given message type and configured ReplaySubject.
+   * @param type - The constructor of the message type; must declare its own static `ID`.
+   * @param bufferSize - How many past messages to replay to new subscribers; defaults to 1.
+   * @return This registrator, for chaining.
    */
   public recordReplay<T extends PostboyGenericMessage>(
     type: MessageType<T>,
@@ -140,14 +187,13 @@ export abstract class PostboyAbstractRegistrator {
   }
 
   /**
-   * Represents a method that records a specific behavior associated with a message type.
-   * It creates a `BehaviorSubject` initialized with the provided initial message
-   * and associates it with the given message type using the `record` method.
+   * Registers the type with a `BehaviorSubject` seeded with `initial`: every new
+   * subscriber immediately receives the most recent message — the seed itself until
+   * anything is fired. Suited for state-like messages rather than one-off events.
    *
-   * @template T - A type parameter extending `PostboyGenericMessage` that defines the message structure.
-   * @param {MessageType<T>} type - The constructor function of the message type to be recorded.
-   * @param {T} initial - The initial value of the message that will be set in the `BehaviorSubject`.
-   * @returns {void} - This function does not return a value; instead, it modifies the internal state.
+   * @param type - The constructor of the message type; must declare its own static `ID`.
+   * @param initial - The message instance new subscribers receive before any `PostboyService.fire`.
+   * @return This registrator, for chaining.
    */
   public recordBehavior<T extends PostboyGenericMessage>(type: MessageType<T>, initial: T): PostboyAbstractRegistrator {
     this.record(type, new BehaviorSubject<T>(initial));
@@ -155,11 +201,11 @@ export abstract class PostboyAbstractRegistrator {
   }
 
   /**
-   * A function that creates and returns a new generic message recorder for a specific message type.
+   * Registers the type with a plain `Subject`: subscribers only see messages fired after
+   * they subscribed. The default choice for event-like messages.
    *
-   * @template T - A type parameter extending from `PostboyGenericMessage`.
-   * @param {MessageType<T>} type - The constructor for the message type being recorded.
-   * @returns {Subject<T>} A new instance of `Subject<T>` bound to the specified message type.
+   * @param type - The constructor of the message type; must declare its own static `ID`.
+   * @return This registrator, for chaining.
    */
   public recordSubject<T extends PostboyGenericMessage>(type: MessageType<T>) {
     this.record(type, new Subject<T>());

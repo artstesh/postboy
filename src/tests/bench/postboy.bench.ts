@@ -70,7 +70,10 @@ bench
     const postboy = setup();
     //
     for (let i = 0; i < 500; i++) {
-      postboy.sub(TestMessage).subscribe(() => {}).unsubscribe();
+      postboy
+        .sub(TestMessage)
+        .subscribe(() => {})
+        .unsubscribe();
     }
     //
     postboy.dispose();

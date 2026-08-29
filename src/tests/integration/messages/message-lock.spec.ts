@@ -51,9 +51,7 @@ describe('Integration.Messages.Lock', () => {
 
     const received: unknown[] = [];
     const activeMessage = activeScenario.getMessage();
-    SubscriptionBuilder.forType(activeScenario.getWorld(), activeMessage.type)
-      .collect(received)
-      .subscribe();
+    SubscriptionBuilder.forType(activeScenario.getWorld(), activeMessage.type).collect(received).subscribe();
 
     activeScenario.actions().fire(activeMessage);
     await flushMicrotasks();

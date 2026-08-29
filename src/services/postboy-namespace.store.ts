@@ -3,18 +3,18 @@ import { NamespaceRegistrator } from './namespace-registrator';
 import { PostboyService } from '../postboy.service';
 
 /**
- * Represents a store for managing namespaces in the Postboy system.
- * Provides functionality to add, eliminate, and dispose namespaces.
+ * The registry of namespaces behind `AddNamespace`/`EliminateNamespace`: maps each name
+ * to the registrator managing its registrations.
  */
 export class PostboyNamespaceStore {
   private spaces: Map<string, PostboyAbstractRegistrator> = new Map();
 
   /**
-   * Adds a new space or retrieves an existing one if it already exists.
+   * Returns the registrator of the given name, creating it on first use.
    *
-   * @param {string} space - The name of the space to add or retrieve.
-   * @param {PostboyService} postboy - The PostboyService instance used to create a namespace registrator.
-   * @return {PostboyAbstractRegistrator} The registrator associated with the specified space.
+   * @param space - The unique namespace name.
+   * @param postboy - The bus the new registrator executes its registration messages on.
+   * @return The registrator of the namespace — the existing one when the name is known.
    */
   public addSpace(space: string, postboy: PostboyService): PostboyAbstractRegistrator {
     if (this.spaces.has(space)) return this.spaces.get(space)!;
@@ -24,11 +24,10 @@ export class PostboyNamespaceStore {
   }
 
   /**
-   * Removes a specified space from the spaces collection if it exists.
-   * If the space exists, it will be deleted after invoking its down method.
+   * Tears the namespace down — `down()` on its registrator, disconnecting everything it
+   * recorded — and removes it. Unknown names are ignored.
    *
-   * @param {string} space - The name of the space to be removed.
-   * @return {void} This method does not return a value.
+   * @param space - The namespace name to remove.
    */
   public eliminateSpace(space: string): void {
     if (!this.spaces.has(space)) return;
@@ -36,13 +35,7 @@ export class PostboyNamespaceStore {
     this.spaces.delete(space);
   }
 
-  /**
-   * Disposes of the current instance by performing cleanup operations.
-   * Iterates through all spaces, performs a "down" operation on each,
-   * and then clears the collection of spaces.
-   *
-   * @return {void} No return value.
-   */
+  /** Tears down every namespace and clears the store; called by `PostboyService.dispose()`. */
   public dispose(): void {
     this.spaces.forEach((space) => space.down());
     this.spaces.clear();

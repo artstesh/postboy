@@ -2,31 +2,19 @@ import { PostboyMiddlewareService } from './postboy-middleware.service';
 import { PostboyMessageStore } from './postboy-message.store';
 import { PostboyNamespaceStore } from './postboy-namespace.store';
 
+/**
+ * Assembles the internal collaborators of a `PostboyService`: its middleware pipeline,
+ * message store, and namespace store. The default factories create fresh instances with
+ * no shared state; substitute stubs (e.g. in tests) by passing a custom resolver to the
+ * `PostboyService` constructor.
+ */
 export class PostboyDependencyResolver {
-  /**
-   * Retrieves an instance of the PostboyMiddlewareService.
-   *
-   * This function initializes and returns a new instance of the
-   * PostboyMiddlewareService, which can be used to configure and manage
-   * middleware for a specific module or application.
-   *
-   * @returns {PostboyMiddlewareService} A new instance of PostboyMiddlewareService.
-   */
+  /** Factory for the bus middleware pipeline — one fresh instance per call. */
   getMiddlewareService = () => new PostboyMiddlewareService();
-  /**
-   * A function that instantiates and returns a new instance of PostboyMessageStore.
-   *
-   * This function serves as a factory method for creating instances
-   * of the PostboyMessageStore class.
-   *
-   * @returns {PostboyMessageStore} A new instance of the PostboyMessageStore class.
-   */
+
+  /** Factory for the message registry — one fresh instance per call. */
   getMessageStore = () => new PostboyMessageStore();
-  /**
-   * Creates and initializes a new instance of PostboyNamespaceStore using the provided PostboyService instance.
-   *
-   * @function getNamespaceStore
-   * @returns {PostboyNamespaceStore} A new instance of PostboyNamespaceStore associated with the given PostboyService.
-   */
+
+  /** Factory for the namespace registry — one fresh instance per call. */
   getNamespaceStore = () => new PostboyNamespaceStore();
 }

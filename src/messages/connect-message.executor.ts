@@ -4,23 +4,28 @@ import { MessageType } from '../postboy-abstract.registrator';
 import { Observable, Subject } from 'rxjs';
 
 /**
- * Represents a message that facilitates connection functionality
- * within the application's messaging system.
+ * Infrastructure message that registers a pub/sub message type on the bus.
  *
- * @template T - A type that extends {@link PostboyGenericMessage}, representing
- * the structure of the message being handled.
+ * Executing it via `PostboyService.exec` binds the type's static `ID` to the given
+ * subject: `sub()` and `once()` start returning its (piped) stream, and `fire()`
+ * delivers into it. Re-registering the same `ID` logs a warning and overrides the
+ * previous registration. The non-deprecated replacement for the `PostboyService.record*`
+ * methods.
  *
- * @extends PostboyExecutor<void>
+ * @example
+ * ```ts
+ * postboy.exec(new ConnectMessage(PingMessage, new Subject<PingMessage>()));
+ * // with a pipe — subscribers see the transformed stream
+ * postboy.exec(new ConnectMessage(PingMessage, new Subject<PingMessage>(), (s) => s.pipe(share())));
+ * ```
  */
 export class ConnectMessage<T extends PostboyGenericMessage> extends PostboyExecutor<void> {
   static readonly ID = 'aa03a192-bdc7-402d-9f2f-bf3748229ea2';
 
   /**
-   * Constructs a new instance of the class.
-   *
-   * @param {MessageType<T>} type - The type of the message.
-   * @param {Subject<T>} sub - The subject to be used for message handling.
-   * @param {(s: Subject<T>) => Observable<T>} [pipe] - An optional function to transform the subject.
+   * @param type - The constructor of the message type; must declare its own static `ID`.
+   * @param sub - The subject the message type is served from.
+   * @param pipe - Optional wrapper producing the observable subscribers receive, e.g. to apply operators.
    */
   constructor(
     public type: MessageType<T>,

@@ -2,23 +2,23 @@ import { PostboyExecutor } from '../models/postboy-executor';
 import { PostboyExecutionHandler } from '../models/postboy-execution.handler';
 
 /**
- * Represents a connection handler that extends the PostboyExecutor class.
+ * Infrastructure message that registers a {@link PostboyExecutionHandler} for an
+ * executor type.
  *
- * This class encapsulates logic associated with executing a handler in a structured way.
- * It is generic and operates on the provided executor and handler types.
+ * Executing it via `PostboyService.exec` binds the executor class's static `ID` to the
+ * handler: every subsequent `exec` of that type calls `handler.handle(...)` and returns
+ * its result. Re-registering the same `ID` logs a warning and overrides the previous
+ * registration. The non-deprecated replacement for `PostboyService.recordHandler`.
  *
- * Type Parameters:
- *   E - Represents an extension of the PostboyExecutor class with a specific type parameter R.
- *   R - Represents the type of the result that the executor is expected to operate on.
+ * @template E - The executor type being served.
+ * @template R - The result its handler returns.
  */
 export class ConnectHandler<E extends PostboyExecutor<R>, R> extends PostboyExecutor<void> {
   static readonly ID = 'bf618cea-6f32-417c-9548-8eafe937378b';
 
   /**
-   * Constructs an instance of the class.
-   *
-   * @param {new (...args: any[]) => E} executor - A constructor function for the executor object.
-   * @param {PostboyExecutionHandler<R, E>} handler - A handler that processes the execution logic.
+   * @param executor - The constructor of the executor class; must declare its own static `ID`.
+   * @param handler - The handler whose `handle` method receives the executor.
    */
   constructor(
     public executor: new (...args: any[]) => E,

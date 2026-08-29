@@ -2,23 +2,22 @@ import { PostboyExecutor } from '../models/postboy-executor';
 import { MessageType } from '../postboy-abstract.registrator';
 
 /**
- * Registers an executor that connects to a specific type of message handler.
- * This class extends the functionality of `PostboyExecutor` and is designed to manage
- * the execution of a handler defined by a specific message type and an execution function.
+ * Infrastructure message that registers a synchronous handler for an executor type.
  *
- * @template E The type of the executor extending {@link PostboyExecutor}.
- * @template T The return type of the execution function.
+ * Executing it via `PostboyService.exec` binds the type's static `ID` to the given
+ * function: every subsequent `exec` of that executor type invokes it and returns its
+ * result. Re-registering the same `ID` logs a warning and overrides the previous
+ * registration. The non-deprecated replacement for `PostboyService.recordExecutor`.
  *
- * @extends {PostboyExecutor<void>}
+ * @template E - The executor type being registered.
+ * @template T - The result its handler returns.
  */
 export class ConnectExecutor<E extends PostboyExecutor<T>, T> extends PostboyExecutor<void> {
   static readonly ID = 'cb80e8ad-b68c-4b2d-8c44-617ea6017cb3';
 
   /**
-   * Constructs an instance of the class with the specified type and execution function.
-   *
-   * @param {MessageType<E>} type - The type of the message.
-   * @param {(e: E) => T} exec - The function to be executed with the input of type E that returns a value of type T.
+   * @param type - The constructor of the executor class; must declare its own static `ID`.
+   * @param exec - The handler invoked with the executor instance on every `exec` of this type.
    */
   constructor(
     public type: MessageType<E>,

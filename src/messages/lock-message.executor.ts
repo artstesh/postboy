@@ -3,20 +3,25 @@ import { MessageType } from '../postboy-abstract.registrator';
 import { PostboyExecutor } from '../models/postboy-executor';
 
 /**
- * Locks a specific message type to prevent firing of them.
+ * Infrastructure message that locks a message type on the bus.
  *
- * This class is used to handle operations associated with locking mechanisms
- * for a specified message type.
+ * Executing it via `PostboyService.exec` adds the type's static `ID` to the locked set:
+ * subsequent `fire()` and `fireCallback()` calls for that type silently skip delivery —
+ * subscribers receive nothing — while middleware `before`/`after` hooks still run and
+ * `exec()` is unaffected. Registration stays intact, so unlocking resumes delivery
+ * immediately. Treat a locked message as a no-op, not an error.
  *
- * @template T - A type that extends {@link PostboyGenericMessage}.
+ * @example
+ * ```ts
+ * postboy.exec(new LockMessage(PingMessage)); // PingMessage stops being delivered
+ * postboy.exec(new UnlockMessage(PingMessage)); // delivery resumes
+ * ```
  */
 export class LockMessage<T extends PostboyGenericMessage> extends PostboyExecutor<void> {
   static readonly ID = '477df3e2-1f99-4476-9a3b-afd1fa426436';
 
   /**
-   * Constructs an instance of the class with the specified message type.
-   *
-   * @param {MessageType<T>} type - The type of the message to be used for the instance.
+   * @param type - The constructor of the message type to lock.
    */
   constructor(public type: MessageType<T>) {
     super();

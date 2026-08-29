@@ -1,21 +1,21 @@
 import { PostboyExecutor } from './postboy-executor';
 
 /**
- * Abstract class representing a handler for executing a Postboy task.
+ * Base class for class-based executor handlers — the object-oriented alternative to the
+ * `(e) => result` function accepted by `ConnectExecutor`.
  *
- * This class is intended to manage the execution flow of a PostboyExecutor instance.
- * Subclasses must implement the `handle` method, which executes a given PostboyExecutor
- * and returns a result of type R.
+ * Register an instance with `ConnectHandler` (or `PostboyAbstractRegistrator.recordHandler`);
+ * {@link handle} is then invoked on every `PostboyService.exec` of the executor type.
  *
- * @template R The type of the result returned by the `handle` method.
- * @template E The type of the executor extending the PostboyExecutor.
+ * @template R - Result type returned by {@link handle}.
+ * @template E - The executor type this handler serves.
  */
 export abstract class PostboyExecutionHandler<R, E extends PostboyExecutor<R>> {
   /**
-   * Abstract method to handle the specified executor and return a result.
+   * Processes an executor command and returns its result synchronously.
    *
-   * @param {E} executor - The executor that will be processed by the method.
-   * @return {R} The result obtained after handling the executor.
+   * @param executor - The executor instance passed to `PostboyService.exec`.
+   * @return The result handed back to the caller of `exec`.
    */
   abstract handle(executor: E): R;
 }

@@ -79,21 +79,25 @@ export class PostboyService {
   }
 
   /**
-   * Triggers a callback function associated with a given message.
+   * Triggers a callback message and returns its result observable.
+   *
+   * The optional `action` is subscribed directly to the message result and is invoked
+   * exactly once per emitted value, independently of any subscriptions to the returned
+   * observable. When `action` is provided, the message is dispatched immediately;
+   * otherwise the dispatch happens on the first subscription to the returned observable.
    *
    * @param {PostboyCallbackMessage<T>} message - The message object used to trigger the callback.
    * It contains details about the event and result subscription.
-   * @param {(e: T) => void} [action] - Optional callback function to execute when the result of the message is emitted.
-   * @return {void} This method does not return any value.
+   * @param {(e: T) => void} [action] - Optional callback invoked once per emitted result value.
+   * @return {Observable<T>} The observable of the message result.
    */
   public fireCallback<T>(message: PostboyCallbackMessage<T>, action?: (e: T) => void): Observable<T> {
     this.middleware.beforeCallback(message);
-    if (action) message.result.subscribe(action);
     this.store.callbackFired(message);
-    const result$ = action ? message.result.pipe(tap(action)) : message.result;
+    if (action) message.result.subscribe(action);
     const msg = this.store.getMessage(message.id, message.constructor.name);
     const observable = new Observable<T>((subscriber) => {
-      const subscription = result$.pipe(tap(() => this.middleware.afterCallback(message))).subscribe(subscriber);
+      const subscription = message.result.pipe(tap(() => this.middleware.afterCallback(message))).subscribe(subscriber);
 
       if (!this.locked.has(message.id)) {
         msg.fire(message);

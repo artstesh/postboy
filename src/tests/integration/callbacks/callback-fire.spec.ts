@@ -3,6 +3,7 @@ import { TestAssertions } from '../../shared/harness/assertions';
 import { waitFor, waitForValue } from '../../shared/utils/async';
 import { toArray } from '../../shared/utils/observables';
 import { MessageFixture } from '../../shared/fixtures/message.fixture';
+import { TestCallbackMessage } from '../../shared/models/test-callback-message';
 
 describe('Integration.Callbacks.Fire', () => {
   it('should fire callback message and emit result value', async () => {
@@ -82,5 +83,73 @@ describe('Integration.Callbacks.Fire', () => {
     await waitFor(() => !completed);
 
     expect(completed).toBe(false);
+  });
+
+  it('should invoke action exactly once per emitted value', () => {
+    const scenario = new ScenarioBuilder().useCallback().subjectRegistry();
+    const postboy = scenario.getWorld().getPostboy();
+    const message = scenario.getMessage();
+
+    const action = jest.fn();
+    postboy.fireCallback(message, action);
+
+    message.next('first');
+    message.next('second');
+    message.finish('done');
+
+    expect(action).toHaveBeenCalledTimes(3);
+    expect(action.mock.calls.map((call) => call[0])).toEqual(['first', 'second', 'done']);
+  });
+
+  it('should invoke action once even when the returned observable is also subscribed', () => {
+    const scenario = new ScenarioBuilder().useCallback().subjectRegistry();
+    const postboy = scenario.getWorld().getPostboy();
+    const message = scenario.getMessage();
+    const received: string[] = [];
+
+    const action = jest.fn();
+    const observable = postboy.fireCallback(message, action);
+    observable.subscribe((value: string) => received.push(value));
+    message.finish('done');
+
+    expect(action).toHaveBeenCalledTimes(1);
+    TestAssertions.receivedOne(received, 'done');
+  });
+
+  it('should defer dispatch until the returned observable is subscribed when no action is given', () => {
+    const scenario = new ScenarioBuilder().useCallback().subjectRegistry();
+    const postboy = scenario.getWorld().getPostboy();
+    const message: TestCallbackMessage = scenario.getMessage();
+    const requests: string[] = [];
+
+    postboy.sub(message.type).subscribe((m) => {
+      m.finish('ok');
+      requests.push('responded');
+    });
+
+    const observable = postboy.fireCallback(message);
+    expect(requests).toHaveLength(0);
+
+    const received: string[] = [];
+    observable.subscribe((value: string) => received.push(value));
+
+    expect(requests).toHaveLength(1);
+    TestAssertions.receivedOne(received, 'ok');
+  });
+
+  it('should call after middleware hook on each result emission', () => {
+    const afterSpy = jest.fn();
+    const scenario = new ScenarioBuilder().useCallback().subjectRegistry();
+    scenario.useMiddleware().active({ onAfter: () => afterSpy() });
+    const postboy = scenario.getWorld().getPostboy();
+    const message = scenario.getMessage();
+
+    const action = jest.fn();
+    postboy.fireCallback(message, action);
+    message.next('first');
+    message.finish('done');
+
+    expect(action).toHaveBeenCalledTimes(2);
+    expect(afterSpy).toHaveBeenCalledTimes(2);
   });
 });

@@ -82,10 +82,21 @@ export class PostboyService {
   /**
    * Triggers a callback function associated with a given message.
    *
+ * Dispatch semantics depend on `action`:
+   * - with `action`, the message is dispatched immediately and `action` is invoked
+   *   per emitted result value, independently of any subscriptions to the returned
+   *   observable;
+   * - without `action`, dispatch is lazy: it happens on the first subscription to the
+   *   returned observable.
+   *
+   * In both modes the message is dispatched at most once per `fireCallback` call:
+   * further subscriptions to the returned observable never re-send the request.
+   * If the type is locked, dispatch is silently skipped.
+   *
    * @param {PostboyCallbackMessage<T>} message - The message object used to trigger the callback.
    * It contains details about the event and result subscription.
    * @param {(e: T) => void} [action] - Optional callback function to execute when the result of the message is emitted.
-   * @return {void} This method does not return any value.
+   * @return {Observable<T>} An observable emitting the result values produced by the responder.
    */
   public fireCallback<T>(message: PostboyCallbackMessage<T>, action?: (e: T) => void): Observable<T> {
     this.middleware.beforeCallback(message);
@@ -93,10 +104,12 @@ export class PostboyService {
     this.store.callbackFired(message);
     const result$ = action ? message.result.pipe(tap(action)) : message.result;
     const msg = this.store.getMessage(message.id, message.constructor.name);
+    let dispatched = false;
     const observable = new Observable<T>((subscriber) => {
       const subscription = result$.pipe(tap(() => this.middleware.afterCallback(message))).subscribe(subscriber);
 
-      if (!this.locked.has(message.id)) {
+      if (!dispatched && !this.locked.has(message.id)) {
+        dispatched = true;
         msg.fire(message);
       }
 

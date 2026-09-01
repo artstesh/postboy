@@ -3,6 +3,7 @@ import { TestAssertions } from '../../shared/harness/assertions';
 import { waitFor, waitForValue } from '../../shared/utils/async';
 import { toArray } from '../../shared/utils/observables';
 import { MessageFixture } from '../../shared/fixtures/message.fixture';
+import { TestCallbackMessage } from '../../shared/models/test-callback-message';
 
 describe('Integration.Callbacks.Fire', () => {
   it('should fire callback message and emit result value', async () => {
@@ -82,5 +83,42 @@ describe('Integration.Callbacks.Fire', () => {
     await waitFor(() => !completed);
 
     expect(completed).toBe(false);
+  });
+
+  it('should not re-dispatch when the returned observable is subscribed again', () => {
+    const scenario = new ScenarioBuilder().useCallback().subjectRegistry();
+    const postboy = scenario.getWorld().getPostboy();
+    const message: TestCallbackMessage = scenario.getMessage();
+    const requests: string[] = [];
+
+    postboy.sub(message.type).subscribe((m) => {
+      m.finish('ok');
+      requests.push('responded');
+    });
+
+    const observable = postboy.fireCallback(message);
+    const received: string[] = [];
+    observable.subscribe((value: string) => received.push(value));
+    observable.subscribe();
+
+    expect(requests).toHaveLength(1);
+    TestAssertions.receivedOne(received, 'ok');
+  });
+
+  it('should dispatch only once when action is combined with a subscription to the returned observable', () => {
+    const scenario = new ScenarioBuilder().useCallback().subjectRegistry();
+    const postboy = scenario.getWorld().getPostboy();
+    const message: TestCallbackMessage = scenario.getMessage();
+    const requests: string[] = [];
+
+    postboy.sub(message.type).subscribe((m) => {
+      m.finish('done');
+      requests.push('responded');
+    });
+
+    const observable = postboy.fireCallback(message, () => undefined);
+    observable.subscribe();
+
+    expect(requests).toHaveLength(1);
   });
 });

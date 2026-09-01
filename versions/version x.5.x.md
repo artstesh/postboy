@@ -107,3 +107,17 @@ If you use custom middleware, you will need to update it to the new middleware c
 
 - Documentation was updated to reflect the new model.
 - Tests were added/updated to cover the new middleware behavior.
+
+## Patch 3.5.3
+
+`PostboyService.fireCallback` now dispatches the message **at most once per call**, matching the documented contract:
+
+- with `action`, the eager internal subscription dispatches the message immediately, and `action` is invoked once per emitted result value;
+- without `action`, the first subscription to the returned observable dispatches the message;
+- further subscriptions to the returned observable never re-send the request.
+
+Previously, every subscription re-fired the message. Code that combined `action` with a subscription to the returned observable — or subscribed to it more than once (for example, two `async` pipes over the same observable) — sent duplicate requests to the responder, and the duplicate response was silently lost, because the message's `result` completes after the first `finish`.
+
+Locked types keep their no-op semantics: a dispatch skipped by a lock does not consume the single dispatch attempt.
+
+Regression tests were added to the callback fire integration suite; the at-most-once contract is now stated explicitly in the `fireCallback` TSDoc, `AI_SKILL.md`, and the FAQ API reference.

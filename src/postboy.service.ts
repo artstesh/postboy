@@ -134,6 +134,9 @@ export class PostboyService {
    * - without `action`, dispatch is lazy: it happens on the first subscription to the
    *   returned observable.
    *
+   * In both modes the message is dispatched at most once per `fireCallback` call:
+   * further subscriptions to the returned observable never re-send the request.
+   *
    * `Callback`-stage middleware `before` hooks run at call time; `after` hooks run on
    * every emitted result value. If the type is locked, dispatch is silently skipped.
    * The result observable completes when the message type is disconnected
@@ -159,10 +162,12 @@ export class PostboyService {
     this.store.callbackFired(message);
     if (action) message.result.subscribe(action);
     const msg = this.store.getMessage(message.id, message.constructor.name);
+    let dispatched = false;
     const observable = new Observable<T>((subscriber) => {
       const subscription = message.result.pipe(tap(() => this.middleware.afterCallback(message))).subscribe(subscriber);
 
-      if (!this.locked.has(message.id)) {
+      if (!dispatched && !this.locked.has(message.id)) {
+        dispatched = true;
         msg.fire(message);
       }
 

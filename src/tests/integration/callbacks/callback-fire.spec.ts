@@ -137,6 +137,45 @@ describe('Integration.Callbacks.Fire', () => {
     TestAssertions.receivedOne(received, 'ok');
   });
 
+  it('should not re-dispatch when the returned observable is subscribed again', () => {
+    const scenario = new ScenarioBuilder().useCallback().subjectRegistry();
+    const postboy = scenario.getWorld().getPostboy();
+    const message: TestCallbackMessage = scenario.getMessage();
+    const requests: string[] = [];
+
+    postboy.sub(message.type).subscribe((m) => {
+      m.finish('ok');
+      requests.push('responded');
+    });
+
+    const observable = postboy.fireCallback(message);
+    const received: string[] = [];
+    observable.subscribe((value: string) => received.push(value));
+    observable.subscribe();
+
+    expect(requests).toHaveLength(1);
+    TestAssertions.receivedOne(received, 'ok');
+  });
+
+  it('should dispatch only once when action is combined with a subscription to the returned observable', () => {
+    const scenario = new ScenarioBuilder().useCallback().subjectRegistry();
+    const postboy = scenario.getWorld().getPostboy();
+    const message: TestCallbackMessage = scenario.getMessage();
+    const requests: string[] = [];
+
+    postboy.sub(message.type).subscribe((m) => {
+      m.finish('done');
+      requests.push('responded');
+    });
+
+    const action = jest.fn();
+    const observable = postboy.fireCallback(message, action);
+    observable.subscribe();
+
+    expect(requests).toHaveLength(1);
+    expect(action).toHaveBeenCalledTimes(1);
+  });
+
   it('should call after middleware hook on each result emission', () => {
     const afterSpy = jest.fn();
     const scenario = new ScenarioBuilder().useCallback().subjectRegistry();

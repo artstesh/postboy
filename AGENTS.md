@@ -6,7 +6,7 @@ System context and instructions for the agent working with this repository.
 
 ## 1. 🎯 PROJECT OVERVIEW
 
-**@artstesh/postboy** — a lightweight, typed message bus library for TypeScript/RxJS, built around a "postal service" metaphor (messages, subscriptions, middleware "customs officers", registrators). Published to npm as `@artstesh/postboy` (current branch `v3`, version 3.5.0). The audience is Angular/TS developers who need communication between components and services without direct dependencies. The library itself is framework-independent: the only peer dependency is `rxjs` (^7); Angular is not used at all.
+**@artstesh/postboy** — a lightweight, typed message bus library for TypeScript/RxJS, built around a "postal service" metaphor (messages, subscriptions, middleware "customs officers", registrators). Published to npm as `@artstesh/postboy` (current branch `master`, version 3.5.3). The audience is Angular/TS developers who need communication between components and services without direct dependencies. The library itself is framework-independent: the only peer dependency is `rxjs` (^7); Angular is not used at all.
 
 Key features:
 - Typed messages with a mandatory static `ID`.
@@ -54,7 +54,38 @@ AI_SKILL.md   # AI-agent context document for library CONSUMERS (shipped in the 
 
 Interaction logic: layered and unidirectional. `PostboyService` is a facade; it delegates to internal services (`PostboyMessageStore`, `PostboyMiddlewareService`, `PostboyNamespaceStore`) assembled via `PostboyDependencyResolver`. User code: create a message → `fire()`/`fireCallback()` → middleware pipeline (staged before/after hooks, may throw `CancelError` on interrupt) → subscription Subject; or an executor → `exec()` → registered handler. All bus mutations go through the infrastructure messages in `messages/` (`registerInfrastructureMessages()` in `postboy.service.ts`).
 
-## 3. 📜 CODING GUIDELINES & RULES
+## 3. 🌿 VERSION LINES AND BRANCHES
+
+Two published lines are maintained in parallel; every change is ported between them (see the
+sync flow below).
+
+| Branch   | Line | Role                                                                        |
+|----------|------|-----------------------------------------------------------------------------|
+| `master` | 3.x  | **Primary working line** (v3). All changes land here first; also the release branch for `latest`. |
+| `v1`     | 1.x  | Legacy line; receives a port of every master change that applies to it.     |
+| `v2`, `v3`, `v3_3`, `v3_4`, `3_5`, `middleware`, `esm`, `config` | — | Historical/side branches; do not use for new work. |
+
+### Sync flow (master → v1)
+
+1. Author and merge the change on `master`; the checks from §5 must pass there.
+2. Port it to `v1` in the same wave: `git checkout v1 && git cherry-pick -x <sha>` — the `-x`
+   trailer keeps the traceability link back to the master commit. Adapt the code where the v1
+   API surface requires it.
+3. The checks must pass on `v1` too; a port may not skip specs.
+4. A change is only **done** when it lives on both lines — or is recorded in `../backlog/`
+   as master-only with the reason (e.g. it relies on v3-only API such as the staged
+   middleware pipeline or message-driven registration).
+
+Hard rules:
+
+- The lines have diverged: never merge `v1` into `master` or back — port with `cherry-pick` only.
+- Never mix changes for different lines in one commit/PR.
+- Releases are independent per line (`3.x` from `master`, `1.x` from `v1`, both published to npm).
+- The v1 line publishes with the npm dist-tag `v1-latest` (see §5) — `latest` always points at 3.x.
+- Documentation (`../postboy-faq`) describes the v3 line; v1-only deviations are covered by the
+  Versions articles. Don't touch docs for changes that live only on `v1`.
+
+## 4. 📜 CODING GUIDELINES & RULES
 
 **Naming:**
 - Files: kebab-case with a dot-separated role suffix — `postboy.service.ts`, `connect-executor.executor.ts`, `postboy-middleware.ts`; interfaces get the `i-` prefix. Specs are `*.spec.ts`; integration specs get the `int-` prefix.
@@ -74,7 +105,7 @@ Interaction logic: layered and unidirectional. `PostboyService` is a facade; it 
 - Do not swallow errors silently; invalid operations (e.g., a message without an ID) must be checked explicitly (`checkId`) with predictable outcomes. Middleware cancellation surfaces as a `CancelError` with `CancelDetails`.
 - There is no logging as such (it's a library) — do not introduce console calls in runtime code.
 
-## 4. 🤖 AGENT WORKFLOW PROTOCOL
+## 5. 🤖 AGENT WORKFLOW PROTOCOL
 
 1. **Plan before code.** Before making changes, produce a step-by-step plan and get the user's approval (checkout). Especially for public API changes — this is a published npm package.
 2. **Verify before finishing.** Before completing a task, always run:
@@ -85,3 +116,5 @@ Interaction logic: layered and unidirectional. `PostboyService` is a facade; it 
 3. **Iterate.** Changes are made in small atomic commits following the existing history style; every commit keeps the tests green.
 4. **Formatting.** Before committing, run `npm run format` (prettier) for the touched `src/**/*.ts` files.
 5. **Versioning/publishing** — only on the user's explicit request (the `preversion`/`postversion` npm scripts push tags automatically — never run `npm version` unprompted). The publishing gate is `prepublishOnly`: lint → typecheck → test → build → `pack:check` (`npm pack --dry-run`, which also verifies that `AI_SKILL.md` ships in the package).
+
+   Releasing uses `../release.bat` from the workspace root (run `../release.bat setup` once per machine; `../release.bat check [v3|v1|both]` before a release). `release.bat <v3|v1|both> <patch|minor|major>` runs the whole flow per line: preflights (clean tree, branch up to date, ssh key in the agent, valid npm token) → `npm version` (hooks: lint, typecheck, tests, tag, push) → `npm publish --access public` (runs the full publishing gate via `prepublishOnly`). The v3 line is released from `master` (no mirror step — `master` **is** the v3 line); the v1 line is released from `v1` with `--tag v1-latest`: npm refuses to move `latest` onto a version lower than the current one, so `latest` stays on 3.x and the legacy line is installed via `@artstesh/postboy@v1-latest` or a `^1` semver range.

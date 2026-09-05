@@ -82,7 +82,7 @@ export class PostboyService {
   /**
    * Triggers a callback function associated with a given message.
    *
- * Dispatch semantics depend on `action`:
+   * Dispatch semantics depend on `action`:
    * - with `action`, the message is dispatched immediately and `action` is invoked
    *   per emitted result value, independently of any subscriptions to the returned
    *   observable;

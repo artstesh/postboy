@@ -211,7 +211,8 @@ export class PostboyService {
 
   /**
    * Disposes of resources and cleans up any internal components or stores associated with the instance.
-   * This method ensures that all resources are properly released to avoid memory leaks.
+   * This method ensures that all resources are properly released to avoid memory leaks,
+   * including releasing all locked ids.
    *
    * @return {void} This method does not return a value.
    */
@@ -219,5 +220,6 @@ export class PostboyService {
     this.namespaceStore?.dispose();
     this.store.dispose();
     this.middleware.dispose();
+    this.locked.clear();
   }
 }

@@ -47,7 +47,7 @@ class PostboyService {
   sub<T extends PostboyGenericMessage>(type: MessageType<T>): Observable<T>
   once<T extends PostboyGenericMessage>(type: MessageType<T>): Observable<T>   // = sub(type).pipe(first())
   exec<T>(executor: PostboyExecutor<T>): T                       // synchronous; throws if executor not registered or cancelled
-  dispose(): void                                                // disposes namespaces, store, middleware
+  dispose(): void                                                // disposes namespaces, store, middleware; releases all locked ids
 
   // Bus mutations — @deprecated since v3; use exec(new XxxMessage(...)) equivalents below
   record<T>(type: MessageType<T>, sub: Subject<T>): void

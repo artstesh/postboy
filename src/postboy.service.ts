@@ -290,7 +290,7 @@ export class PostboyService {
   /**
    * Tears down the whole bus: calls `down()` on every namespace registrator (completing
    * everything they registered), completes all remaining message subscriptions and
-   * callback results, and disposes every middleware.
+   * callback results, disposes every middleware, and releases all locked ids.
    *
    * Infrastructure registrations are re-created only by constructing a new service.
    */
@@ -298,5 +298,6 @@ export class PostboyService {
     this.namespaceStore?.dispose();
     this.store.dispose();
     this.middleware.dispose();
+    this.locked.clear();
   }
 }

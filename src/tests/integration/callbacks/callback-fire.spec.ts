@@ -85,6 +85,37 @@ describe('Integration.Callbacks.Fire', () => {
     expect(completed).toBe(false);
   });
 
+  it('should invoke action exactly once per emitted value', () => {
+    const scenario = new ScenarioBuilder().useCallback().subjectRegistry();
+    const postboy = scenario.getWorld().getPostboy();
+    const message = scenario.getMessage();
+
+    const action = jest.fn();
+    postboy.fireCallback(message, action);
+
+    message.next('first');
+    message.next('second');
+    message.finish('done');
+
+    expect(action).toHaveBeenCalledTimes(3);
+    expect(action.mock.calls.map((call) => call[0])).toEqual(['first', 'second', 'done']);
+  });
+
+  it('should invoke action once even when the returned observable is also subscribed', () => {
+    const scenario = new ScenarioBuilder().useCallback().subjectRegistry();
+    const postboy = scenario.getWorld().getPostboy();
+    const message = scenario.getMessage();
+    const received: string[] = [];
+
+    const action = jest.fn();
+    const observable = postboy.fireCallback(message, action);
+    observable.subscribe((value: string) => received.push(value));
+    message.finish('done');
+
+    expect(action).toHaveBeenCalledTimes(1);
+    TestAssertions.receivedOne(received, 'done');
+  });
+
   it('should not re-dispatch when the returned observable is subscribed again', () => {
     const scenario = new ScenarioBuilder().useCallback().subjectRegistry();
     const postboy = scenario.getWorld().getPostboy();

@@ -102,11 +102,10 @@ export class PostboyService {
     this.middleware.beforeCallback(message);
     if (action) message.result.subscribe(action);
     this.store.callbackFired(message);
-    const result$ = action ? message.result.pipe(tap(action)) : message.result;
     const msg = this.store.getMessage(message.id, message.constructor.name);
     let dispatched = false;
     const observable = new Observable<T>((subscriber) => {
-      const subscription = result$.pipe(tap(() => this.middleware.afterCallback(message))).subscribe(subscriber);
+      const subscription = message.result.pipe(tap(() => this.middleware.afterCallback(message))).subscribe(subscriber);
 
       if (!dispatched && !this.locked.has(message.id)) {
         dispatched = true;

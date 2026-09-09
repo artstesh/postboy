@@ -48,7 +48,9 @@ src/
     └── integration/                # grouped by topic: callbacks/ executors/ messages/
                                     #   middleware/ namespaces/ layers/ scenarios/
 lib/          # tsup build output (published to npm)
-versions/     # release notes per version ("version 3.3.0.md", "version x.4.x.md", "version x.5.x.md")
+docs/         # user-facing docs in the repo:
+              #   releases/ — release notes per version ("3.3.0.md", "3.4.x.md", "3.5.x.md")
+              #   migration/ — upgrade guides between breaking lines ("3-4-to-3-5.md", ...)
 AI_SKILL.md   # AI-agent context document for library CONSUMERS (shipped in the npm package)
 ```
 

@@ -40,3 +40,10 @@ Imagine Postboy as your app’s postal service. Here’s how it works:
 
 ### Why Does It Work?
 Over the past five years, I’ve built dozens of enterprise apps. One recurring issue? Logic fragmentation. Components communicate via `@Output()` chains and services until a single button change breaks three screens. Postboy offers an alternative: a centralized yet unobtrusive event bus that doesn’t demand architectural overhauls.
+
+---
+
+## Documentation
+- Full documentation — concepts, cookbook, and API reference: **[postboy.artstesh.ru](https://postboy.artstesh.ru)**
+- Release notes: [`docs/releases/`](docs/releases/)
+- Migration guides (including the breaking 3.4 → 3.5): [`docs/migration/`](docs/migration/)

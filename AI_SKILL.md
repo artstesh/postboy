@@ -31,7 +31,7 @@ import { PostboyService, PostboyGenericMessage, PostboyCallbackMessage, PostboyE
 const { PostboyService } = require('@artstesh/postboy');
 ```
 
-Everything below is exported from the package root: `PostboyService`, `PostboyAbstractRegistrator`, `MessageType`, `IPostboyDependingService`, `PostboyMessage`, `PostboyGenericMessage`, `PostboyCallbackMessage`, `PostboyExecutor`, `PostboyExecutionHandler`, `PostboyMiddleware`, `PostboySubscription`, `PostboyMessageMetadata`, `PostboyMessageContext`, `PostboyMiddlewareService`, `PostboyMessageStore`, `PostboyNamespaceStore`, the pipeline types (`MiddlewareStage`, `MiddlewareDecision`, `MiddlewareDecisionType`, `PipelineContext`, `PipelineResult`, `CancelDetails`, `CancelError`), and the infrastructure messages `AddMiddleware`, `RemoveMiddleware`, `AddNamespace`, `EliminateNamespace`, `ConnectMessage`, `ConnectExecutor`, `ConnectHandler`, `DisconnectMessage`, `LockMessage`, `UnlockMessage`.
+Everything below is exported from the package root: `PostboyService`, `PostboyAbstractRegistrator`, `MessageType`, `IPostboyDependingService`, `PostboyMessage`, `PostboyGenericMessage`, `PostboyCallbackMessage`, `PostboyExecutor`, `PostboyExecutionHandler`, `PostboyMiddleware`, `PostboySubscription`, `PostboyMessageMetadata`, `PostboyMessageContext`, `PostboyMiddlewareService`, `PostboyMessageStore`, `PostboyNamespaceStore`, the pipeline types (`MiddlewareStage`, `MiddlewareDecision`, `MiddlewareDecisionType`, `PipelineContext`, `PipelineResult`, `CancelDetails`), the error types (`PostboyError`, `CancelError`, `NoRegisteredMessageError`, `NoRegisteredExecutorError`, guards `isPostboyError()`, `isCancelError()`), and the infrastructure messages `AddMiddleware`, `RemoveMiddleware`, `AddNamespace`, `EliminateNamespace`, `ConnectMessage`, `ConnectExecutor`, `ConnectHandler`, `DisconnectMessage`, `LockMessage`, `UnlockMessage`.
 
 ## 2. 🛠️ CORE API REFERENCE
 
@@ -42,11 +42,11 @@ class PostboyService {
   constructor(resolver?: PostboyDependencyResolver) // omit in app code
 
   // Messaging
-  fire(message: PostboyGenericMessage): void                    // throws CancelError if middleware interrupts; throws if type not registered
-  fireCallback<T>(message: PostboyCallbackMessage<T>, action?: (e: T) => void): Observable<T> // action is invoked exactly once per emitted value; without action the dispatch is lazy (see §4)
+  fire(message: PostboyGenericMessage): void                    // throws CancelError if middleware interrupts; throws NoRegisteredMessageError if type not registered
+  fireCallback<T>(message: PostboyCallbackMessage<T>, action?: (e: T) => void): Observable<T> // action is invoked exactly once per emitted value; without action the dispatch is lazy (see §4); throws NoRegisteredMessageError synchronously if type not registered
   sub<T extends PostboyGenericMessage>(type: MessageType<T>): Observable<T>
-  once<T extends PostboyGenericMessage>(type: MessageType<T>): Observable<T>   // = sub(type).pipe(first())
-  exec<T>(executor: PostboyExecutor<T>): T                       // synchronous; throws if executor not registered or cancelled
+  once<T extends PostboyGenericMessage>(type: MessageType<T>): Observable<T>   // = sub(type).pipe(first()); both throw NoRegisteredMessageError if type not registered
+  exec<T>(executor: PostboyExecutor<T>): T                       // synchronous; throws NoRegisteredExecutorError if executor not registered, CancelError if cancelled
   dispose(): void                                                // disposes namespaces, store, middleware; releases all locked ids
 
   // Bus mutations — @deprecated since v3; use exec(new XxxMessage(...)) equivalents below
@@ -92,10 +92,27 @@ abstract class PostboyMiddleware {
   dispose(): void                                         // called on removal / bus dispose
 }
 
-class CancelError extends Error {                         // thrown when a middleware interrupts
+class PostboyError extends Error {                        // base class of all library errors; name = 'PostboyError'
+}
+
+class CancelError extends PostboyError {                  // thrown when a middleware interrupts
   readonly details: CancelDetails;                        // { stage, middleware, messageId, namespace?, reason? }
   name = 'PostboyCancelError';
 }
+
+class NoRegisteredMessageError extends PostboyError {     // thrown by fire/fireCallback/sub/once for an unregistered message type
+  readonly id: string;                                    // the static `ID` looked up
+  readonly typeName: string;                              // the message class name
+  name = 'PostboyNoRegisteredMessageError';
+}
+
+class NoRegisteredExecutorError extends PostboyError {    // thrown by exec for an unregistered executor type
+  readonly id: string;                                    // the static `ID` looked up
+  name = 'PostboyNoRegisteredExecutorError';
+}
+
+function isPostboyError(error: unknown): error is PostboyError;  // true for every error above
+function isCancelError(error: unknown): error is CancelError;
 ```
 
 Key rules:
@@ -203,7 +220,7 @@ Rules of composition:
 - Prefer registrators over bare `exec(new ConnectMessage(...))` in application code — they track IDs and dispose.
 - Middleware: move validation/gating to `before` (return `Interrupt` to cancel), logging/side effects to `after`. Catch `CancelError` at call sites where cancellation is expected and check `error.details` (stage, middleware, messageId, reason).
 - `fireCallback` with no `action` argument dispatches the message **lazily** — the subject fires only when the returned Observable is subscribed. Pass `action` (or subscribe immediately) when the request must be sent right away. The request is dispatched **at most once per `fireCallback` call**: further subscriptions to the returned Observable never re-send it. When `action` IS passed, it is invoked exactly once per emitted value, no matter how many subscriptions the returned Observable has — do not add extra `subscribe(action)` calls on the result. `after` middleware hooks for the Callback stage fire on each result emission.
-- Error handling: `checkId` throws `"<ClassName> should have a static ID field"`; `fire` throws for unregistered message IDs; `exec` throws for unregistered executor IDs (TypeError calling undefined). Wrap `exec`/`fire` in try/catch at call sites where registration is not guaranteed; treat a locked message as a no-op, not an error.
+- Error handling: `checkId` throws `"<ClassName> should have a static ID field"`; `fire`/`sub`/`once`/`fireCallback` throw `NoRegisteredMessageError` and `exec` throws `NoRegisteredExecutorError` for unregistered IDs. Wrap `exec`/`fire` in try/catch at call sites where registration is not guaranteed; treat a locked message as a no-op, not an error. Catch library errors as a group via `isPostboyError(error)` or `catch (e if e instanceof PostboyError)`, and narrow to the concrete type (`CancelError`, `NoRegisteredMessageError`, `NoRegisteredExecutorError`) when the handling differs.
 
 ## 5. ⚠️ ANTI-PATTERNS & PITFALLS
 
@@ -217,7 +234,7 @@ Rules of composition:
 - `new PostboyService(someConfig)` — the optional constructor arg is a `PostboyDependencyResolver`, not settings. Construct with no arguments.
 - `PostboyMessage` without a static `ID` — `checkId` throws. `ID` must be `static readonly` on the class itself (inheriting a parent's `ID` causes ID collisions and cross-talk).
 - Mocking helper assumptions: `postboy.sub(type)` returns `Observable<T>` (not a `Subject`). Do not call `.next()` on it.
-- `isCancelError(...)` exists in sources but is not exported from the package root — use `error.name === 'PostboyCancelError'` or `error instanceof CancelError`.
+- Do not assume library errors are plain `Error`: `fire`/`sub`/`once`/`fireCallback` throw `NoRegisteredMessageError`, `exec` throws `NoRegisteredExecutorError`, interruptions throw `CancelError` — all extend `PostboyError`. Match them with the exported guards `isPostboyError`/`isCancelError` or `instanceof`; `error.name` (`'PostboyCancelError'`, `'PostboyNoRegisteredMessageError'`, `'PostboyNoRegisteredExecutorError'`) also works across bundle formats.
 
 **Hard constraints:**
 

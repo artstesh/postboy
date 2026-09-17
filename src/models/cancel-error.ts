@@ -1,15 +1,17 @@
 import { CancelDetails } from './cancel-details';
 import { MiddlewareStage } from './middleware-stage.enum';
+import { PostboyError } from './postboy-error';
 
 /**
  * The error thrown when a middleware interrupts an operation by returning an interrupt
  * decision from its `before` hook — the operation does not run.
  *
  * Thrown by `PostboyService.fire`, `fireCallback`, and `exec`. Distinguish it from other
- * errors via `error.name === 'PostboyCancelError'` or `error instanceof CancelError`,
- * then inspect {@link details} to find the cancelling middleware and stage.
+ * errors via `error.name === 'PostboyCancelError'`, `error instanceof CancelError`, or the
+ * {@link isCancelError} guard, then inspect {@link details} to find the cancelling middleware
+ * and stage. It is a {@link PostboyError}, so the broader guard recognizes it too.
  */
-export class CancelError extends Error {
+export class CancelError extends PostboyError {
   /** Structured information about the cancellation. */
   public readonly details: CancelDetails;
 

@@ -111,7 +111,7 @@ export class PostboyService {
    *
    * @param message - The message instance to publish.
    * @throws CancelError When a `Publish`-stage middleware returns an interrupt decision.
-   * @throws Error When no message of this type is registered; the `after` hooks are then skipped.
+   * @throws NoRegisteredMessageError When no message of this type is registered; the `after` hooks are then skipped.
    */
   public fire(message: PostboyGenericMessage): void {
     this.middleware.beforePublish(message);
@@ -146,7 +146,7 @@ export class PostboyService {
    * @param action - Optional callback invoked once per emitted result value.
    * @return An observable emitting the result values produced by the responder.
    * @throws CancelError When a `Callback`-stage middleware returns an interrupt decision.
-   * @throws Error When no message of this type is registered; thrown synchronously, before any dispatch.
+   * @throws NoRegisteredMessageError When no message of this type is registered; thrown synchronously, before any dispatch.
    *
    * @example
    * ```ts
@@ -191,7 +191,7 @@ export class PostboyService {
    * @param executor - The executor instance carrying the command.
    * @return Whatever the registered handler returns.
    * @throws CancelError When an `Execute`-stage middleware returns an interrupt decision.
-   * @throws Error When no handler is registered for this executor type.
+   * @throws NoRegisteredExecutorError When no handler is registered for this executor type.
    */
   public exec<T>(executor: PostboyExecutor<T>): T {
     this.middleware.beforeExecute(executor);
@@ -210,7 +210,8 @@ export class PostboyService {
    * replay or behavior subject.
    *
    * @param type - The constructor of the message type; must declare its own static `ID`.
-   * @throws Error When the class has no static `ID` or no message of this type is registered.
+   * @throws Error When the class has no static `ID`.
+   * @throws NoRegisteredMessageError When no message of this type is registered.
    */
   public sub<T extends PostboyGenericMessage>(type: MessageType<T>): Observable<T> {
     return this.store.getMessage(checkId(type), type.name).sub();
@@ -221,7 +222,8 @@ export class PostboyService {
    *
    * @param type - The constructor of the message type; must declare its own static `ID`.
    * @return An observable that emits one message and then completes.
-   * @throws Error When the class has no static `ID` or no message of this type is registered.
+   * @throws Error When the class has no static `ID`.
+   * @throws NoRegisteredMessageError When no message of this type is registered.
    */
   public once<T extends PostboyGenericMessage>(type: MessageType<T>): Observable<T> {
     return this.sub(type).pipe(first());

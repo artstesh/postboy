@@ -1,6 +1,8 @@
 import { PostboySubscription } from '../models/postboy-subscription';
 import { PostboyExecutor } from '../models/postboy-executor';
 import { PostboyCallbackMessage } from '../models/postboy-callback.message';
+import { NoRegisteredExecutorError } from '../models/no-registered-executor-error';
+import { NoRegisteredMessageError } from '../models/no-registered-message-error';
 
 /**
  * The registry behind the bus: message subscriptions and executor handlers keyed by
@@ -43,21 +45,21 @@ export class PostboyMessageStore {
   /**
    * @param id - The static `ID` the subscription was registered under.
    * @param name - Used only in the error message.
-   * @throws Error When no message is registered under the id.
+   * @throws NoRegisteredMessageError When no message is registered under the id.
    */
   public getMessage(id: string, name: string): PostboySubscription<any> {
     const msg = this.messages.get(id);
-    if (!msg) throw new Error(`There is no registered event ${name}`);
+    if (!msg) throw new NoRegisteredMessageError(id, name);
     return msg;
   }
 
   /**
    * @param id - The static `ID` the handler was registered under.
-   * @throws Error When no executor is registered under the id.
+   * @throws NoRegisteredExecutorError When no executor is registered under the id.
    */
   public getExecutor<T>(id: string): (e: PostboyExecutor<T>) => T {
     const executorFunction = this.executors.get(id);
-    if (!executorFunction) throw new Error(`There is no registered executor with id ${id}`);
+    if (!executorFunction) throw new NoRegisteredExecutorError(id);
     return executorFunction;
   }
 

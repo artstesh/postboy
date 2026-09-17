@@ -69,7 +69,7 @@ export class PostboyService {
    *
    * @param {PostboyGenericMessage} message - The message object containing the event data.
    * @return {void} This method does not return a value.
-   * @throws {Error} Throws an error if no registered event is found for the provided message ID.
+   * @throws {NoRegisteredMessageError} Throws an error if no registered event is found for the provided message ID.
    */
   public fire(message: PostboyGenericMessage): void {
     this.middleware.beforePublish(message);
@@ -123,7 +123,7 @@ export class PostboyService {
    *
    * @param {PostboyExecutor<T>} executor The executor to be executed, which includes its identifier and logic.
    * @return {T} The resulting output from the executed executor function.
-   * @throws {Error} If the specified executor is not registered.
+   * @throws {NoRegisteredExecutorError} If the specified executor is not registered.
    */
   public exec<T>(executor: PostboyExecutor<T>): T {
     this.middleware.beforeExecute(executor);

@@ -1,7 +1,10 @@
 export { MiddlewareDecisionType } from './middleware-decision.enum';
 export { MiddlewareDecision } from './middleware-decision';
 export { CancelDetails } from './cancel-details';
-export { CancelError } from './cancel-error';
+export { CancelError, isCancelError } from './cancel-error';
+export { PostboyError, isPostboyError } from './postboy-error';
+export { NoRegisteredMessageError } from './no-registered-message-error';
+export { NoRegisteredExecutorError } from './no-registered-executor-error';
 export { MiddlewareStage } from './middleware-stage.enum';
 export { PipelineContext } from './pipeline-context';
 export { PipelineResult } from './pipeline-result';

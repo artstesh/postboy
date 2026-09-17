@@ -1,7 +1,8 @@
 import { CancelDetails } from './cancel-details';
 import { MiddlewareStage } from './middleware-stage.enum';
+import { PostboyError } from './postboy-error';
 
-export class CancelError extends Error {
+export class CancelError extends PostboyError {
   public readonly details: CancelDetails;
 
   constructor(details: CancelDetails) {
